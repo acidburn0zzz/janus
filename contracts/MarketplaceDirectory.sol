@@ -26,16 +26,16 @@ contract MarketplaceDirectory {
         _;
     }
     
-    function marketplaceDirectory() {
+    function MarketplaceDirectory() public {
         consortiumAddress = msg.sender;
         participantName[msg.sender] = consortiumNameHash;
     }
     
-    function callerName() returns (bytes32) {
+    function callerName() public constant returns (bytes32) {
         return participantName[msg.sender];
     }
     
-    function participant(string pName) returns (bytes32 parent, uint effDate, uint termDate, string name, address walletAddress) {
+    function participant(string pName) public constant returns (bytes32 parent, uint effDate, uint termDate, string name, address walletAddress) {
         var p = participants[keccak256(pName)];
         return (p.parent, p.effDate, p.termDate, p.name, p.walletAddress);
     }
@@ -43,7 +43,7 @@ contract MarketplaceDirectory {
     //TODO remove old address
     //TODO avoid name collision by creating hierarchy of name
     //TODO support multiple entries for a participant under different companies
-    function updateParticipant(uint pEffDate, uint pTermDate, string pName, address pWalletAddress) onlyParent(pName) {
+    function updateParticipant(uint pEffDate, uint pTermDate, string pName, address pWalletAddress) public onlyParent(pName) {
         bytes32 parent = callerName();
         participantName[pWalletAddress] = keccak256(pName);
         participants[keccak256(pName)] = Participant(
