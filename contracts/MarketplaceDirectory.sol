@@ -40,13 +40,27 @@ contract MarketplaceDirectory {
         return (p.parent, p.effDate, p.termDate, p.name, p.walletAddress);
     }
     
-    //TODO remove old address
-    //TODO avoid name collision by creating hierarchy of name
-    //TODO support multiple entries for a participant under different companies
     function updateParticipant(uint pEffDate, uint pTermDate, string pName, address pWalletAddress) public onlyParent(pName) {
-        bytes32 parent = callerName();
-        participantName[pWalletAddress] = keccak256(pName);
-        participants[keccak256(pName)] = Participant(
+        require(pEffDate > 0);
+        require(pTermDate > 0);
+        require(pWalletAddress != 0);
+
+        // TODO support multiple entries for a participant under different companies
+        // TODO avoid name collision by creating hierarchy of name
+        var parent = callerName();
+        var name = keccak256(pName);
+
+        var oldAddress = participants[name].walletAddress;
+        if (address(oldAddress) != 0) { 
+            delete participantName[pWalletAddress];
+        }
+
+        participantName[pWalletAddress] = name;
+        participants[name] = Participant(
             {parent: parent, effDate: pEffDate, termDate: pTermDate, name: pName, walletAddress: pWalletAddress});
+
+        ParticipantUpdated(name, pName, pEffDate, pTermDate);
     } 
+
+    event ParticipantUpdated(bytes32 indexed namehash, string name, uint effDate, uint termDate);
 }
