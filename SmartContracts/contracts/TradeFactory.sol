@@ -3,8 +3,9 @@ pragma solidity ^0.4.17;
 import "./TradeProxy.sol";
 import "./TradeInterface.sol";
 import "./GovernedSmartContractFactory.sol";
+import "./FactoryInterface.sol";
 
-contract TradeFactory is GovernedSmartContractFactory {
+contract TradeFactory is GovernedSmartContractFactory, FactoryInterface {
     function nextTradeNumber() view public returns (uint) {
         return nextTokenNumber;
     }
@@ -18,10 +19,10 @@ contract TradeFactory is GovernedSmartContractFactory {
         nextTokenNumber = 1001;
     }
     
-    function CreateTrade() onlyOracle returns (uint)  {
+    function CreateTransaction(string pGuid) onlyOracle returns (uint)  {
         var tradeProxy = address(new TradeProxy());
         var tradeNumber = buyToken();
-        TradeInterface(tradeProxy).initialize(this, oracleAddress, tradeNumber);
+        TradeInterface(tradeProxy).initialize(this, pGuid, oracleAddress, tradeNumber);
         contracts[tradeNumber] = tradeProxy;
         TradeCreated(tradeNumber);
         return tradeNumber;
@@ -39,4 +40,3 @@ contract TradeFactory is GovernedSmartContractFactory {
     event TradeFieldUpdated(uint indexed tradeNumber);
     event TradePartyUpdated(uint indexed tradeNumber, uint partyType, address partyAddress);
 }
-

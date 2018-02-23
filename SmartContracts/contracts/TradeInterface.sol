@@ -4,13 +4,14 @@ import "./TradeFactory.sol";
 
 contract TradeInterface {
 
-    enum Party { Unassigned, Buyer, Seller}
-    enum Field { unassigned, tradeDate, product, qty, price, buyer, seller}
+    enum Party { Unassigned, Buyer, Seller, Broker}
+    enum Field { unassigned, tradeDate, product, qty, price, buyer, seller, paymentTerm}
 
-    function initialize(TradeFactory pFactory, address pOracleAddress, uint pTradeNumber);
-    function updateData(string symmetricKey, string pTradeDate, string pProduct, 
+    function initialize(TradeFactory pFactory, string pGuid, address pOracleAddress, uint pTradeNumber);
+    function updateData(bytes32 pCommonFieldsSymKeyHash, string pTradeDate, string pProduct, 
             string pQty, string pPrice, string pBuyer, string pSeller);
-    function updateParty(Party partyType, address partyAddress, string companyName, string accessibleSymKey);
-    function accept(string symmetricKey, string signerKey);
-    function cancel(string symmetricKey);
+    function updatePaymentInfo(bytes32 pPaymentFieldsSymKeyHash, string pPaymentTerm);
+    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pCommonFieldsSymKey, string pPaymentFieldsSymKey);
+    function accept(bytes32 symmetricKeyHash, string signerKey);
+    function cancel(bytes32 symmetricKeyHash);
 }

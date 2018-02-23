@@ -30,12 +30,14 @@ contract AnonymizedEncryptedSmartContract {
     
     //symmetric key -> List of fields it has access to
     mapping(bytes32=>uint8[]) public accessibleFieldsBySymKey;
+    
+    string public guid;
 
-    modifier onlyByPartiesToTheTransaction(string symmetricKey) {
+    modifier onlyByPartiesToTheTransaction(bytes32 symmetricKeyHash) {
         string[] accessibleKeys = accessibleSymmetricKeysByUser[msg.sender];
         bool hasAccess = false;
         for(uint i=0;i<accessibleKeys.length;i++) {
-            if(keccak256(symmetricKey) == keccak256(accessibleKeys[i])) {
+            if(symmetricKeyHash == keccak256(accessibleKeys[i])) {
                 hasAccess = true;
                 break;
             }
@@ -75,16 +77,16 @@ contract AnonymizedEncryptedSmartContract {
         accessibleSymmetricKeysByUser[partyAddress].push(accessibleSymKey);
     }
     
-    function grantFieldAccessToSymmetricKey(string accessibleSymKey, uint8[] fieldEnumIndices) internal  {
+    function grantFieldAccessToSymmetricKey(string accessibleSymKey, uint8[] fieldEnumIndices) internal {
         if(accessibleFieldsBySymKey[keccak256(accessibleSymKey)].length < (fieldEnumIndices.length - 1)) {
             for(uint i=1;i< fieldEnumIndices.length;i++)
                 accessibleFieldsBySymKey[keccak256(accessibleSymKey)].push(fieldEnumIndices[i]);
         }
     }
     
-    function acceptInternal(string symmetricKey, string signerKey) onlyByPartiesToTheTransaction(symmetricKey) {
-        signatures[keccak256(symmetricKey)][msg.sender] = now;
-        signer[keccak256(symmetricKey)][msg.sender] = signerKey;
+    function acceptInternal(bytes32 symmetricKeyHash, string signerKey) onlyByPartiesToTheTransaction(symmetricKeyHash) {
+        signatures[symmetricKeyHash][msg.sender] = now;
+        signer[symmetricKeyHash][msg.sender] = signerKey;
     }
 
     function hasAllPartiesSigned(uint8[] requiredParties) returns (bool) {
@@ -107,3 +109,4 @@ contract AnonymizedEncryptedSmartContract {
         }
     }
 }
+

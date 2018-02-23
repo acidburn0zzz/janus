@@ -1,6 +1,8 @@
 pragma solidity ^0.4.17;
 
-contract MarketplaceDirectory {
+import "./MarketplaceDirectoryInterface.sol";
+
+contract MarketplaceDirectory is MarketplaceDirectoryInterface {
     address public consortiumAddress;
     bytes32 public consortiumNameHash = keccak256("ForceField ETRM Registry");
     
