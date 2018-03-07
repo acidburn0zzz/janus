@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 //import { } from './models';
-import { IndOracle, Party, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest} from 'indOracle';
+import { IndOracle, Party, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest} from 'ind-oracle';
 var oracle: IndOracle;
 let oraclePrivateKey = "0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
 var nodeUrl = "http://forcefield01.uksouth.cloudapp.azure.com:8545";
@@ -34,6 +34,7 @@ export class OracleService {
     var response = await oracle.createTransaction(request);
     if(response && response.status == true) {
       var contractId: number = response.contractId;
+      console.log("Created contractId", contractId);
       this.countUsage(request.message.factoryAddress, caller.companyName);
     }
     return response;

@@ -2,7 +2,7 @@ pragma solidity ^0.4.17;
 
 import "./GovernedSmartContract.sol";
 import "./TradeInterface.sol";
-import "./TradeFactory.sol";
+import "./FactoryInterface.sol";
 
 contract Trade is GovernedSmartContract, TradeInterface {
     
@@ -14,7 +14,7 @@ contract Trade is GovernedSmartContract, TradeInterface {
     uint8[] signatureRequiredParties = [uint8(Party.Buyer), uint8(Party.Seller)];
 
     uint public tradeNumber;
-    TradeFactory public tradeFactory;
+    FactoryInterface public tradeFactory;
 
 	uint public tradeIsActive;
 
@@ -24,8 +24,11 @@ contract Trade is GovernedSmartContract, TradeInterface {
 		_;
 	}
 
-    function initialize(TradeFactory pFactory, string pGuid,
-            address pOracleAddress, uint pTradeNumber) {
+    function Trade() public {
+    }
+    
+    function initialize(FactoryInterface pFactory, string pGuid,
+            address pOracleAddress, uint pTradeNumber) public {
         require(createdOn == 0);
 		guid = pGuid;
         tradeNumber = pTradeNumber;
@@ -36,24 +39,22 @@ contract Trade is GovernedSmartContract, TradeInterface {
     }
     
     function updateData(bytes32 pCommonFieldsSymKeyHash, string pTradeDate, string pProduct, 
-            string pQty, string pPrice, string pBuyer, string pSeller) onlyByPartiesToTheTransaction(pCommonFieldsSymKeyHash) onlyIfTradeIsActive { //
+            string pQty, string pPrice) public onlyByPartiesToTheTransaction(pCommonFieldsSymKeyHash) onlyIfTradeIsActive { //
         updateField(pCommonFieldsSymKeyHash, uint8(Field.tradeDate), pTradeDate);
         updateField(pCommonFieldsSymKeyHash, uint8(Field.product), pProduct);
         updateField(pCommonFieldsSymKeyHash, uint8(Field.qty), pQty);
         updateField(pCommonFieldsSymKeyHash, uint8(Field.price), pPrice);
-        updateField(pCommonFieldsSymKeyHash, uint8(Field.buyer), pBuyer);
-        updateField(pCommonFieldsSymKeyHash, uint8(Field.seller), pSeller);
         resetSignatures();
-        tradeFactory.RaiseTradeFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber);
     }
     
-    function updatePaymentInfo(bytes32 pPaymentFieldsSymKeyHash, string pPaymentTerm) onlyByPartiesToTheTransaction(pPaymentFieldsSymKeyHash) onlyIfTradeIsActive { //
+    function updatePaymentInfo(bytes32 pPaymentFieldsSymKeyHash, string pPaymentTerm) public onlyByPartiesToTheTransaction(pPaymentFieldsSymKeyHash) onlyIfTradeIsActive { //
         updateField(pPaymentFieldsSymKeyHash, uint8(Field.paymentTerm), pPaymentTerm);
         resetSignatures();
-        tradeFactory.RaiseTradeFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber);
     }
     
-    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pCommonFieldsSymKey, string pPaymentFieldsSymKey) onlyOracle onlyIfTradeIsActive {
+    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pCommonFieldsSymKey, string pPaymentFieldsSymKey) public onlyIfTradeIsActive { //onlyOracle
         assignOTAddressToParty(observerPartyIndex, partyAddress);
         if(keccak256(pCommonFieldsSymKey) != keccak256("")) {
             grantSymmetricKeyAccessToParty(partyAddress, pCommonFieldsSymKey);
@@ -64,25 +65,41 @@ contract Trade is GovernedSmartContract, TradeInterface {
             grantFieldAccessToSymmetricKey(pPaymentFieldsSymKey, PAYMENT_FIELDS);
         }
         if(observerPartyIndex == uint8(Party.Buyer)) {
-            fields[uint8(Field.buyer)].field[keccak256(Field.buyer)] = EncryptedValue({lastUpdated: now, value: companyName});
+            //fields[uint8(Field.buyer)].field[keccak256(Field.buyer)] = EncryptedValue({lastUpdated: now, value: companyName});
+            fields[uint8(Field.buyer)].value = companyName;
+            fields[uint8(Field.buyer)].lastUpdated = now;
         } else if(observerPartyIndex == uint8(Party.Seller)) {
-            fields[uint8(Field.seller)].field[keccak256(Field.seller)] = EncryptedValue({lastUpdated: now, value: companyName});
+            //fields[uint8(Field.seller)].field[keccak256(Field.seller)] = EncryptedValue({lastUpdated: now, value: companyName});
+            fields[uint8(Field.seller)].value = companyName;
+            fields[uint8(Field.seller)].lastUpdated = now;
+        } else if(observerPartyIndex == uint8(Party.Broker)) {
+            //fields[uint8(Field.broker)].field[keccak256(Field.broker)] = EncryptedValue({lastUpdated: now, value: companyName});
+            fields[uint8(Field.broker)].value = companyName;
+            fields[uint8(Field.broker)].lastUpdated = now;
         }
-        tradeFactory.RaiseTradePartyUpdated(tradeNumber, observerPartyIndex, partyAddress);
+        //tradeFactory.raiseContractPartyUpdated(tradeNumber, observerPartyIndex, partyAddress);
     }
     
-    function accept(bytes32 symmetricKeyHash, string signerKey) onlyByPartiesToTheTransaction(symmetricKeyHash) onlyIfTradeIsActive {
+    function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string) {
+        return accessibleSymmetricKeysByUser[partyAddress][symKeyIndex];
+    }
+    
+    function getGuid() view public returns (string) {
+        return guid;
+    }
+    
+    function accept(bytes32 symmetricKeyHash, string signerKey) public onlyByPartiesToTheTransaction(symmetricKeyHash) onlyIfTradeIsActive {
         acceptInternal(symmetricKeyHash, signerKey);
-        tradeFactory.RaiseTradeFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber);
     }
 
-	function cancel(bytes32 symmetricKeyHash) onlyByPartiesToTheTransaction(symmetricKeyHash) {
+	function cancel(bytes32 symmetricKeyHash) public onlyByPartiesToTheTransaction(symmetricKeyHash) {
 		
 		bool allSigned = hasAllPartiesSigned(signatureRequiredParties);
 
 		if(!allSigned){ 
 			tradeIsActive = 0;
-			tradeFactory.RaiseTradeFieldUpdated(tradeNumber);
+			tradeFactory.raiseContractFieldUpdated(tradeNumber);
 		}
 	}
     

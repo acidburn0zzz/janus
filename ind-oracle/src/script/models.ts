@@ -15,30 +15,28 @@ export class Party {
   }
 }
 
-export class TransactionData {
-  marketplaceAddress: string;
-  factoryAddress: string;
-  myParty: Party;
-  parties: Array<Party>;
-  constructor(fields: Partial<TransactionData> & {}) {
-    Object.assign(this, fields);
-  }
-}
-class TransactionRequest {    
-  message: TransactionData;
-  signature: string;
-}
-export class CreateTransactionRequest extends TransactionRequest {
-  constructor(fields: Partial<CreateTransactionRequest> & {}) {
-    super();
-    Object.assign(this, fields);
-  }
-}
-
 
 export class Response {    
   error: string;
   status: boolean;
+}
+
+
+export class TransactionData {
+  marketplaceAddress: string;
+  factoryAddress: string;
+  myParty: Party;
+  otherParty: Party;
+  constructor(fields: Partial<TransactionData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class CreateTransactionRequest {
+  message: TransactionData;
+  signature: string;
+  constructor(fields: Partial<CreateTransactionRequest> & {}) {
+    Object.assign(this, fields);
+  }
 }
 export class CreateTransactionResponse extends Response {
   contractId: number;
@@ -57,13 +55,10 @@ export class RegistrationData {
     Object.assign(this, fields);
   }
 }
-class RegistrationRequest {
+export class WalletRegistrationRequest {
   message: RegistrationData;
   signature: string;
-}
-export class WalletRegistrationRequest extends RegistrationRequest {
   constructor(fields: Partial<WalletRegistrationRequest> & {}) {
-    super();
     Object.assign(this, fields);
   }
 }
@@ -81,13 +76,10 @@ export class UnRegistrationData {
     Object.assign(this, fields);
   }
 }
-class UnRegistrationRequest {
+export class WalletUnRegistrationRequest {
   message: UnRegistrationData;
   signature: string;
-}
-export class WalletUnRegistrationRequest extends UnRegistrationRequest {
   constructor(fields: Partial<WalletUnRegistrationRequest> & {}) {
-    super();
     Object.assign(this, fields);
   }
 }
@@ -98,20 +90,29 @@ export class WalletUnRegistrationResponse extends Response {
   }
 }
 
-// export interface ICreateOTKeyRequest {
-//   address: string;
-//   signature: string;
-//   message: string;
-//   contractId: number;
-// }
 
-// export class OTKeyResponse {
-//   public message: string;
-//   public OTAddress: string;
-//   public bitcorePublicKey: string;
-//   constructor() {
-//     this.message = "OK";
-//     this.OTAddress = "0x00";
-//     this.bitcorePublicKey = "0x00";
-//   }
-// }
+export class GrantAccessData {
+  marketplaceAddress: string;
+  factoryAddress: string;
+  contractAddress: string;
+  myParty: Party;
+  parties: Array<Party>;
+  constructor(fields: Partial<TransactionData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class GrantAccessRequest {
+  message: GrantAccessData;
+  signature: string;
+  constructor(fields: Partial<GrantAccessRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class GrantAccessResponse extends Response {
+  transactionHash: Array<string>;
+  constructor(fields: Partial<GrantAccessResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+

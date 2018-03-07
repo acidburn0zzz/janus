@@ -49,12 +49,7 @@ export class IndOracle {
 	async createTransaction(request: CreateTransactionRequest) {//marketplaceAddress: string, factoryAddress: string, myParty: Party, parties: Array<Party>, signature: string) {
 		//inputs: mktplace address, factory address, [list of user info in json format], signature
 		
-
-		//TODO verify signature first
-		//Check permissions for the requestor against Marketplace Registry
-		//Get onetime key for caller
-		//Create transaction
-		
+		return this.smartContractService.createTransaction(request);
 		//returns {contractId, error, list of transaction hashes, status};
 	}
 	async updateParty(marketplaceAddress: string, factoryAddress: string, contractId: number, parties: Array<Party>, signature: string) {

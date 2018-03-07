@@ -1,42 +1,49 @@
 pragma solidity ^0.4.17;
 
-import "./TradeProxy.sol";
+import "./DelegateProxy.sol";
 import "./TradeInterface.sol";
 import "./GovernedSmartContractFactory.sol";
 import "./FactoryInterface.sol";
 
 contract TradeFactory is GovernedSmartContractFactory, FactoryInterface {
+    address public refTrade;
     function nextTradeNumber() view public returns (uint) {
         return nextTokenNumber;
     }
     
-    function trades(uint tradeNumber) view public returns(address) {
-        return contracts[tradeNumber];
+    function getContract(uint tokenNumber) view public returns(address) {
+        return contracts[tokenNumber];
     }
 
-    function TradeFactory() {
+    function TradeFactory(address pRefTrade) public {
         oracleAddress = msg.sender;
         nextTokenNumber = 1001;
+        refTrade = pRefTrade;
     }
     
-    function CreateTransaction(string pGuid) onlyOracle returns (uint)  {
-        var tradeProxy = address(new TradeProxy());
-        var tradeNumber = buyToken();
-        TradeInterface(tradeProxy).initialize(this, pGuid, oracleAddress, tradeNumber);
-        contracts[tradeNumber] = tradeProxy;
-        TradeCreated(tradeNumber);
-        return tradeNumber;
+    function createTransaction(string pGuid, address pBuyerAddress, string pBuyerCompanyName, string pBuyerCommonFieldsSymKey, string pBuyerPaymentFieldsSymKey,
+        address pSellerAddress, string pSellerCompanyName, string pSellerCommonFieldsSymKey, string pSellerPaymentFieldsSymKey
+        ) public onlyOracle returns (uint)  {
+        var tradeProxy = address(new DelegateProxy(refTrade));
+        var tokenNumber = buyToken();
+        var trade = TradeInterface(tradeProxy);
+        trade.initialize(this, pGuid, oracleAddress, tokenNumber);
+        trade.updateParty(1, pBuyerAddress, pBuyerCompanyName, pBuyerCommonFieldsSymKey, pBuyerPaymentFieldsSymKey);
+        trade.updateParty(2, pSellerAddress, pSellerCompanyName, pSellerCommonFieldsSymKey, pSellerPaymentFieldsSymKey);
+        contracts[tokenNumber] = tradeProxy;
+        ContractCreated(tokenNumber);
+        return tokenNumber;
     }
     
-    function RaiseTradeFieldUpdated(uint tradeNumber) onlyContractOwner(tradeNumber) {
-        TradeFieldUpdated(tradeNumber);
+    function raiseContractFieldUpdated(uint tokenNumber) public onlyContractOwner(tokenNumber) {
+        ContractFieldUpdated(tokenNumber);
     }
 
-    function RaiseTradePartyUpdated(uint tradeNumber,uint partyType, address partyAddress) onlyContractOwner(tradeNumber) {
-        TradePartyUpdated(tradeNumber,partyType,partyAddress);
+    function raiseContractPartyUpdated(uint tokenNumber, uint partyType, address partyAddress) public onlyContractOwner(tokenNumber) {
+        ContractPartyUpdated(tokenNumber,partyType,partyAddress);
     }
     
-    event TradeCreated(uint indexed tradeNumber);
-    event TradeFieldUpdated(uint indexed tradeNumber);
-    event TradePartyUpdated(uint indexed tradeNumber, uint partyType, address partyAddress);
+    event ContractCreated(uint indexed tokenNumber);
+    event ContractFieldUpdated(uint indexed tokenNumber);
+    event ContractPartyUpdated(uint indexed tokenNumber, uint partyType, address partyAddress);
 }

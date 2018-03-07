@@ -15,7 +15,7 @@ contract GovernedSmartContractFactory {
         _;
     }
 
-    function buyToken() returns (uint) {
+    function buyToken() public returns (uint) {
         return nextTokenNumber++;
     }
 }

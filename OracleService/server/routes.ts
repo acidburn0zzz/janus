@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
 import { Party, CreateTransactionRequest, CreateTransactionResponse,  
-  WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'indOracle';
+  WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-oracle';
 
 const router = express.Router();
 

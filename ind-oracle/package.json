@@ -9,9 +9,6 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc",
-    "test3": "mocha --require babel-register ./src/tests/*.test.ts",
-    "test2": "mocha --compilers js:babel-core/register --require babel-polyfill ./src/tests/*.test.ts",
-    "test1": "mocha --require ts-node/register ./src/tests/*.test.ts",
     "test": "mocha ./build/tests/*.test.js"
   },
   "keywords": [
@@ -37,6 +34,7 @@
     "cookie-parser": "^1.4.3",
     "ethers": "^2.1.3",
     "express": "^4.15.2",
+    "guid-typescript": "^1.0.7",
     "morgan": "^1.9.0",
     "pug": "^2.0.0-rc.4",
     "ts-node": "^4.0.2"
