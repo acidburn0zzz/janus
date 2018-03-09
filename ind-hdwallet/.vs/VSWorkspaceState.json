@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\build",
+    "\\node_modules\\bitcore-ecies\\node_modules",
+    "\\node_modules\\bitcore-ecies\\node_modules\\bitcore-lib",
+    "\\node_modules\\bitcore-lib\\lib\\errors",
+    "\\node_modules\\bitcore-lib\\node_modules\\inherits",
+    "\\node_modules\\guid-typescript",
+    "\\node_modules\\guid-typescript\\dist",
+    "\\server\\script",
+    "\\server\\services"
+  ],
+  "SelectedNode": "\\server",
+  "PreviewInSolutionExplorer": false
+}
