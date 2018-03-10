@@ -54,4 +54,46 @@ router.post('/decryptData', async (req: express.Request, res: express.Response, 
     res.send(responseData);
 });
 
+router.post('/encryptData', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let responseData;
+
+    try {
+        responseData = new models.EncryptDataResponse(req.body.guid);
+
+        let requestData = new models.EncryptDataRequest();
+        requestData.guid = req.body.guid;
+        requestData.message = req.body.message;
+        requestData.signature = req.body.signature;
+
+        responseData = addressObfuscator.encryptData(requestData);
+    }
+    catch (error) {
+        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+    }
+
+    res.send(responseData);
+});
+
+router.post('/grantAccess', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let responseData;
+
+    try {
+        responseData = new models.GrantAccessResponse(req.body.guid);
+
+        let requestData = new models.GrantAccessRequest(req.body.guid);
+        requestData.guid = req.body.guid;
+        requestData.accessibleSymmetricKey = req.body.accessibleSymmetricKey;
+        requestData.partyBitcorePublicKey = req.body.partyBitcorePublicKey;
+        requestData.message = req.body.message;
+        requestData.signature = req.body.signature;
+
+        responseData = addressObfuscator.grantAccess(requestData);
+    }
+    catch (error) {
+        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+    }
+
+    res.send(responseData);
+});
+
 export = router;
