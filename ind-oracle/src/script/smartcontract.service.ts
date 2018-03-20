@@ -5,9 +5,9 @@ import { AgentService } from './agent.service';
 import { HttpUtil } from './http-util';
 import { Guid } from "guid-typescript";
 
-let factoryJson: any = require('../contracts/FactoryInterface.json');
-let contractJson: any = require('../contracts/ContractInterface.json');
-let marketplaceDirectoryJson: any = require('../contracts/MarketplaceDirectoryInterface.json');
+let factoryJson: any = require('../../contracts/FactoryInterface.json');
+let contractJson: any = require('../../contracts/ContractInterface.json');
+let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
 import { Party, PartyType, CreateTransactionRequest, CreateTransactionResponse, GrantAccessRequest, GrantAccessResponse } from './models';
 import * as constants from './constants';
@@ -29,13 +29,14 @@ export class SmartContractService {
       refId: refId,
       companyName: companyName };
 
-    let msgSignature = this.oracleWallet.signMessage(signingMessage);
+    let signingMessageStr = JSON.stringify(signingMessage,null,4);
+    let msgSignature = this.oracleWallet.signMessage(signingMessageStr);
     let OTKeyRequest = {
-      message: signingMessage,
+      message: signingMessageStr,
       signature: msgSignature
     };
 
-    let response: any = await HttpUtil.RaiseHttpRequest(hdWalletUrl.host, hdWalletUrl.port, constants.OTKeyPath, constants.OTKeyPath, OTKeyRequest);
+    let response: any = await HttpUtil.RaiseHttpRequest(hdWalletUrl.host, hdWalletUrl.port, constants.OTKeyPath, constants.OTKeyMethod, OTKeyRequest);
   
     if(response && response.OTAddress) {
       await this.sendEtherToAddress(response.OTAddress);
@@ -43,13 +44,13 @@ export class SmartContractService {
     return response;
   }
 
-  private async getEncryptedSymmetricKeyForParty(request: GrantAccessRequest, guid: string, contractAddress: string, 
+  private async getEncryptedSymmetricKeyForParty(request: GrantAccessRequest, guid: string, contractId: number, 
     partyOTAddress: string, partyBitcorePublicKey: string, hdWalletUrl: any): Promise<any> {
 
     var grantAccessRequest = {
       message: request.message,
       signature: request.signature,
-      contractAddress: request.message.contractAddress,
+      contractAddress: contractId,
       partyOTAddress: partyOTAddress,
       partyBitcorePublicKey: partyBitcorePublicKey,
     };
@@ -60,10 +61,13 @@ export class SmartContractService {
   }
 
   private async sendEtherToAddress(address: any) {
-    var amount = utils.parseEther('0.1');
-    var tx = await this.oracleWallet.send(address, amount, { gasLimit: utils.bigNumberify("50000") });
-    console.log("tx", tx);
-    //var confirmedTxn = await this.provider.waitForTransaction(tx.hash, 20000);
+    let balance = await this.provider.getBalance(address);
+    if(!balance || balance.lt(utils.parseEther('0.05'))) {
+      var amount = utils.parseEther('0.1');
+      var tx = await this.oracleWallet.send(address, amount, { gasLimit: utils.bigNumberify("50000") });
+      console.log("tx", tx);
+      //var confirmedTxn = await this.provider.waitForTransaction(tx.hash, 20000);
+    }
   }
 
   private factoryContract(factoryAddress: string) {
@@ -96,11 +100,11 @@ export class SmartContractService {
         let buyerAddress: string; 
         let buyerCompanyName: string;
         let buyerCommonFieldsEncSymKey: string;
-        let buyerPaymentFieldsSymKey: string;
+        let buyerPaymentFieldsEncSymKey: string;
         let sellerAddress: string;
         let sellerCompanyName: string;
-        let sellerCommonFieldsSymKey: string;
-        let sellerPaymentFieldsSymKey: string;
+        let sellerCommonFieldsEncSymKey: string;
+        let sellerPaymentFieldsEncSymKey: string;
         let guid: string = Guid.create().toString();
         console.log("guid", guid);
 
@@ -116,47 +120,49 @@ export class SmartContractService {
         //verify signature and permission
         if(!this.verifySignature(request.message, request.signature))
         {
-            response.error = "Invalid signature";
-            return response;
+          response.status = false;
+          response.error = "Invalid signature";
+          return response;
         }
-        
         if(buyer) {
           //Getting onetime key for buyer
-          let buyerPartyHDWalletUrl = this.agentService.getWalletAgentUrl(buyer.companyName);
+          let buyerPartyHDWalletUrl = await this.agentService.getWalletAgentUrl(buyer.companyName);
           console.log("buyerPartyHDWalletUrl", buyerPartyHDWalletUrl);
           let buyerPartyOTKey = await this.getOTKey(guid, buyer.companyName, buyerPartyHDWalletUrl);
           console.log("buyerPartyOTKey", buyerPartyOTKey);
           buyerAddress = buyerPartyOTKey.OTAddress         
           buyerCompanyName = symEngine.encrypt(buyer.companyName, commonFieldsSymKey);
           //Encrypt the symmetric keys 
-          let buyerCommonFieldsEncSymKey: string = "0x" + asymEngine.encrypt(commonFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
+          buyerCommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
           console.log("Common Enc Sym Key:", buyerCommonFieldsEncSymKey);
-          let buyerPaymentFieldsSymKey: string = "0x" + asymEngine.encrypt(paymentFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
-          console.log("Payment Enc Sym Key:", buyerPaymentFieldsSymKey);
+          buyerPaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
+          console.log("Payment Enc Sym Key:", buyerPaymentFieldsEncSymKey);
         }
         if(seller) {
           //Getting onetime key for seller
-          let sellerPartyHDWalletUrl = this.agentService.getWalletAgentUrl(seller.companyName);
+          let sellerPartyHDWalletUrl = await this.agentService.getWalletAgentUrl(seller.companyName);
           console.log("sellerPartyHDWalletUrl", sellerPartyHDWalletUrl);
           let sellerPartyOTKey = await this.getOTKey(guid, seller.companyName, sellerPartyHDWalletUrl);
           console.log("sellerPartyOTKey", sellerPartyOTKey);
           sellerAddress = sellerPartyOTKey.OTAddress         
           sellerCompanyName = symEngine.encrypt(seller.companyName, commonFieldsSymKey);
           //Encrypt the symmetric keys 
-          let sellerCommonFieldsEncSymKey: string = "0x" + asymEngine.encrypt(commonFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
+          sellerCommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
           console.log("Common Enc Sym Key:", sellerCommonFieldsEncSymKey);
-          let sellerPaymentFieldsSymKey: string = "0x" + asymEngine.encrypt(paymentFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
-          console.log("Payment Enc Sym Key:", sellerPaymentFieldsSymKey);
+          sellerPaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
+          console.log("Payment Enc Sym Key:", sellerPaymentFieldsEncSymKey);
         }
         //Create transaction from factory
         let overrideOptions = {
-           gasLimit: 1000000,
+           gasLimit: 2000000,
         };
         let factory: Contract = this.factoryContract(request.message.factoryAddress);
-        let tx = await factory.createTransaction(guid, buyerAddress, buyerCompanyName, buyerCommonFieldsEncSymKey, buyerPaymentFieldsSymKey,
-          sellerAddress, sellerCompanyName, sellerCommonFieldsSymKey, sellerPaymentFieldsSymKey, overrideOptions);
+        console.log(guid, buyerAddress, buyerCompanyName, buyerCommonFieldsEncSymKey, buyerPaymentFieldsEncSymKey,
+          sellerAddress, sellerCompanyName, sellerCommonFieldsEncSymKey, sellerPaymentFieldsEncSymKey, overrideOptions);
+        let tx = await factory.createTransaction(guid, buyerAddress, buyerCompanyName, buyerCommonFieldsEncSymKey, buyerPaymentFieldsEncSymKey,
+          sellerAddress, sellerCompanyName, sellerCommonFieldsEncSymKey, sellerPaymentFieldsEncSymKey, overrideOptions);
 
-        console.log("tx", tx);
+        console.log("tx", tx.hash);
         let confirmedTxn = await this.provider.waitForTransaction(tx.hash, 20000);
         let receipt = await this.provider.getTransactionReceipt(confirmedTxn.hash);
         response.transactionHash = [tx.hash];
@@ -171,10 +177,12 @@ export class SmartContractService {
             let ContractCreatedEvent = iface.events.ContractCreated();
             let result = ContractCreatedEvent.parse(receipt.logs[0].topics, receipt.logs[0].data);
             console.log("result", result);
-            //contractId = result[0];
+            contractId = result['tokenNumber'].toNumber();
           }
+        } else {
+          response.status = false;          
         }
-        
+        response.contractId = contractId;
         
         // var SolidityCoder = require("web3/lib/solidity/coder.js");
         
@@ -200,7 +208,7 @@ export class SmartContractService {
         // }
     }
     catch (error) {
-        console.log(error);
+        console.log("Error", error);
         response.error = error.toString();
     }
     return response;
@@ -219,17 +227,23 @@ export class SmartContractService {
           response.error = "Invalid signature";
           return response;
       }
+      let contractAddress: string;
       let contract: Contract;
       let guid: string;
 
-      contract = new Contract(request.message.contractAddress, contractJson.abi, this.oracleWallet);
-      guid = await contract.getGuid();
+      let factory: Contract = this.factoryContract(request.message.factoryAddress);
+      if(factory)
+        contractAddress = await factory.getContract(request.message.contractId);
+
+      if(contractAddress)
+        contract = new Contract(contractAddress, contractJson.abi, this.oracleWallet);
       
       if(!contract) {
         response.error = "Contract no found";
         return response;
       }
       
+      guid = await contract.getGuid();
       let asymEngine: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
       let symEngine: SymmetricKeyEncryption = new SymmetricKeyEncryption();
 
@@ -254,7 +268,7 @@ export class SmartContractService {
 
         console.log("party OTkey", partyOTKey);
 
-        let accessResp = await this.getEncryptedSymmetricKeyForParty(request, guid, request.message.contractAddress,
+        let accessResp = await this.getEncryptedSymmetricKeyForParty(request, guid, request.message.contractId,
                                                                     partyOTKey.OTAddress, partyOTKey.bitcorePublicKey,
                                                                     callingPartyHDWalletUrl);
         

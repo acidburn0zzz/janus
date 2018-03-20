@@ -7,7 +7,7 @@ import "./FactoryInterface.sol";
 contract Trade is GovernedSmartContract, TradeInterface {
     
     uint8[] COMMON_FIELDS = [uint8(Field.unassigned), uint8(Field.tradeDate), uint8(Field.product), uint8(Field.qty), 
-        uint8(Field.price), uint8(Field.buyer), uint8(Field.seller)];
+        uint8(Field.price), uint8(Field.buyer), uint8(Field.seller), uint8(Field.broker)];
 
     uint8[] PAYMENT_FIELDS = [uint8(Field.unassigned), uint8(Field.paymentTerm)];
     

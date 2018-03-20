@@ -1,4 +1,4 @@
-import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest} from './models';
+import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, GrantAccessRequest} from './models';
 import { SmartContractService } from './smartcontract.service';
 import { AgentService } from './agent.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
@@ -46,18 +46,16 @@ export class IndOracle {
 		return this.agentService.unRegisterWalletAgent(request);
 	}
 
-	async createTransaction(request: CreateTransactionRequest) {//marketplaceAddress: string, factoryAddress: string, myParty: Party, parties: Array<Party>, signature: string) {
-		//inputs: mktplace address, factory address, [list of user info in json format], signature
-		
+	async createTransaction(request: CreateTransactionRequest) {
 		return this.smartContractService.createTransaction(request);
-		//returns {contractId, error, list of transaction hashes, status};
+		//returns {contractId, error, transaction hash, status};
 	}
-	async updateParty(marketplaceAddress: string, factoryAddress: string, contractId: number, parties: Array<Party>, signature: string) {
-		//inputs: mktplace address, factory address, contractId, [list of user info in json format], signature
 
-
-		//returns {error, transaction hash, status};
+	async grantAccessToContract(request: GrantAccessRequest) {
+		return this.smartContractService.grantAccessToContract(request);
+		//returns {error, list of transaction hashes, status};
 	}
+
 	async verifyIdentity(marketplaceAddress: string, factoryAddress: string, contractId: number, partyOTA: string, role: PartyType, signature: string) {
 		//inputs: mktplace address, factory address, contractId, onetime key, role of that OTA, signature
 
