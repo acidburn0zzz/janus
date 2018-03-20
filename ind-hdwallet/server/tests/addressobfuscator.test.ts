@@ -23,15 +23,15 @@ describe('address obfuscator', () => {
         let obfuscator = new AddressObfuscator();
         let addressRequest = new OneTimeAddressRequest();
         let senderWallet = ethers.Wallet.createRandom();
+        let messageObject = {
+            guid: Guid.create().toString(),
+            companyName: "Shell Corporation"
+        };
 
-        addressRequest.guid = Guid.create().toString();
-        addressRequest.message = JSON.stringify({
-                                                    guid: addressRequest.guid,
-                                                    companyName: "Shell Corporation",
-                                                    signerName: "John Smith"
-        });
+        addressRequest.message = JSON.stringify(messageObject);
 
         addressRequest.signature = senderWallet.signMessage(addressRequest.message);
+        addressRequest.messageObject = messageObject;
 
         let response = obfuscator.getOnetimeAddress(addressRequest);
 
@@ -63,16 +63,17 @@ describe('encrypt decrypt methods', () => {
 
     let encryptedSymmetricKeyBuyer;
     let encryptedSymmetricKeyInspector;
+    let guidString = Guid.create().toString();
+    let messageObject = {
+        guid: guidString,
+        companyName: "Shell Corporation"
+    };
 
     before(() => {
-        addressRequest.guid = Guid.create().toString();
-        addressRequest.message = JSON.stringify({
-            guid: addressRequest.guid,
-            companyName: "Shell Corporation",
-            signerName: "John Smith"
-        });
-
+        addressRequest.message = JSON.stringify(messageObject);
         addressRequest.signature = senderWallet.signMessage(addressRequest.message);
+        addressRequest.messageObject = messageObject;
+
         otaResponse = obfuscator.getOnetimeAddress(addressRequest);
 
         encryptedSymmetricKeyBuyer = asymEngine.encrypt(symmetricKeyBuyer, otaResponse.bitcorePublicKey);
@@ -87,9 +88,8 @@ describe('encrypt decrypt methods', () => {
          * Create a decrypt request object and populate the sample encrypted data
          */
         let requestEncrypt = new EncryptDataRequest();
-        requestEncrypt.guid = addressRequest.guid;
-
-        requestEncrypt.message = JSON.stringify({
+        let encryptMessageObject = {
+            guid: guidString,
             keys: [
                 { key: encryptedSymmetricKeyBuyer, fields: ["buyer", "seller", "price", "quantity", "uom"] },
                 { key: encryptedSymmetricKeyInspector, fields: ["commodity", "apiGravity"] }
@@ -102,10 +102,14 @@ describe('encrypt decrypt methods', () => {
                 uom: 'BBL',
                 commodity: 'Brent',
                 apiGravity: '38.5'
-            }
-        });
+            },
+            companyName: "Shell Corporation"
+        };
 
+        requestEncrypt.message = JSON.stringify(encryptMessageObject);
         requestEncrypt.signature = senderWallet.signMessage(requestEncrypt.message);
+        requestEncrypt.messageObject = encryptMessageObject;
+
         /**
         * Invoke the encrypt data method here
         */
@@ -123,9 +127,8 @@ describe('encrypt decrypt methods', () => {
          * Create a decrypt request object and populate the sample encrypted data
          */
         let requestDecrypt = new DecryptDataRequest();
-        requestDecrypt.guid = addressRequest.guid;
-
-        requestDecrypt.message = JSON.stringify({
+        let decryptMessageObject = {
+            guid: guidString,
             keys: [
                 { key: encryptedSymmetricKeyBuyer, fields: ["buyer", "seller", "price", "quantity", "uom"] },
                 { key: encryptedSymmetricKeyInspector, fields: ["commodity", "apiGravity"] }
@@ -138,10 +141,14 @@ describe('encrypt decrypt methods', () => {
                 uom: responseEncrypt.data["uom"],
                 commodity: responseEncrypt.data["commodity"],
                 apiGravity: responseEncrypt.data["apiGravity"]
-            }
-        });
+            },
+            companyName: "Shell Corporation"
+        };
 
+        requestDecrypt.message = JSON.stringify(decryptMessageObject);
         requestDecrypt.signature = senderWallet.signMessage(requestDecrypt.message);
+        requestDecrypt.messageObject = decryptMessageObject;
+
         /**
         * Invoke the decrypt data method here
         */
@@ -160,40 +167,49 @@ describe('encrypt decrypt methods', () => {
          * Create a new OTA for the requesting party
          */
         let partyAddressRequest = new OneTimeAddressRequest();
-        partyAddressRequest.guid = Guid.create().toString();
-        partyAddressRequest.message = JSON.stringify({
-            guid: partyAddressRequest.guid,
-            companyName: "Acme Inspections",
-            signerName: "David Smith"
-        });
-
+        let partyGuidString = Guid.create().toString();
+        let grantAccessMessageObject = {
+            guid: partyGuidString,
+            companyName: "Acme Inspections"
+        };
+        partyAddressRequest.message = JSON.stringify(grantAccessMessageObject);
         partyAddressRequest.signature = senderWallet.signMessage(partyAddressRequest.message);
+        partyAddressRequest.messageObject = grantAccessMessageObject;
+
         let partyOtaResponse = obfuscator.getOnetimeAddress(partyAddressRequest);
 
-        let requestGrantAccess = new GrantAccessRequest(addressRequest.guid);
-        requestGrantAccess.accessibleSymmetricKey = encryptedSymmetricKeyInspector;
-        requestGrantAccess.message = "Signed message";
-        requestGrantAccess.partyBitcorePublicKey = partyOtaResponse.bitcorePublicKey;
-
+        let requestGrantAccess = new GrantAccessRequest();
+        let requestGrantAccessMessageObject = {
+            guid: guidString,
+            accessibleSymmetricKey: encryptedSymmetricKeyInspector,
+            partyOTAddress: partyOtaResponse.OTAddress,
+            partyBitcorePublicKey: partyOtaResponse.bitcorePublicKey,
+            contractAddress: "0x123456",
+            companyName: "Acme Inspections"
+        }
+        requestGrantAccess.message = JSON.stringify(requestGrantAccessMessageObject);
         requestGrantAccess.signature = senderWallet.signMessage(requestGrantAccess.message);
+        requestGrantAccess.messageObject = requestGrantAccessMessageObject;
 
         let responseGrantAccess = obfuscator.grantAccess(requestGrantAccess);
 
         //decrypt the data using the newly created encrypted symmetric key
         let requestDecrypt = new DecryptDataRequest();
-        requestDecrypt.guid = partyAddressRequest.guid;
+        let decryptMessageObject = {
+                                        guid: partyGuidString,
+                                        keys: [
+                                            { key: responseGrantAccess.partyEncryptedSymmetricKey, fields: ["commodity", "apiGravity"] }
+                                        ],
+                                        data: {
+                                            commodity: responseEncrypt.data["commodity"],
+                                            apiGravity: responseEncrypt.data["apiGravity"]
+                                        },
+                                        companyName: "Shell Corporation"
+                                    };
 
-        requestDecrypt.message = JSON.stringify({
-            keys: [
-                { key: responseGrantAccess.partyEncryptedSymmetricKey, fields: ["commodity", "apiGravity"] }
-            ],
-            data: {
-                commodity: responseEncrypt.data["commodity"],
-                apiGravity: responseEncrypt.data["apiGravity"]
-            }
-        });
-
+        requestDecrypt.message = JSON.stringify(decryptMessageObject);
         requestDecrypt.signature = senderWallet.signMessage(requestDecrypt.message);
+        requestDecrypt.messageObject = decryptMessageObject;
         /**
         * Invoke the decrypt data method here
         */

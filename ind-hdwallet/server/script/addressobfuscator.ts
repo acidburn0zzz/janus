@@ -35,7 +35,7 @@ export class AddressObfuscator {
      */
     public getOnetimeAddress(request: models.OneTimeAddressRequest): models.OneTimeAddressResponse {
 
-        let response = new models.OneTimeAddressResponse();
+        let response = new models.OneTimeAddressResponse(request.messageObject.guid);
 
         try {
 
@@ -47,22 +47,18 @@ export class AddressObfuscator {
                 return response;
             }
 
-            //extract the message JSON object
-            let message: models.OneTimeAddressMessage = JSON.parse(request.message);
-
-            let otaData = this.walletCache.getOneTimeAddress(request.guid);
+            let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
             if (otaData == null) { 
 
                 //we did not find the OTA. So lets create a new one
                 let walletPath: string = this.getNextAddressPath();
 
                 //Create a new wallet object from a given mnemonic.
-                var wallet = walletObject.fromMnemonic(this.getMnemonic(message.companyName), walletPath);
+                var wallet = walletObject.fromMnemonic(this.getMnemonic(request.messageObject.companyName), walletPath);
                 var bitcorePublicKey = utils.bitcorePublicKey(wallet.privateKey);
 
                 otaData = new models.OneTimeAddressData(wallet.address, walletPath, bitcorePublicKey,
-                    message.signerName, message.companyName,
-                    message.guid);
+                    request.messageObject.companyName, request.messageObject.guid);
 
                 this.walletCache.saveOneTimeAddress(otaData);
             }
@@ -88,11 +84,11 @@ export class AddressObfuscator {
      */
     public decryptData(request: models.DecryptDataRequest): models.DecryptDataResponse {
 
-        let response = new models.DecryptDataResponse(request.guid);
+        let response = new models.DecryptDataResponse(request.messageObject.guid);
 
         try {
             //get the otadata object for the specified guid
-            let otaData = this.walletCache.getOneTimeAddress(request.guid);
+            let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
             if (otaData == null) {
                 response.error = constants.errorRequestOtaFailed;
@@ -107,25 +103,22 @@ export class AddressObfuscator {
                 return response;
             }
 
-            //extract the message JSON object
-            let message: models.DataMessage = JSON.parse(request.message);
-
             let asymEncryp: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
             let symEncryp: SymmetricKeyEncryption = new SymmetricKeyEncryption();
             let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
             //decrypt the data that is in the message object
-            message.keys.forEach(element => {
+            request.messageObject.keys.forEach(element => {
                 console.log("key = ", element.key);
 
                 //decrypt the symmetric key here
                 let decryptedSymmetricKey: string = asymEncryp.decrypt(element.key, wallet.privateKey);
 
                 element.fields.forEach(field => {
-                    console.log(field, "=", message.data[field]);
+                    console.log(field, "=", request.messageObject.data[field]);
 
                     //decrypt the data using the decrypted symmetric key here
-                    response.data[field] = symEncryp.decrypt(message.data[field], decryptedSymmetricKey);
+                    response.data[field] = symEncryp.decrypt(request.messageObject.data[field], decryptedSymmetricKey);
                 });
             });
 
@@ -146,11 +139,11 @@ export class AddressObfuscator {
      */
     public encryptData(request: models.EncryptDataRequest): models.EncryptDataResponse {
 
-        let response = new models.EncryptDataResponse(request.guid);
+        let response = new models.EncryptDataResponse(request.messageObject.guid);
 
         try {
             //get the otadata object for the specified guid
-            let otaData = this.walletCache.getOneTimeAddress(request.guid);
+            let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
             if (otaData == null) {
                 response.error = constants.errorRequestOtaFailed;
@@ -165,25 +158,22 @@ export class AddressObfuscator {
                 return response;
             }
 
-            //extract the message JSON object
-            let message: models.DataMessage = JSON.parse(request.message);
-
             let asymEncryp: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
             let symEncryp: SymmetricKeyEncryption = new SymmetricKeyEncryption();
             let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
             //encrypt the data that is in the message object
-            message.keys.forEach(element => {
+            request.messageObject.keys.forEach(element => {
                 console.log("key = ", element.key);
 
                 //decrypt the symmetric key here
                 let decryptedSymmetricKey: string = asymEncryp.decrypt(element.key, wallet.privateKey);
 
                 element.fields.forEach(field => {
-                    console.log(field, "=", message.data[field]);
+                    console.log(field, "=", request.messageObject.data[field]);
 
                     //encrypt the data using the decrypted symmetric key here
-                    response.data[field] = symEncryp.encrypt(message.data[field], decryptedSymmetricKey);
+                    response.data[field] = symEncryp.encrypt(request.messageObject.data[field], decryptedSymmetricKey);
                 });
             });
 
@@ -203,11 +193,11 @@ export class AddressObfuscator {
      */
     public grantAccess(request: models.GrantAccessRequest): models.GrantAccessResponse {
 
-        let response = new models.GrantAccessResponse(request.guid);
+        let response = new models.GrantAccessResponse(request.messageObject.guid);
 
         try {
                 //get the otadata object for the specified guid
-                let otaData = this.walletCache.getOneTimeAddress(request.guid);
+            let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
                 if (otaData == null) {
                     response.error = constants.errorRequestOtaFailed;
@@ -227,8 +217,8 @@ export class AddressObfuscator {
                 let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
                 //decrypt the symmetric key
-                let decryptedSymmetricKey: string = asymEngine.decrypt(request.accessibleSymmetricKey, wallet.privateKey);
-                response.partyEncryptedSymmetricKey = asymEngine.encrypt(decryptedSymmetricKey, request.partyBitcorePublicKey);
+                let decryptedSymmetricKey: string = asymEngine.decrypt(request.messageObject.accessibleSymmetricKey, wallet.privateKey);
+                response.partyEncryptedSymmetricKey = asymEngine.encrypt(decryptedSymmetricKey, request.messageObject.partyBitcorePublicKey);
         }
         catch (error) {
             utils.writeFormattedMessage("Error while granting access", error);

@@ -19,9 +19,10 @@ router.post('/getOTAddress', async (req: express.Request, res: express.Response,
 
     try {
             let requestData = new models.OneTimeAddressRequest();
-            requestData.guid = req.body.guid;
+
             requestData.message = req.body.message;
             requestData.signature = req.body.signature;
+            requestData.messageObject = JSON.parse(req.body.message);
 
             responseData = addressObfuscator.getOnetimeAddress(requestData);
 
@@ -35,15 +36,16 @@ router.post('/getOTAddress', async (req: express.Request, res: express.Response,
 });
 
 router.post('/decryptData', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
     let responseData;
 
     try {
-        responseData = new models.DecryptDataResponse(req.body.guid);
+        responseData = new models.DecryptDataResponse();
 
         let requestData = new models.DecryptDataRequest();
-        requestData.guid = req.body.guid;
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
+        requestData.messageObject = JSON.parse(req.body.message);
 
         responseData = addressObfuscator.decryptData(requestData);
     }
@@ -58,12 +60,12 @@ router.post('/encryptData', async (req: express.Request, res: express.Response, 
     let responseData;
 
     try {
-        responseData = new models.EncryptDataResponse(req.body.guid);
+        responseData = new models.EncryptDataResponse();
 
         let requestData = new models.EncryptDataRequest();
-        requestData.guid = req.body.guid;
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
+        requestData.messageObject = JSON.parse(req.body.message);
 
         responseData = addressObfuscator.encryptData(requestData);
     }
@@ -78,14 +80,12 @@ router.post('/grantAccess', async (req: express.Request, res: express.Response, 
     let responseData;
 
     try {
-        responseData = new models.GrantAccessResponse(req.body.guid);
+        responseData = new models.GrantAccessResponse();
 
-        let requestData = new models.GrantAccessRequest(req.body.guid);
-        requestData.guid = req.body.guid;
-        requestData.accessibleSymmetricKey = req.body.accessibleSymmetricKey;
-        requestData.partyBitcorePublicKey = req.body.partyBitcorePublicKey;
+        let requestData = new models.GrantAccessRequest();
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
+        requestData.messageObject = JSON.parse(req.body.message);
 
         responseData = addressObfuscator.grantAccess(requestData);
     }

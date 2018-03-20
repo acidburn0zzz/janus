@@ -1,5 +1,19 @@
 import * as constants from './constants';
 
+export class BaseRequest {
+    public message: string;
+    public signature: string;
+}
+
+export class BaseResponse {
+    public guid: string;
+    public error: string;
+
+    constructor(guid: string = "") {
+        this.guid = guid;
+        this.error = constants.OK;
+    }
+}
 
 /*
     Object data passed by the indirection oracle when it is requesting a one time address
@@ -11,25 +25,23 @@ import * as constants from './constants';
     }
 */
 
-export type OneTimeAddressMessage = { guid: string; companyName: string; signerName: string };
+export interface BaseMessageObject { guid: string; companyName: string; };
 
-export class OneTimeAddressRequest {
-    public guid: string;
-    public message: string;
-    public signature: string;
+export class OneTimeAddressRequest extends BaseRequest {
+    public messageObject: BaseMessageObject; 
 }
 
 /**
  * one time address response object returned by the wallet service
  */
-export class OneTimeAddressResponse {
-    public error: string;
+export class OneTimeAddressResponse extends BaseResponse {
     public OTAddress: string;
     public bitcorePublicKey: string;
     public encryptedSymmetricKey: string;
 
-    constructor() {
-        this.error = constants.OK;
+    constructor(guid: string = "") {
+        super(guid);
+
         this.OTAddress = "0x00";
         this.bitcorePublicKey = "0x00";
     }
@@ -40,17 +52,15 @@ export class OneTimeAddressData {
     walletPath: string;
     bitcorePublicKey: any;
     encryptedSymmetricKey: string;
-    signerName: string;
     signerCompany: string;
     guid: string;
 
     constructor(otaddress: string, walletPath: string, bitcorePublicKey: any,
-        signerName: string, signerCompany: string, guid: string) {
+                signerCompany: string, guid: string) {
 
         this.OTAddress = otaddress;
         this.walletPath = walletPath;
         this.bitcorePublicKey = bitcorePublicKey;
-        this.signerName = signerName;
         this.signerCompany = signerCompany;
         this.guid = guid;
     }
@@ -60,6 +70,7 @@ export class OneTimeAddressData {
  * request data sent to decrypt a set of data fields
     message is a JSON string expected in the following shape
     {
+                        "guid" : "1234",
                         "keys" : [
                             { "key": "0xkey1",
                                 "fields": [ "F1", "F2", "F3"] },
@@ -83,22 +94,18 @@ export class OneTimeAddressData {
  */
 
 export type KeyFields = { key: string; fields: string[] };
-export type DataMessage = { keys: KeyFields[]; data: {} };
+export interface DecryptDataRequestMessage extends BaseMessageObject { keys: KeyFields[]; data: {} };
 
-export class DecryptDataRequest {
-    public guid: string;
-    public message: string;
-    public signature: string;
+export class DecryptDataRequest extends BaseRequest {
+    public messageObject: DecryptDataRequestMessage;
 }
 
-export class DecryptDataResponse {
-    public error: string;
-    public guid: string;
+export class DecryptDataResponse extends BaseResponse {
     public data: object;
 
-    constructor(guid: string) {
-        this.error = constants.OK;
-        this.guid = guid;
+    constructor(guid: string = "") {
+        super(guid);
+
         this.data = {};
     }
 }
@@ -107,6 +114,7 @@ export class DecryptDataResponse {
  * request data sent to encrypt a set of data fields
     message is a JSON string expected in the following shape
     {
+                        "guid": "1234",
                         "keys" : [
                             { "key": "0xkey1",
                                 "fields": [ "buyer", "seller", "price", "quantity", "uom"] },
@@ -122,47 +130,54 @@ export class DecryptDataResponse {
                           apiGravity: '38.5' }
                             }
  */
+export interface EncryptDataRequestMessage extends BaseMessageObject { keys: KeyFields[]; data: {} };
 
-export class EncryptDataRequest {
-    public guid: string;
-    public message: string;
-    public signature: string;
+export class EncryptDataRequest extends BaseRequest {
+    public messageObject: EncryptDataRequestMessage;
 }
 
-export class EncryptDataResponse {
-    public error: string;
-    public guid: string;
+export class EncryptDataResponse extends BaseResponse {
     public data: object;
 
-    constructor(guid: string) {
-        this.error = constants.OK;
-        this.guid = guid;
+    constructor(guid: string = "") {
+        super(guid);
         this.data = {};
     }
 }
 
 /**
  * Models for Granting access to a third party
- */
-export class GrantAccessRequest {
-    public guid: string;
-    public accessibleSymmetricKey: string;
-    public partyBitcorePublicKey: string;
-    public message: string;
-    public signature: string;
 
-    constructor(guid: string) {
-        this.guid = guid;
+    message is a JSON object with the following shape
+    {
+        "guid": "1234",
+        "accessibleSymmetricKey": "",
+        "partyOTAddress": "",
+        "partyBitcorePublicKey": "",
+        "contractAddress": "",
+        "companyName": ""
     }
+ */
+
+export interface GrantAccessRequestMessage extends BaseMessageObject  {
+                                            accessibleSymmetricKey: string,
+                                            partyOTAddress: string,
+                                            partyBitcorePublicKey: string,
+                                            contractAddress: string,
+                                        };
+
+export class GrantAccessRequest extends BaseRequest {
+
+    public messageObject: GrantAccessRequestMessage;
 }
 
-export class GrantAccessResponse {
-    public error: string;
-    public guid: string;
+export class GrantAccessResponse extends BaseResponse {
+
     public partyEncryptedSymmetricKey: string;
 
-    constructor(guid: string) {
-        this.guid = guid;
+    constructor(guid: string = "") {
+        super(guid);
+
         this.error = "OK";
     }
 }
