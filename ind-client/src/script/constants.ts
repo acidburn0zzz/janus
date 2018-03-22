@@ -11,5 +11,5 @@ export let CreateTransactionPath = '/createTransaction';
 export let CreateTransactionMethod = 'POST';
 export let UpdateTransactionPath = '/updateTransaction';
 export let UpdateTransactionMethod = 'POST';
-export let GrantAccessPath = '/grantAccess';
+export let GrantAccessPath = '/grantAccessToContract';
 export let GrantAccessMethod = 'POST';

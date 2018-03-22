@@ -109,7 +109,7 @@ export class GrantAccessRequest {
   }
 }
 export class GrantAccessResponse extends Response {
-  transactionHash: Array<string>;
+  transactionHashes: Array<string>;
   constructor(fields: Partial<GrantAccessResponse> & {}) {
     super();
     Object.assign(this, fields);

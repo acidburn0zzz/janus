@@ -39,20 +39,20 @@ export class IndOracle {
 	}
 
     async registerWalletAgent(request: WalletRegistrationRequest) {
-		return this.agentService.registerWalletAgent(request);
+		return await this.agentService.registerWalletAgent(request);
 	}
 
 	async unRegisterWalletAgent(request: WalletUnRegistrationRequest) {
-		return this.agentService.unRegisterWalletAgent(request);
+		return await this.agentService.unRegisterWalletAgent(request);
 	}
 
 	async createTransaction(request: CreateTransactionRequest) {
-		return this.smartContractService.createTransaction(request);
+		return await this.smartContractService.createTransaction(request);
 		//returns {contractId, error, transaction hash, status};
 	}
 
 	async grantAccessToContract(request: GrantAccessRequest) {
-		return this.smartContractService.grantAccessToContract(request);
+		return await this.smartContractService.grantAccessToContract(request);
 		//returns {error, list of transaction hashes, status};
 	}
 

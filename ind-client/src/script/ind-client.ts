@@ -69,7 +69,7 @@ export class IndClient {
 		let error;
 		let validationError = this.validateConfig();
 		if(!validationError) {
-			let resp = this.smartContractService.grantAccessToContract(this.marketplaceAddress, this.tradeFactoryAddress, this.oracleUrl, contractId, myParty, parties);
+			let resp = await this.smartContractService.grantAccessToContract(this.marketplaceAddress, this.tradeFactoryAddress, this.oracleUrl, contractId, myParty, parties);
 			status = resp["status"];
 			transactionHashes = resp["transactionHashes"];
 			error = resp["error"];
