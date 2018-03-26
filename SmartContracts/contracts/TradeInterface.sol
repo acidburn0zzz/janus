@@ -9,7 +9,7 @@ contract TradeInterface is ContractInterface {
     enum Field { unassigned, tradeDate, product, qty, price, buyer, seller, broker, paymentTerm}
     function initialize(FactoryInterface pFactory, string pGuid, address pOracleAddress, uint pTradeNumber) public;
     function updateData(bytes32 pCommonFieldsSymKeyHash, string pTradeDate, string pProduct, 
-            string pQty, string pPrice, string pBuyer, string pSeller) public;
+            string pQty, string pPrice) public;
     function updatePaymentInfo(bytes32 pPaymentFieldsSymKeyHash, string pPaymentTerm) public;
     function accept(bytes32 symmetricKeyHash, string signerKey) public;
     function cancel(bytes32 symmetricKeyHash) public;

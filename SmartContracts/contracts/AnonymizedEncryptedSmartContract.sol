@@ -49,7 +49,7 @@ contract AnonymizedEncryptedSmartContract {
         _;    
     }
 
-    function canEditField(bytes32 symmetricKeyHash, uint8 fieldEnumIndex) public returns (bool) {
+    function canEditField(bytes32 symmetricKeyHash, uint8 fieldEnumIndex) public view returns (bool) {
         uint8[] accessibleFields = accessibleFieldsBySymKey[symmetricKeyHash];
         for(uint8 i=0;i<accessibleFields.length;i++) {
             if(fieldEnumIndex == accessibleFields[i]) {
@@ -93,7 +93,7 @@ contract AnonymizedEncryptedSmartContract {
         signer[symmetricKeyHash][msg.sender] = signerKey;
     }
 
-    function hasAllPartiesSigned(uint8[] requiredParties) public returns (bool) {
+    function hasAllPartiesSigned(uint8[] requiredParties) public view returns (bool) {
         for(uint i=0;i<requiredParties.length;i++) {
             address party = partyOTAddresses[uint(requiredParties[i])];
 			//get the symmetric key for the Party

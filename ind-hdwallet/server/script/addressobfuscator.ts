@@ -214,8 +214,8 @@ export class AddressObfuscator {
                 let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
                 //decrypt the symmetric key
-                let decryptedSymmetricKey: string = asymEngine.decrypt(request.messageObject.accessibleSymmetricKey, wallet.privateKey);
-                response.partyEncryptedSymmetricKey = asymEngine.encrypt(decryptedSymmetricKey, request.messageObject.partyBitcorePublicKey);
+                let decryptedSymmetricKey: string = asymEngine.decrypt(String(request.messageObject.accessibleSymmetricKey).substring(2), wallet.privateKey);
+                response.partyEncryptedSymmetricKey = "0x" + asymEngine.encrypt(decryptedSymmetricKey, request.messageObject.partyBitcorePublicKey);
         }
         catch (error) {
             utils.writeFormattedMessage("Error while granting access", error);
