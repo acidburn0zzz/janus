@@ -4,10 +4,10 @@
   "description": "Indirection wallet",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "test": "mocha --require ts-node/register ./server/tests/*.test.ts"
+    "build": "node node_modules/webpack/bin/webpack.js --config config/webpack.config.js",
+    "start": "node build/compiled.js"
   },
-  "main": "./index.js",
+  "main": "",
   "keywords": [
     "Oracle",
     "HDWallet",

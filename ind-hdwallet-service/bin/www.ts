@@ -5,6 +5,8 @@ import * as app from '../app';
 import * as http from 'http';
 import * as debug from 'debug';
 
+const hdwalletConfig = require('../config/hd-wallet-service.config');
+
 // binding to console
 let log = debug('modern-express:server');
 log.log = console.log.bind(console);

@@ -1,16 +1,13 @@
-import * as models from './models'
-import ethers = require('ethers');
-import * as constants from './constants';
-import * as Utils from './utils';
+import * as indCommon from 'ind-common';
+
 import * as cachingService from '../services/wallet-caching-service';
 import * as vaultService from '../services/secure-enclave-service';
-import { AsymmetricKeyEncryption } from './asymmetrickey-encryption';
-import { SymmetricKeyEncryption } from './symmetrickey-encryption';
+import ethers = require('ethers');
 
 const walletObject = ethers.Wallet;
 const providers = ethers.providers;
 
-let utils = new Utils.Utils();
+let utils = new indCommon.Utils();
 
 let addressIndex: number = -1;
 
@@ -21,11 +18,11 @@ let addressIndex: number = -1;
 export class AddressObfuscator {
 
     private walletCache: cachingService.WalletCachingService;
-    private secureEnclave: vaultService.VaultService; 
+    private secureEnclave: vaultService.SecureEnclaveService; 
 
     constructor() {
         this.walletCache = new cachingService.WalletCachingService();
-        this.secureEnclave = new vaultService.VaultService();
+        this.secureEnclave = new vaultService.SecureEnclaveService();
     }
 
     /**
@@ -33,17 +30,17 @@ export class AddressObfuscator {
      already exists in the cache, the existing address is returned
      * @param request
      */
-    public getOnetimeAddress(request: models.OneTimeAddressRequest): models.OneTimeAddressResponse {
+    public getOnetimeAddress(request: indCommon.OneTimeAddressRequest): indCommon.OneTimeAddressResponse {
 
-        let response = new models.OneTimeAddressResponse(request.messageObject.guid);
+        let response = new indCommon.OneTimeAddressResponse(request.messageObject.guid);
 
         try {
 
             //verify if the signature on the message matches
             let verifiedAddress: string = this.verifyPayload(request.message, request.signature);
-            if (verifiedAddress === constants.errorInvalidSignature) {
+            if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
 
-                response.error = constants.errorInvalidSignature;
+                response.error = indCommon.Constants.errorInvalidSignature;
                 return response;
             }
 
@@ -57,7 +54,7 @@ export class AddressObfuscator {
                 var wallet = walletObject.fromMnemonic(this.getMnemonic(request.messageObject.companyName), walletPath);
                 var bitcorePublicKey = utils.bitcorePublicKey(wallet.privateKey);
 
-                otaData = new models.OneTimeAddressData(wallet.address, walletPath, bitcorePublicKey,
+                otaData = new indCommon.OneTimeAddressData(wallet.address, walletPath, bitcorePublicKey,
                     request.messageObject.companyName, request.messageObject.guid);
 
                 this.walletCache.saveOneTimeAddress(otaData);
@@ -71,7 +68,7 @@ export class AddressObfuscator {
             console.log(error);
 
             //something bombed. return error
-            response.error = constants.errorOTAGenFailed + ": " + error;
+            response.error = indCommon.Constants.errorOTAGenFailed + ": " + error;
         }
 
         return response;
@@ -82,29 +79,29 @@ export class AddressObfuscator {
      * decrypts the data using the wallet that the request guid id associated with
      * @param request
      */
-    public decryptData(request: models.DecryptDataRequest): models.DecryptDataResponse {
+    public decryptData(request: indCommon.DecryptDataRequest): indCommon.DecryptDataResponse {
 
-        let response = new models.DecryptDataResponse(request.messageObject.guid);
+        let response = new indCommon.DecryptDataResponse(request.messageObject.guid);
 
         try {
             //get the otadata object for the specified guid
             let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
             if (otaData == null) {
-                response.error = constants.errorRequestOtaFailed;
+                response.error = indCommon.Constants.errorRequestOtaFailed;
                 return response;
             }
 
             //verify the message signature and get the public address of the signer
             let verifiedAddress: string = this.verifyPayload(request.message, request.signature);
-            if (verifiedAddress === constants.errorInvalidSignature) {
+            if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
 
-                response.error = constants.errorInvalidSignature;
+                response.error = indCommon.Constants.errorInvalidSignature;
                 return response;
             }
 
-            let asymEncryp: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
-            let symEncryp: SymmetricKeyEncryption = new SymmetricKeyEncryption();
+            let asymEncryp: indCommon.AsymmetricKeyEncryption = new indCommon.AsymmetricKeyEncryption();
+            let symEncryp: indCommon.SymmetricKeyEncryption = new indCommon.SymmetricKeyEncryption();
             let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
             //decrypt the data that is in the message object
@@ -127,7 +124,7 @@ export class AddressObfuscator {
             utils.writeFormattedMessage("Error while decrypting data", error);
 
             //something bombed. return error
-            response.error = constants.errorDecryptionFailed + ": " + error;
+            response.error = indCommon.Constants.errorDecryptionFailed + ": " + error;
         }
 
         return response;
@@ -137,29 +134,29 @@ export class AddressObfuscator {
      * For a given set of data, this method encrypts the data using the symmetric key passed in the request
      * @param request
      */
-    public encryptData(request: models.EncryptDataRequest): models.EncryptDataResponse {
+    public encryptData(request: indCommon.EncryptDataRequest): indCommon.EncryptDataResponse {
 
-        let response = new models.EncryptDataResponse(request.messageObject.guid);
+        let response = new indCommon.EncryptDataResponse(request.messageObject.guid);
 
         try {
             //get the otadata object for the specified guid
             let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
             if (otaData == null) {
-                response.error = constants.errorRequestOtaFailed;
+                response.error = indCommon.Constants.errorRequestOtaFailed;
                 return response;
             }
 
             //verify the message signature and get the public address of the signer
             let verifiedAddress: string = this.verifyPayload(request.message, request.signature);
-            if (verifiedAddress === constants.errorInvalidSignature) {
+            if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
 
-                response.error = constants.errorInvalidSignature;
+                response.error = indCommon.Constants.errorInvalidSignature;
                 return response;
             }
 
-            let asymEncryp: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
-            let symEncryp: SymmetricKeyEncryption = new SymmetricKeyEncryption();
+            let asymEncryp: indCommon.AsymmetricKeyEncryption = new indCommon.AsymmetricKeyEncryption();
+            let symEncryp: indCommon.SymmetricKeyEncryption = new indCommon.SymmetricKeyEncryption();
             let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
             //encrypt the data that is in the message object
@@ -181,7 +178,7 @@ export class AddressObfuscator {
         catch (error) {
             utils.writeFormattedMessage("Error while encrypting data", error);
 
-            response.error = constants.errorEncryptionFailed + ": " + error;
+            response.error = indCommon.Constants.errorEncryptionFailed + ": " + error;
         }
 
         return response;
@@ -191,29 +188,29 @@ export class AddressObfuscator {
      * 
      * @param request
      */
-    public grantAccess(request: models.GrantAccessRequest): models.GrantAccessResponse {
+    public grantAccess(request: indCommon.GrantAccessRequest): indCommon.GrantAccessResponse {
 
-        let response = new models.GrantAccessResponse(request.messageObject.guid);
+        let response = new indCommon.GrantAccessResponse(request.messageObject.guid);
 
         try {
                 //get the otadata object for the specified guid
             let otaData = this.walletCache.getOneTimeAddress(request.messageObject.guid);
 
                 if (otaData == null) {
-                    response.error = constants.errorRequestOtaFailed;
+                    response.error = indCommon.Constants.errorRequestOtaFailed;
                     return response;
                 }
 
                 //verify the message signature and get the public address of the signer
                 let verifiedAddress: string = this.verifyPayload(request.message, request.signature);
-                if (verifiedAddress === constants.errorInvalidSignature) {
+                if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
 
-                    response.error = constants.errorInvalidSignature;
+                    response.error = indCommon.Constants.errorInvalidSignature;
                     return response;
                 }
 
-                let asymEngine: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
-                let symEngine: SymmetricKeyEncryption = new SymmetricKeyEncryption();
+                let asymEngine: indCommon.AsymmetricKeyEncryption = new indCommon.AsymmetricKeyEncryption();
+                let symEngine: indCommon.SymmetricKeyEncryption = new indCommon.SymmetricKeyEncryption();
                 let wallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
 
                 //decrypt the symmetric key
@@ -223,7 +220,7 @@ export class AddressObfuscator {
         catch (error) {
             utils.writeFormattedMessage("Error while granting access", error);
 
-            response.error = constants.errorEncryptionFailed + ": " + error;
+            response.error = indCommon.Constants.errorEncryptionFailed + ": " + error;
         }
 
         return response;
@@ -286,7 +283,7 @@ export class AddressObfuscator {
             console.log(error);
 
             //something bombed. return error
-            return constants.errorInvalidSignature;
+            return indCommon.Constants.errorInvalidSignature;
         }
     }
 }

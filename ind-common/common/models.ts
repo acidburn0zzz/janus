@@ -1,4 +1,5 @@
-import * as constants from './constants';
+import * as constants from './hdwallet-constants';
+import * as commontypes from './common-types';
 
 export class BaseRequest {
     public message: string;
@@ -25,10 +26,8 @@ export class BaseResponse {
     }
 */
 
-export interface BaseMessageObject { guid: string; companyName: string; };
-
 export class OneTimeAddressRequest extends BaseRequest {
-    public messageObject: BaseMessageObject; 
+    public messageObject: commontypes.BaseMessageObject; 
 }
 
 /**
@@ -93,11 +92,9 @@ export class OneTimeAddressData {
     }
  */
 
-export type KeyFields = { key: string; fields: string[] };
-export interface DecryptDataRequestMessage extends BaseMessageObject { keys: KeyFields[]; data: {} };
 
 export class DecryptDataRequest extends BaseRequest {
-    public messageObject: DecryptDataRequestMessage;
+    public messageObject: commontypes.DecryptDataRequestMessage;
 }
 
 export class DecryptDataResponse extends BaseResponse {
@@ -130,10 +127,10 @@ export class DecryptDataResponse extends BaseResponse {
                           apiGravity: '38.5' }
                             }
  */
-export interface EncryptDataRequestMessage extends BaseMessageObject { keys: KeyFields[]; data: {} };
+
 
 export class EncryptDataRequest extends BaseRequest {
-    public messageObject: EncryptDataRequestMessage;
+    public messageObject: commontypes.EncryptDataRequestMessage;
 }
 
 export class EncryptDataResponse extends BaseResponse {
@@ -159,16 +156,11 @@ export class EncryptDataResponse extends BaseResponse {
     }
  */
 
-export interface GrantAccessRequestMessage extends BaseMessageObject  {
-                                            accessibleSymmetricKey: string,
-                                            partyOTAddress: string,
-                                            partyBitcorePublicKey: string,
-                                            contractAddress: string,
-                                        };
+
 
 export class GrantAccessRequest extends BaseRequest {
 
-    public messageObject: GrantAccessRequestMessage;
+    public messageObject: commontypes.GrantAccessRequestMessage;
 }
 
 export class GrantAccessResponse extends BaseResponse {

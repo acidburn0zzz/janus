@@ -10,8 +10,8 @@ export class Utils {
 
     public writeFormattedMessage(header: string, message: any) {
         console.log("");
-    console.log("===" + header + "===");
-    console.log(message);
-    console.log("=== END", header, "END===");
-}
+        console.log("===" + header + "===");
+        console.log(message);
+        console.log("=== END", header, "END===");
+    }
 }

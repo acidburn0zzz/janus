@@ -2,7 +2,7 @@
 /**
  * This class implements a secure vault service to store and create mnemonics for the hdwallet
  */
-export class VaultService {
+export class SecureEnclaveService {
 
     /**
      * returns a new mnemomic for an HD wallet. If one does not exist, or if createNew = true,

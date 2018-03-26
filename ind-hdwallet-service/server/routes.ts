@@ -1,11 +1,9 @@
 import * as express from 'express';
-import * as models from './script/models'
-import * as obfuscatorService from './script/addressobfuscator';
-import * as utils from './script/utils';
-import * as constants from './script/constants';
+import * as indCommon from 'ind-common';
+import { AddressObfuscator } from 'ind-hdwallet';
 
 const router = express.Router();
-const addressObfuscator = new obfuscatorService.AddressObfuscator();
+const addressObfuscator = new AddressObfuscator.AddressObfuscator();
 
 router.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.render('index', {
@@ -15,10 +13,10 @@ router.get('/', (req: express.Request, res: express.Response, next: express.Next
 
 router.post('/getOTAddress', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
-    let responseData = new models.OneTimeAddressResponse();
+    let responseData = new indCommon.OneTimeAddressResponse();
 
     try {
-            let requestData = new models.OneTimeAddressRequest();
+        let requestData = new indCommon.OneTimeAddressRequest();
 
             requestData.message = req.body.message;
             requestData.signature = req.body.signature;
@@ -29,7 +27,7 @@ router.post('/getOTAddress', async (req: express.Request, res: express.Response,
     }
     catch (error) {
 
-        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+        responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;
     }
 
     res.send(responseData);
@@ -40,9 +38,9 @@ router.post('/decryptData', async (req: express.Request, res: express.Response, 
     let responseData;
 
     try {
-        responseData = new models.DecryptDataResponse();
+        responseData = new indCommon.DecryptDataResponse();
 
-        let requestData = new models.DecryptDataRequest();
+        let requestData = new indCommon.DecryptDataRequest();
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
         requestData.messageObject = JSON.parse(req.body.message);
@@ -50,7 +48,7 @@ router.post('/decryptData', async (req: express.Request, res: express.Response, 
         responseData = addressObfuscator.decryptData(requestData);
     }
     catch (error) {
-        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+        responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;
     }
 
     res.send(responseData);
@@ -60,9 +58,9 @@ router.post('/encryptData', async (req: express.Request, res: express.Response, 
     let responseData;
 
     try {
-        responseData = new models.EncryptDataResponse();
+        responseData = new indCommon.EncryptDataResponse();
 
-        let requestData = new models.EncryptDataRequest();
+        let requestData = new indCommon.EncryptDataRequest();
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
         requestData.messageObject = JSON.parse(req.body.message);
@@ -70,7 +68,7 @@ router.post('/encryptData', async (req: express.Request, res: express.Response, 
         responseData = addressObfuscator.encryptData(requestData);
     }
     catch (error) {
-        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+        responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;
     }
 
     res.send(responseData);
@@ -80,9 +78,9 @@ router.post('/grantAccess', async (req: express.Request, res: express.Response, 
     let responseData;
 
     try {
-        responseData = new models.GrantAccessResponse();
+        responseData = new indCommon.GrantAccessResponse();
 
-        let requestData = new models.GrantAccessRequest();
+        let requestData = new indCommon.GrantAccessRequest();
         requestData.message = req.body.message;
         requestData.signature = req.body.signature;
         requestData.messageObject = JSON.parse(req.body.message);
@@ -90,7 +88,7 @@ router.post('/grantAccess', async (req: express.Request, res: express.Response, 
         responseData = addressObfuscator.grantAccess(requestData);
     }
     catch (error) {
-        responseData.error = constants.errorRequestObjectParseFailed + " " + error;
+        responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;
     }
 
     res.send(responseData);

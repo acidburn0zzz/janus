@@ -3,14 +3,8 @@ import * as mocha from 'mocha';
 import * as chai from 'chai';
 import { Guid } from 'guid-typescript';
 
+import * as indCommon from 'ind-common';
 import { AddressObfuscator } from '../script/addressobfuscator';
-import {
-    OneTimeAddressRequest, OneTimeAddressResponse, DecryptDataRequest, DecryptDataResponse,
-    EncryptDataRequest, EncryptDataResponse, GrantAccessRequest, GrantAccessResponse
-        } from '../script/models';
-import { Utils } from '../script/utils';
-import { AsymmetricKeyEncryption } from '../script/asymmetrickey-encryption';
-import { SymmetricKeyEncryption } from '../script/symmetrickey-encryption';
 
 const expect = chai.expect;
 const should = chai.should();
@@ -21,7 +15,7 @@ describe('address obfuscator', () => {
     it('should return a one time address for a given guid', () => {
 
         let obfuscator = new AddressObfuscator();
-        let addressRequest = new OneTimeAddressRequest();
+        let addressRequest = new indCommon.OneTimeAddressRequest();
         let senderWallet = ethers.Wallet.createRandom();
         let messageObject = {
             guid: Guid.create().toString(),
@@ -35,7 +29,7 @@ describe('address obfuscator', () => {
 
         let response = obfuscator.getOnetimeAddress(addressRequest);
 
-        (new Utils()).writeFormattedMessage("getOneTimeAddress Response", response);
+        (new indCommon.Utils()).writeFormattedMessage("getOneTimeAddress Response", response);
 
         response.error.should.equal("OK");
         response.OTAddress.length.should.greaterThan(0);
@@ -50,13 +44,13 @@ describe('encrypt decrypt methods', () => {
 
     let obfuscator = new AddressObfuscator();
     let senderWallet = ethers.Wallet.createRandom();
-    let addressRequest = new OneTimeAddressRequest();
+    let addressRequest = new indCommon.OneTimeAddressRequest();
 
-    let utils = new Utils();
+    let utils = new indCommon.Utils();
     let otaResponse;
-    let responseEncrypt = new EncryptDataResponse("");
-    let symEngine = new SymmetricKeyEncryption();
-    let asymEngine = new AsymmetricKeyEncryption();
+    let responseEncrypt = new indCommon.EncryptDataResponse("");
+    let symEngine = new indCommon.SymmetricKeyEncryption();
+    let asymEngine = new indCommon.AsymmetricKeyEncryption();
 
     let symmetricKeyBuyer = symEngine.generateSymKey();
     let symmetricKeyInspector = symEngine.generateSymKey();
@@ -87,7 +81,9 @@ describe('encrypt decrypt methods', () => {
         /**
          * Create a decrypt request object and populate the sample encrypted data
          */
-        let requestEncrypt = new EncryptDataRequest();
+
+        try {
+                    let requestEncrypt = new indCommon.EncryptDataRequest();
         let encryptMessageObject = {
             guid: guidString,
             keys: [
@@ -106,6 +102,7 @@ describe('encrypt decrypt methods', () => {
             companyName: "Shell Corporation"
         };
 
+        
         requestEncrypt.message = JSON.stringify(encryptMessageObject);
         requestEncrypt.signature = senderWallet.signMessage(requestEncrypt.message);
         requestEncrypt.messageObject = encryptMessageObject;
@@ -119,14 +116,17 @@ describe('encrypt decrypt methods', () => {
         responseEncrypt = obfuscator.encryptData(requestEncrypt);
 
         utils.writeFormattedMessage("Response data", responseEncrypt.data);
-
+        }
+        catch(error) {
+            console.log(error);
+        }
     });
 
     it('should decrypt data', () => {
         /**
          * Create a decrypt request object and populate the sample encrypted data
          */
-        let requestDecrypt = new DecryptDataRequest();
+        let requestDecrypt = new indCommon.DecryptDataRequest();
         let decryptMessageObject = {
             guid: guidString,
             keys: [
@@ -166,7 +166,7 @@ describe('encrypt decrypt methods', () => {
         /**
          * Create a new OTA for the requesting party
          */
-        let partyAddressRequest = new OneTimeAddressRequest();
+        let partyAddressRequest = new indCommon.OneTimeAddressRequest();
         let partyGuidString = Guid.create().toString();
         let grantAccessMessageObject = {
             guid: partyGuidString,
@@ -178,7 +178,7 @@ describe('encrypt decrypt methods', () => {
 
         let partyOtaResponse = obfuscator.getOnetimeAddress(partyAddressRequest);
 
-        let requestGrantAccess = new GrantAccessRequest();
+        let requestGrantAccess = new indCommon.GrantAccessRequest();
         let requestGrantAccessMessageObject = {
             guid: guidString,
             accessibleSymmetricKey: encryptedSymmetricKeyInspector,
@@ -194,7 +194,7 @@ describe('encrypt decrypt methods', () => {
         let responseGrantAccess = obfuscator.grantAccess(requestGrantAccess);
 
         //decrypt the data using the newly created encrypted symmetric key
-        let requestDecrypt = new DecryptDataRequest();
+        let requestDecrypt = new indCommon.DecryptDataRequest();
         let decryptMessageObject = {
                                         guid: partyGuidString,
                                         keys: [
