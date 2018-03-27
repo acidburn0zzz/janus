@@ -1,9 +1,10 @@
 import * as model from "../script/models" 
 import * as indClient from "../script/ind-client" 
 import * as constants from "../script/constants" 
-import * as httpUtil from '../script/http-util';
+//import * as httpService from '../script/http.service';
 import * as mocha from 'mocha'
 import * as chai from 'chai'
+import { HttpService } from "../script/http.service";
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -39,6 +40,7 @@ describe('Trade tests', () => {
 	let oracleUrl: string;
     let client: indClient.IndClient;
     let testTradeNumber: number;
+    let httpService: HttpService;
 
     before(function () {
         this.timeout(0);
@@ -49,22 +51,23 @@ describe('Trade tests', () => {
             marketplaceAddress = "0xc3846686993466515c28504cf75a98cb777967ae";
             tradeFactoryAddress = "0xc3846686993466515c28504cf75a98cb777967ae";
             testTradeNumber = 0;
+            httpService = new HttpService();
             console.log("directory:", process.cwd());
-            client = new indClient.IndClient(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl);
+            client = new indClient.IndClient(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl, httpService);
 
             let message = new model.RegistrationData({companyName: "Mercuria", url: "localhost:4000"});
             let request = new model.WalletRegistrationRequest({message: message});
-            let response = await httpUtil.HttpUtil.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            let response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Mercuria:", response);
 
             message = new model.RegistrationData({companyName: "Shell", url: "localhost:4000"});
             request = new model.WalletRegistrationRequest({message: message});
-            response = await httpUtil.HttpUtil.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Shell:", response);
 
             message = new model.RegistrationData({companyName: "BP", url: "localhost:4000"});
             request = new model.WalletRegistrationRequest({message: message});
-            response = await httpUtil.HttpUtil.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered BP:", response);
         });
         return fn();

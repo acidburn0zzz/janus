@@ -1,7 +1,7 @@
 declare var require: any
 declare const Buffer
 import { Contract, utils, Wallet, Provider, providers, Interface } from "ethers";
-import { HttpUtil } from './http-util';
+import { IHttpService } from './ihttp.service';
 import { Guid } from "guid-typescript";
 const Web3 = require('web3');
 import * as ethUtil from 'ethereumjs-util';
@@ -38,6 +38,12 @@ declare var web3: any;
 
 export class SmartContractService {
   
+  httpService: IHttpService;
+  
+  constructor(httpService: IHttpService) {
+    this.httpService = httpService;
+  }
+
   // private internalSign(message: string, account : string): any {
   //   let localWeb3 = globalWeb3();
   //   let hexEncoded = ethUtil.bufferToHex(new Buffer(message, 'utf8'));
@@ -78,7 +84,7 @@ export class SmartContractService {
       let urlParts: string[] = oracleUrl.split(':');
       let host: string = urlParts[0];
       let port: number = Number(urlParts[1]);
-      let resp: CreateTransactionResponse = await HttpUtil.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
+      let resp: CreateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
       response = {tradeNumber:resp.contractId,transactionhash:resp.transactionHash,status:resp.status,error:resp.error};      
     }
     catch (error) {
@@ -115,7 +121,7 @@ export class SmartContractService {
       let urlParts: string[] = oracleUrl.split(':');
       let host: string = urlParts[0];
       let port: number = Number(urlParts[1]);
-      let resp: GrantAccessResponse = await HttpUtil.RaiseHttpRequest(host, String(port), constants.GrantAccessPath, constants.GrantAccessMethod, request);
+      let resp: GrantAccessResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.GrantAccessPath, constants.GrantAccessMethod, request);
       console.log(resp);
       response = {transactionHash:resp.transactionHash,status:resp.status,error:resp.error};      
     }
