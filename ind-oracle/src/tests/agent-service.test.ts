@@ -3,6 +3,7 @@ import * as model from "../script/models"
 import * as ethers from "ethers" 
 import * as mocha from 'mocha'
 import * as chai from 'chai'
+import { RegistrationData, WalletRegistrationRequest, UnRegistrationData, WalletUnRegistrationRequest } from "ind-common";
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -51,8 +52,8 @@ describe('Agent-service tests', () => {
         console.log("In Register test");
 
         //register
-        let message = new model.RegistrationData({companyName: testCompanyName, url: testHost+":"+testPort});
-        let request = new model.WalletRegistrationRequest({message: message});
+        let message = new RegistrationData({companyName: testCompanyName, url: testHost+":"+testPort});
+        let request = new WalletRegistrationRequest({message: message});
         var response = await agentSevice.registerWalletAgent(request);
         console.log(response);
         assert.equal(response,true,"Registration failed");
@@ -70,8 +71,8 @@ describe('Agent-service tests', () => {
         console.log("In UnRegister test");
 
         //unregister
-        let message = new model.UnRegistrationData({companyName: testCompanyName});
-        let request = new model.WalletUnRegistrationRequest({message: message});
+        let message = new UnRegistrationData({companyName: testCompanyName});
+        let request = new WalletUnRegistrationRequest({message: message});
         var response = await agentSevice.unRegisterWalletAgent(request);
         console.log(response);
         assert.equal(response,true,"UnRegistration failed");

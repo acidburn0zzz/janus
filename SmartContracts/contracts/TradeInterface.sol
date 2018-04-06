@@ -5,8 +5,10 @@ import "./ContractInterface.sol";
 
 contract TradeInterface is ContractInterface {
 
+    uint public tradeNumber;
     enum Party { Unassigned, Buyer, Seller, Broker}
     enum Field { unassigned, tradeDate, product, qty, price, buyer, seller, broker, paymentTerm}
+    enum SymKey { unassigned, commonFields, paymentTerms}
     function initialize(FactoryInterface pFactory, string pGuid, address pOracleAddress, uint pTradeNumber) public;
     function updateData(bytes32 pCommonFieldsSymKeyHash, string pTradeDate, string pProduct, 
             string pQty, string pPrice) public;

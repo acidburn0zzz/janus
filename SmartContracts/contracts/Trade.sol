@@ -12,8 +12,8 @@ contract Trade is GovernedSmartContract, TradeInterface {
     uint8[] PAYMENT_FIELDS = [uint8(Field.unassigned), uint8(Field.paymentTerm)];
     
     uint8[] signatureRequiredParties = [uint8(Party.Buyer), uint8(Party.Seller)];
-
-    uint public tradeNumber;
+    
+    //uint public tradeNumber;
     FactoryInterface public tradeFactory;
 
 	uint public tradeIsActive;
@@ -36,6 +36,9 @@ contract Trade is GovernedSmartContract, TradeInterface {
         tradeFactory = pFactory;
         oracleAddress = pOracleAddress;
 		tradeIsActive = 1;
+		SYMKEY_LIST[uint8(Party.Buyer)] = [uint8(SymKey.commonFields), uint8(SymKey.paymentTerms)];
+		SYMKEY_LIST[uint8(Party.Seller)] = [uint8(SymKey.commonFields), uint8(SymKey.paymentTerms)];
+		SYMKEY_LIST[uint8(Party.Broker)] = [uint8(SymKey.commonFields)];
     }
     
     function updateData(bytes32 pCommonFieldsSymKeyHash, string pTradeDate, string pProduct, 
@@ -54,15 +57,15 @@ contract Trade is GovernedSmartContract, TradeInterface {
         tradeFactory.raiseContractFieldUpdated(tradeNumber);
     }
     
-    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pCommonFieldsSymKey, string pPaymentFieldsSymKey) public onlyIfTradeIsActive { //onlyOracle
+    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pSymKey1, string pSymKey2) public onlyIfTradeIsActive { //onlyOracle
         assignOTAddressToParty(observerPartyIndex, partyAddress);
-        if(keccak256(pCommonFieldsSymKey) != keccak256("")) {
-            grantSymmetricKeyAccessToParty(partyAddress, pCommonFieldsSymKey);
-            grantFieldAccessToSymmetricKey(pCommonFieldsSymKey, COMMON_FIELDS);
+        if(SYMKEY_LIST[observerPartyIndex].length >= 1 && keccak256(pSymKey1) != keccak256("")) {
+            grantSymmetricKeyAccessToParty(partyAddress, uint8(SymKey.commonFields), pSymKey1);
+            grantFieldAccessToSymmetricKey(pSymKey1, COMMON_FIELDS);
         }
-        if(keccak256(pPaymentFieldsSymKey) != keccak256("")) {
-            grantSymmetricKeyAccessToParty(partyAddress, pPaymentFieldsSymKey);
-            grantFieldAccessToSymmetricKey(pPaymentFieldsSymKey, PAYMENT_FIELDS);
+        if(SYMKEY_LIST[observerPartyIndex].length >= 2 && keccak256(pSymKey2) != keccak256("")) {
+            grantSymmetricKeyAccessToParty(partyAddress, uint8(SymKey.paymentTerms), pSymKey2);
+            grantFieldAccessToSymmetricKey(pSymKey2, PAYMENT_FIELDS);
         }
         if(observerPartyIndex == uint8(Party.Buyer)) {
             //fields[uint8(Field.buyer)].field[keccak256(Field.buyer)] = EncryptedValue({lastUpdated: now, value: companyName});
@@ -77,11 +80,12 @@ contract Trade is GovernedSmartContract, TradeInterface {
             fields[uint8(Field.broker)].value = companyName;
             fields[uint8(Field.broker)].lastUpdated = now;
         }
-        //tradeFactory.raiseContractPartyUpdated(tradeNumber, observerPartyIndex, partyAddress);
+        if(msg.sender != address(tradeFactory))
+            tradeFactory.raiseContractPartyUpdated(tradeNumber, observerPartyIndex, partyAddress);
     }
     
     function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string) {
-        return accessibleSymmetricKeysByUser[partyAddress][symKeyIndex];
+        return accessibleSymmetricKeysByUser[partyAddress].accessibleSymmetricKeys[symKeyIndex];
     }
     
     function getGuid() view public returns (string) {

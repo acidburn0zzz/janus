@@ -4,7 +4,7 @@ import * as constants from "../script/constants"
 //import * as httpService from '../script/http.service';
 import * as mocha from 'mocha'
 import * as chai from 'chai'
-import { HttpService } from "../script/http.service";
+import { HttpService, Party, RegistrationData, WalletRegistrationRequest } from 'ind-common';
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -55,18 +55,18 @@ describe('Trade tests', () => {
             console.log("directory:", process.cwd());
             client = new indClient.IndClient(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl, httpService);
 
-            let message = new model.RegistrationData({companyName: "Mercuria", url: "localhost:4000"});
-            let request = new model.WalletRegistrationRequest({message: message});
+            let message = new RegistrationData({companyName: "Mercuria", url: "localhost:4000"});
+            let request = new WalletRegistrationRequest({message: message});
             let response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Mercuria:", response);
 
-            message = new model.RegistrationData({companyName: "Shell", url: "localhost:4000"});
-            request = new model.WalletRegistrationRequest({message: message});
+            message = new RegistrationData({companyName: "Shell", url: "localhost:4000"});
+            request = new WalletRegistrationRequest({message: message});
             response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Shell:", response);
 
-            message = new model.RegistrationData({companyName: "BP", url: "localhost:4000"});
-            request = new model.WalletRegistrationRequest({message: message});
+            message = new RegistrationData({companyName: "BP", url: "localhost:4000"});
+            request = new WalletRegistrationRequest({message: message});
             response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered BP:", response);
         });
@@ -82,8 +82,8 @@ describe('Trade tests', () => {
         let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
         let sellerAddress: string = "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef";
         
-        let myParty = new model.Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
-        let otherParty = new model.Party({partyType:model.PartyType.Seller,partyAddress:sellerAddress,companyName:sellerCompanyName});
+        let myParty = new Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
+        let otherParty = new Party({partyType:model.PartyType.Seller,partyAddress:sellerAddress,companyName:sellerCompanyName});
         let response = await client.createTrade(myParty,otherParty, new Date(), "WTI", 10000, 50, "term1");
         
         //verify
@@ -105,8 +105,8 @@ describe('Trade tests', () => {
         let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
         let brokerAddress: string = "0x843Bb18ea2b86ef3807E006723784435FF00e27F";
 
-        let myParty = new model.Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
-        let parties = [new model.Party({partyType:model.PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
+        let myParty = new Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
+        let parties = [new Party({partyType:model.PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
         let response = await client.updateParty(testTradeNumber, myParty, parties);
         
         //verify

@@ -1,7 +1,7 @@
 declare var require: any
 declare const Buffer
 import { Contract, utils, Wallet, Provider, providers, Interface } from "ethers";
-import { IHttpService } from './ihttp.service';
+import { IHttpService, Party, PartyType, TransactionData, CreateTransactionRequest, CreateTransactionResponse } from 'ind-common';
 import { Guid } from "guid-typescript";
 const Web3 = require('web3');
 import * as ethUtil from 'ethereumjs-util';
@@ -10,7 +10,7 @@ let factoryJson: any = require('../../contracts/FactoryInterface.json');
 let contractJson: any = require('../../contracts/ContractInterface.json');
 let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
-import { Party, PartyType, TransactionData, CreateTransactionRequest, CreateTransactionResponse, GrantAccessData, GrantAccessRequest, GrantAccessResponse } from './models';
+import { GrantAccessData, GrantAccessRequest, GrantAccessResponse } from './models';
 import * as constants from './constants';
 import { CreateTransactionPath } from "./constants";
 

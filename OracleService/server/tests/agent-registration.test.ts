@@ -1,7 +1,7 @@
 import * as service from "../script/oracle.service"
 import * as ethers from "ethers" 
-import * as oracle from "ind-oracle" 
-
+//import * as oracle from "ind-oracle" 
+import * as common from "ind-common" 
 import * as mocha from 'mocha'
 import * as chai from 'chai'
 
@@ -46,8 +46,8 @@ describe('Agent-registration tests', () => {
     it('Register an ind-agent', async function () {
         this.timeout(0);
         console.log("In Register test");
-        let request: oracle.WalletRegistrationRequest = new oracle.WalletRegistrationRequest();
-        request.message = new oracle.RegistrationData()
+        let request: common.WalletRegistrationRequest = new common.WalletRegistrationRequest();
+        request.message = new common.RegistrationData()
         request.message.companyName = "BP";
         request.message.url = "localhost:6000";
         var response = await oracleSevice.registerWalletAgent(request);
@@ -58,8 +58,8 @@ describe('Agent-registration tests', () => {
     it('UnRegister an ind-agent', async function () {
         this.timeout(0);
         console.log("In UnRegister test");
-        let request: oracle.WalletUnRegistrationRequest = new oracle.WalletUnRegistrationRequest();
-        request.message = new oracle.UnRegistrationData()
+        let request: common.WalletUnRegistrationRequest = new common.WalletUnRegistrationRequest();
+        request.message = new common.UnRegistrationData()
         request.message.companyName = "BP";
         var response = await oracleSevice.unRegisterWalletAgent(request);
         console.log(response);

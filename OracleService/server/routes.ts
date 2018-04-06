@@ -1,7 +1,8 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
-import { Party, CreateTransactionRequest, CreateTransactionResponse, GrantAccessRequest, GrantAccessResponse,  
-  WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-oracle';
+import { GrantAccessRequest, GrantAccessResponse} from 'ind-oracle';
+import { Party, CreateTransactionRequest, CreateTransactionResponse,  
+  WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-common';
 var oracle: OracleService;
 const router = express.Router();
 
@@ -53,13 +54,10 @@ router.post('/unRegisterWalletAgent', async (req: express.Request, res: express.
 
 router.post('/createTransaction', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   let createTransactionRequest = new CreateTransactionRequest({});
-  // createTransactionRequest.message.marketplaceAddress = req.body.message.marketplaceAddress;
-  // createTransactionRequest.message.factoryAddress = req.body.message.factoryAddress;
-  // createTransactionRequest.message.myParty = req.body.message.myParty;
-  // createTransactionRequest.message.otherParty = req.body.message.otherParty;
   console.log("body", req.body);
-  createTransactionRequest.message = req.body.message;
+  createTransactionRequest.data = req.body.data;
   createTransactionRequest.signature = req.body.signature;
+  createTransactionRequest.otherInfo = req.body.otherInfo;
   console.log("createTransactionRequest", createTransactionRequest);
   if(!oracle)
     oracle = new OracleService();
@@ -77,10 +75,6 @@ router.post('/createTransaction', async (req: express.Request, res: express.Resp
 
 router.post('/grantAccessToContract', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   let grantAccessRequest = new GrantAccessRequest({});
-  // grantAccessRequest.message.marketplaceAddress = req.body.message.marketplaceAddress;
-  // grantAccessRequest.message.factoryAddress = req.body.message.factoryAddress;
-  // grantAccessRequest.message.myParty = req.body.message.myParty;
-  // grantAccessRequest.message.parties = req.body.message.parties;
   console.log("body", req.body);
   grantAccessRequest.message = req.body.message;
   grantAccessRequest.signature = req.body.signature;

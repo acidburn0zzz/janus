@@ -1,15 +1,15 @@
-import { SymmetricKeyEncryption } from './symmetrickey-encryption';
-import { AsymmetricKeyEncryption } from './asymmetrickey-encryption';
+import * as indCommon from "ind-common";
 import { Contract, utils, Wallet, Provider, providers, Interface } from "ethers";
 import { AgentService } from './agent.service';
-import { IHttpService } from './ihttp.service';
 import { Guid } from "guid-typescript";
 
 let factoryJson: any = require('../../contracts/FactoryInterface.json');
 let contractJson: any = require('../../contracts/ContractInterface.json');
 let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
-import { Party, PartyType, CreateTransactionRequest, CreateTransactionResponse, GrantAccessRequest, GrantAccessResponse } from './models';
+import { GrantAccessRequest, GrantAccessResponse } from './models';
+import { Party, PartyType, CreateTransactionRequest, CreateTransactionResponse } from "ind-common";
+
 import * as constants from './constants';
 
 
@@ -17,9 +17,9 @@ export class SmartContractService {
   oracleWallet: Wallet;
   provider: Provider;
   agentService: AgentService;
-  httpService: IHttpService;
+  httpService: indCommon.IHttpService;
 
-  constructor(provider: Provider, wallet: Wallet, agentService: AgentService, httpService: IHttpService) {
+  constructor(provider: Provider, wallet: Wallet, agentService: AgentService, httpService: indCommon.IHttpService) {
     this.provider = provider;
     this.oracleWallet = wallet;
     this.agentService = agentService;
@@ -90,36 +90,26 @@ export class SmartContractService {
 
     try{
         //prepare transaction to post to block chain
-        let messageObject = request.message;           
-        let callingParty = request.message.myParty;
-        console.log("callingParty", callingParty);
-        let otherParty = request.message.otherParty;
-        console.log("otherParty", otherParty);
+        let infoObject = request.otherInfo;           
+        let party1: Party = request.otherInfo.myParty;
+        console.log("callingParty", party1);
+        let party2: Party = request.otherInfo.otherParty;
+        console.log("otherParty", party2);
         response = new CreateTransactionResponse({});
-
-        let buyer: Party;
-        let seller: Party;
-        if(callingParty.partyType == PartyType.Buyer) {
-          buyer = callingParty;
-          seller = otherParty;
-        } else {
-          buyer = otherParty;
-          seller = callingParty;
-        }
  		
-        let buyerAddress: string; 
-        let buyerCompanyName: string;
-        let buyerCommonFieldsEncSymKey: string;
-        let buyerPaymentFieldsEncSymKey: string;
-        let sellerAddress: string;
-        let sellerCompanyName: string;
-        let sellerCommonFieldsEncSymKey: string;
-        let sellerPaymentFieldsEncSymKey: string;
-        let guid: string = Guid.create().toString();
+        let party1Address: string; 
+        let party1CompanyName: string;
+        let party1CommonFieldsEncSymKey: string;
+        let party1PaymentFieldsEncSymKey: string;
+        let party2Address: string;
+        let party2CompanyName: string;
+        let party2CommonFieldsEncSymKey: string;
+        let party2PaymentFieldsEncSymKey: string;
+        let guid: string = request.data.guid;//Guid.create().toString();
         console.log("guid", guid);
 
-        let asymEngine: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
-        let symEngine: SymmetricKeyEncryption = new SymmetricKeyEncryption();
+        let asymEngine: indCommon.AsymmetricKeyEncryption = new indCommon.AsymmetricKeyEncryption();
+        let symEngine: indCommon.SymmetricKeyEncryption = new indCommon.SymmetricKeyEncryption();
 
         //Getting new symmetric keys
         let commonFieldsSymKey: string = symEngine.generateSymKey();
@@ -128,49 +118,49 @@ export class SmartContractService {
         console.log("Payment Sym Key:", paymentFieldsSymKey);
         
         //verify signature and permission
-        if(!this.verifySignature(request.message, request.signature))
+        if(!this.verifySignature(request.data, request.signature))
         {
           response.status = false;
           response.error = "Invalid signature";
           return response;
         }
-        if(buyer) {
-          //Getting onetime key for buyer
-          let buyerPartyHDWalletUrl = await this.agentService.getWalletAgentUrl(buyer.companyName);
-          console.log("buyerPartyHDWalletUrl", buyerPartyHDWalletUrl);
-          let buyerPartyOTKey = await this.getOTKey(guid, buyer.companyName, buyerPartyHDWalletUrl);
-          console.log("buyerPartyOTKey", buyerPartyOTKey);
-          buyerAddress = buyerPartyOTKey.OTAddress         
-          buyerCompanyName = symEngine.encrypt(buyer.companyName, commonFieldsSymKey);
+        if(party1) {
+          //Getting onetime key for party1
+          let party1PartyHDWalletUrl = await this.agentService.getWalletAgentUrl(party1.companyName);
+          console.log("party1PartyHDWalletUrl", party1PartyHDWalletUrl);
+          let party1PartyOTKey = await this.getOTKey(guid, party1.companyName, party1PartyHDWalletUrl);
+          console.log("party1PartyOTKey", party1PartyOTKey);
+          party1Address = party1PartyOTKey.OTAddress         
+          party1CompanyName = symEngine.encrypt(party1.companyName, commonFieldsSymKey);
           //Encrypt the symmetric keys 
-          buyerCommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
-          console.log("Common Enc Sym Key:", buyerCommonFieldsEncSymKey);
-          buyerPaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, buyerPartyOTKey.bitcorePublicKey);
-          console.log("Payment Enc Sym Key:", buyerPaymentFieldsEncSymKey);
+          party1CommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, party1PartyOTKey.bitcorePublicKey);
+          console.log("Common Enc Sym Key:", party1CommonFieldsEncSymKey);
+          party1PaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, party1PartyOTKey.bitcorePublicKey);
+          console.log("Payment Enc Sym Key:", party1PaymentFieldsEncSymKey);
         }
-        if(seller) {
-          //Getting onetime key for seller
-          let sellerPartyHDWalletUrl = await this.agentService.getWalletAgentUrl(seller.companyName);
-          console.log("sellerPartyHDWalletUrl", sellerPartyHDWalletUrl);
-          let sellerPartyOTKey = await this.getOTKey(guid, seller.companyName, sellerPartyHDWalletUrl);
-          console.log("sellerPartyOTKey", sellerPartyOTKey);
-          sellerAddress = sellerPartyOTKey.OTAddress         
-          sellerCompanyName = symEngine.encrypt(seller.companyName, commonFieldsSymKey);
+        if(party2) {
+          //Getting onetime key for party2
+          let party2PartyHDWalletUrl = await this.agentService.getWalletAgentUrl(party2.companyName);
+          console.log("party2PartyHDWalletUrl", party2PartyHDWalletUrl);
+          let party2PartyOTKey = await this.getOTKey(guid, party2.companyName, party2PartyHDWalletUrl);
+          console.log("party2PartyOTKey", party2PartyOTKey);
+          party2Address = party2PartyOTKey.OTAddress         
+          party2CompanyName = symEngine.encrypt(party2.companyName, commonFieldsSymKey);
           //Encrypt the symmetric keys 
-          sellerCommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
-          console.log("Common Enc Sym Key:", sellerCommonFieldsEncSymKey);
-          sellerPaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, sellerPartyOTKey.bitcorePublicKey);
-          console.log("Payment Enc Sym Key:", sellerPaymentFieldsEncSymKey);
+          party2CommonFieldsEncSymKey = "0x" + asymEngine.encrypt(commonFieldsSymKey, party2PartyOTKey.bitcorePublicKey);
+          console.log("Common Enc Sym Key:", party2CommonFieldsEncSymKey);
+          party2PaymentFieldsEncSymKey = "0x" + asymEngine.encrypt(paymentFieldsSymKey, party2PartyOTKey.bitcorePublicKey);
+          console.log("Payment Enc Sym Key:", party2PaymentFieldsEncSymKey);
         }
         //Create transaction from factory
         let overrideOptions = {
            gasLimit: 2000000,
         };
-        let factory: Contract = this.factoryContract(request.message.factoryAddress);
-        console.log(guid, buyerAddress, buyerCompanyName, buyerCommonFieldsEncSymKey, buyerPaymentFieldsEncSymKey,
-          sellerAddress, sellerCompanyName, sellerCommonFieldsEncSymKey, sellerPaymentFieldsEncSymKey, overrideOptions);
-        let tx = await factory.createTransaction(guid, buyerAddress, buyerCompanyName, buyerCommonFieldsEncSymKey, buyerPaymentFieldsEncSymKey,
-          sellerAddress, sellerCompanyName, sellerCommonFieldsEncSymKey, sellerPaymentFieldsEncSymKey, overrideOptions);
+        let factory: Contract = this.factoryContract(request.otherInfo.factoryAddress);
+        console.log(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
+          party2.partyType, party2Address, party2CompanyName, party2CommonFieldsEncSymKey, party2PaymentFieldsEncSymKey, overrideOptions);
+        let tx = await factory.createTransaction(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
+          party2.partyType, party2Address, party2CompanyName, party2CommonFieldsEncSymKey, party2PaymentFieldsEncSymKey, overrideOptions);
 
         console.log("tx", tx.hash);
         let confirmedTxn = await this.provider.waitForTransaction(tx.hash, 20000);
@@ -237,8 +227,8 @@ export class SmartContractService {
       }
       
       guid = await contract.getGuid();
-      let asymEngine: AsymmetricKeyEncryption = new AsymmetricKeyEncryption();
-      let symEngine: SymmetricKeyEncryption = new SymmetricKeyEncryption();
+      let asymEngine: indCommon.AsymmetricKeyEncryption = new indCommon.AsymmetricKeyEncryption();
+      let symEngine: indCommon.SymmetricKeyEncryption = new indCommon.SymmetricKeyEncryption();
 
       let callingPartyHDWalletUrl = await this.agentService.getWalletAgentUrl(request.message.myParty.companyName);
       console.log("callingPartyHDWalletUrl", callingPartyHDWalletUrl);

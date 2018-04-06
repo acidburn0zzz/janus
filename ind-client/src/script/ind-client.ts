@@ -1,10 +1,8 @@
-import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest} from './models';
 import { SmartContractService } from './smartcontract.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
 import * as constants from './constants';
 import { error } from 'util';
-import { IHttpService } from './ihttp.service';
-import { HttpService } from './http.service';
+import { IHttpService, HttpService, Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
 
 export class IndClient {
 	marketplaceAddress: string;

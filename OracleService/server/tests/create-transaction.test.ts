@@ -1,6 +1,7 @@
 import * as service from "../script/oracle.service"
 import * as ethers from "ethers" 
 import * as oracle from "ind-oracle" 
+import * as common from "ind-common" 
 
 import * as mocha from 'mocha'
 import * as chai from 'chai'
@@ -47,13 +48,13 @@ describe.only('Create transaction tests', () => {
         this.timeout(0);
         console.log("In create black trade test");
         
-        let request: oracle.CreateTransactionRequest = new oracle.CreateTransactionRequest();
-        request.message = new oracle.TransactionData()
-        request.message.marketplaceAddress = "0x0000";
-        request.message.myParty = new oracle.Party({ partyType: 1, partyAddress: "0x12345", companyName: "Mercuria" });
-        request.message.parties = [new oracle.Party({ partyType: 2, partyAddress: "0x56789", companyName: "Shell" })];
-        request.message.signerCompany = "Mercuria";
-        request.message.signerName = "Max";
+        let request: common.CreateTransactionRequest = new common.CreateTransactionRequest();
+        request.data = new common.TransactionData();
+        request.data.guid = "12dfdfg";
+        request.otherInfo = new common.TransactionInfo();
+        request.otherInfo.marketplaceAddress = "0x0000";
+        request.otherInfo.myParty = new common.Party({ partyType: 1, partyAddress: "0x12345", companyName: "Mercuria" });
+        request.otherInfo.parties = [new common.Party({ partyType: 2, partyAddress: "0x56789", companyName: "Shell" })];
         request.signature = '';
         var response = await oracleSevice.createTransaction(request);
         console.log(response);
