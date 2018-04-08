@@ -1,4 +1,4 @@
-import * as constants from './hdwallet-constants';
+import * as constants from './constants';
 import * as commontypes from './common-types';
 
 export class BaseRequest {
@@ -171,5 +171,66 @@ export class GrantAccessResponse extends BaseResponse {
         super(guid);
 
         this.error = "OK";
+    }
+}
+
+/**
+ *
+{
+    "data": {
+        "guid": "5465675565",
+        "tradeDate": "12/20/2017",
+        "qty": "100000",
+        "product": "WTI",
+        "price": "39.6",
+        "buyer": "Mercuria",
+        "seller": "Shell",
+        "messageHash": "65u56rytuy56454"
+    },
+    "signature": "0x07c5afcc235567ccc94b94f997867eeca15573ff859b053aba5ce321cf76aeb92d4822fb0007ba58b4c41b",
+    "otherInfo": {
+        "factoryAddress": "0x03334c41b",
+        "marketplaceAddress": "0x5454565",
+        "myParty": Party,
+        "otherParty": Party,
+        "functionList": [
+                    "updateData",
+                    "updatePaymentInfo"
+        ],
+        "updateData": [
+                    "symmetricKeyIndex",
+                    "tradeDate",
+                    "product",
+                    "qty",
+                    "price"
+        ],
+        "updatePaymentInfo": [
+                    "symmetricKeyIndex",
+                    "paymentTerm"
+        ]
+    }
+}
+
+ */
+
+export class PostTransactionRequest extends BaseRequest {
+
+    data: {
+        guid: string;
+        messageHash: string;
+    };
+    signature: string;
+    otherInfo: {
+        factoryAddress: string;
+        marketPlaceAddress: string;
+        functionList: string[];
+    };
+}
+
+export class PostTransactionResponse extends BaseResponse {
+    constructor(guid: string = "") {
+        super(guid);
+
+        this.error = constants.OK;
     }
 }
