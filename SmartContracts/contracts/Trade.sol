@@ -48,13 +48,13 @@ contract Trade is GovernedSmartContract, TradeInterface {
         updateField(pCommonFieldsSymKeyHash, uint8(Field.qty), pQty);
         updateField(pCommonFieldsSymKeyHash, uint8(Field.price), pPrice);
         resetSignatures();
-        tradeFactory.raiseContractFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber, guid);
     }
     
     function updatePaymentInfo(bytes32 pPaymentFieldsSymKeyHash, string pPaymentTerm) public onlyByPartiesToTheTransaction(pPaymentFieldsSymKeyHash) onlyIfTradeIsActive { //
         updateField(pPaymentFieldsSymKeyHash, uint8(Field.paymentTerm), pPaymentTerm);
         resetSignatures();
-        tradeFactory.raiseContractFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber, guid);
     }
     
     function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pSymKey1, string pSymKey2) public onlyIfTradeIsActive { //onlyOracle
@@ -81,7 +81,7 @@ contract Trade is GovernedSmartContract, TradeInterface {
             fields[uint8(Field.broker)].lastUpdated = now;
         }
         if(msg.sender != address(tradeFactory))
-            tradeFactory.raiseContractPartyUpdated(tradeNumber, observerPartyIndex, partyAddress);
+            tradeFactory.raiseContractPartyUpdated(tradeNumber, guid, observerPartyIndex, partyAddress);
     }
     
     function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string) {
@@ -94,7 +94,7 @@ contract Trade is GovernedSmartContract, TradeInterface {
     
     function accept(bytes32 symmetricKeyHash, string signerKey) public onlyByPartiesToTheTransaction(symmetricKeyHash) onlyIfTradeIsActive {
         acceptInternal(symmetricKeyHash, signerKey);
-        tradeFactory.raiseContractFieldUpdated(tradeNumber);
+        tradeFactory.raiseContractFieldUpdated(tradeNumber, guid);
     }
 
 	function cancel(bytes32 symmetricKeyHash) public onlyByPartiesToTheTransaction(symmetricKeyHash) {
@@ -103,7 +103,7 @@ contract Trade is GovernedSmartContract, TradeInterface {
 
 		if(!allSigned){ 
 			tradeIsActive = 0;
-			tradeFactory.raiseContractFieldUpdated(tradeNumber);
+			tradeFactory.raiseContractFieldUpdated(tradeNumber, guid);
 		}
 	}
     

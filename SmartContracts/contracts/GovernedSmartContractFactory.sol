@@ -3,15 +3,15 @@ pragma solidity ^0.4.17;
 contract GovernedSmartContractFactory {
     uint nextTokenNumber;
     address public oracleAddress;
-    mapping(uint => address) public contracts;
+    mapping(bytes32 => address) public contracts;
     
     modifier onlyOracle() {
         require(msg.sender == oracleAddress);
         _;
     }
     
-    modifier onlyContractOwner(uint tokenNumber) {
-        require(msg.sender == contracts[tokenNumber]);
+    modifier onlyContractOwner(string guid) {
+        require(msg.sender == contracts[keccak256(guid)]);
         _;
     }
 

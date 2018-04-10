@@ -21,6 +21,7 @@ exports.GrantAccessResponse = models.GrantAccessResponse;
 exports.Party = models.Party;
 exports.PartyType = models.PartyType;
 exports.Response = models.Response;
+exports.Function = models.Function;
 exports.TransactionData = models.TransactionData;
 exports.TransactionInfo = models.TransactionInfo;
 exports.RegistrationData = models.RegistrationData;
