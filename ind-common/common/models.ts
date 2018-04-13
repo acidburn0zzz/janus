@@ -26,6 +26,23 @@ export class BaseResponse {
     }
 */
 
+export enum PartyType { Unassigned, Buyer, Seller, Broker }
+
+export class PartyOTAddress {
+    message: string;
+    OTAddress: string;
+    bitcorePublicKey: string;
+}
+
+export class Party {
+    partyType: PartyType;
+    partyAddress: string;
+    companyName: string;
+    constructor(fields: Partial<Party> & {}) {
+        Object.assign(this, fields);
+    }
+}
+
 export class OneTimeAddressRequest extends BaseRequest {
     public messageObject: commontypes.BaseMessageObject; 
 }
@@ -191,6 +208,7 @@ export class GrantAccessResponse extends BaseResponse {
     "otherInfo": {
         "factoryAddress": "0x03334c41b",
         "marketplaceAddress": "0x5454565",
+        "contract": "Trade"
         "myParty": Party,
         "otherParty": Party,
         "functionList": [
@@ -223,6 +241,9 @@ export class PostTransactionRequest extends BaseRequest {
     otherInfo: {
         factoryAddress: string;
         marketPlaceAddress: string;
+        contractName: string;
+        myParty: Party,
+        otherParty: Party,
         functionList: string[];
     };
 }
@@ -233,4 +254,104 @@ export class PostTransactionResponse extends BaseResponse {
 
         this.error = constants.OK;
     }
+}
+
+
+export class Response {    
+  error: string;
+  status: boolean;
+}
+
+
+export class TransactionData {
+  guid: string;
+  tradeDate: string;
+  qty: string;
+  product: string;
+  price: string;
+  buyer: string;
+  seller: string;
+  broker: string;
+  messageHash: string;
+  
+  constructor(fields: Partial<TransactionData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class TransactionInfo {
+  marketplaceAddress: string;
+  factoryAddress: string;
+  myParty: Party;
+  otherParty: Party;
+  functionList: Function[];
+  
+  constructor(fields: Partial<TransactionData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class Function {
+  name: string;
+  params: string[];  
+  constructor(fields: Partial<TransactionData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class CreateTransactionRequest {
+  data: TransactionData;
+  signature: string;
+  otherInfo: TransactionInfo;
+  constructor(fields: Partial<CreateTransactionRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class CreateTransactionResponse extends Response {
+  contractId: number;
+  transactionHash: Array<string>;
+  constructor(fields: Partial<CreateTransactionResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+
+
+export class RegistrationData {
+  companyName: string;
+  url: string;
+  constructor(fields: Partial<RegistrationData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class WalletRegistrationRequest {
+  message: RegistrationData;
+  signature: string;
+  constructor(fields: Partial<WalletRegistrationRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class WalletRegistrationResponse extends Response {
+  constructor(fields: Partial<WalletRegistrationResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+
+
+export class UnRegistrationData {
+  companyName: string;
+  constructor(fields: Partial<RegistrationData> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class WalletUnRegistrationRequest {
+  message: UnRegistrationData;
+  signature: string;
+  constructor(fields: Partial<WalletUnRegistrationRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class WalletUnRegistrationResponse extends Response {
+  constructor(fields: Partial<WalletUnRegistrationResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
 }

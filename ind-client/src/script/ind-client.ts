@@ -1,8 +1,8 @@
-import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest} from './models';
 import { SmartContractService } from './smartcontract.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
 import * as constants from './constants';
 import { error } from 'util';
+import { IHttpService, HttpService, Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
 
 export class IndClient {
 	marketplaceAddress: string;
@@ -10,14 +10,16 @@ export class IndClient {
 	agentUrl: string;
 	oracleUrl: string;
 	smartContractService: SmartContractService;
+	httpService: IHttpService;
 
-	constructor(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl) {
+	constructor(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl, httpService?: IHttpService) {
 		console.log("In client constructor");
 		this.marketplaceAddress = marketplaceAddress;
 		this.tradeFactoryAddress = tradeFactoryAddress;
 		this.agentUrl = agentUrl;
 		this.oracleUrl = oracleUrl;
-		this.smartContractService = new SmartContractService();
+		this.httpService = httpService || new HttpService();
+		this.smartContractService = new SmartContractService(this.httpService);
 		console.log("In client constructor, completed");
 	}
 	
@@ -85,7 +87,7 @@ export class IndClient {
 		let error;
 		let validationError = this.validateConfig();
 		if(!validationError) {
-			let resp = this.smartContractService.updateTrade(tradeNumber, tradeDate, product, qty, price, paymentTerm);
+			let resp = await this.smartContractService.updateTrade(tradeNumber, tradeDate, product, qty, price, paymentTerm);
 			status = resp["status"];
 			transactionHashes = resp["transactionHashes"];
 			error = resp["error"];

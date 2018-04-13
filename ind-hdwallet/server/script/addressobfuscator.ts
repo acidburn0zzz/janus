@@ -1,9 +1,11 @@
 import * as indCommon from 'ind-common';
+import { AbiLoader } from 'ind-abi-loader';
 
 import * as cachingService from '../services/wallet-caching-service';
 import * as vaultService from '../services/secure-enclave-service';
 import ethers = require('ethers');
 
+const ethersUtils = ethers.utils;
 const walletObject = ethers.Wallet;
 const providers = ethers.providers;
 
@@ -226,6 +228,49 @@ export class AddressObfuscator {
         return response;
     }
 
+    public postTransaction(request: indCommon.PostTransactionRequest): indCommon.Response {
+
+        let response = new indCommon.PostTransactionResponse(request.messageObject.guid);
+
+        try {
+                //verify the message signature and get the public address of the signer
+                let verifiedAddress: string = this.verifyPayload(request.messageObject.data, request.signature);
+                if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
+
+                    response.error = indCommon.Constants.errorInvalidSignature;
+                    return response;
+                }
+
+                //TODO: check the message hash
+                let message2Hash = JSON.stringify(request.otherInfo);
+                let messageHash = ethersUtils.keccak256(message2Hash);
+
+                if (message2Hash != request.data.messageHash) {
+                    response.error = indCommon.Constants.errorInvalidHash;
+                    return response;
+                }
+
+                //get the otadata object for the specified guid
+                let otaData = this.walletCache.getOneTimeAddress(request.messageObject.data.guid);
+
+                if (otaData == null) {
+                    response.error = indCommon.Constants.errorRequestOtaFailed;
+                    return response;
+                }
+
+                //Load the ABI for the specified contract
+                let abiLoader: indCommon.AbiLoaderInterface = new AbiLoader();
+                let abi: string = abiLoader.loadAbi(request.contractName);
+
+                request.otherInfo.functionList.forEach(fn => {
+                    request.otherInfo[fn]
+                });
+        }
+        catch (error) {
+            
+        }
+    }
+
     //private methods
 
     /**
@@ -286,4 +331,5 @@ export class AddressObfuscator {
             return indCommon.Constants.errorInvalidSignature;
         }
     }
+  
 }

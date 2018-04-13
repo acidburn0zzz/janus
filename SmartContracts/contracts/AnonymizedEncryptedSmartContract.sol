@@ -15,6 +15,10 @@ contract AnonymizedEncryptedSmartContract {
         // mapping(bytes32=> EncryptedValue) field;
         string value;
     }
+    struct PartyInfo {
+        string[] accessibleSymmetricKeys;
+        string signature;
+    }
     
     //Field Index -> Field values
     mapping(uint=>EncryptedField) public fields;
@@ -23,7 +27,7 @@ contract AnonymizedEncryptedSmartContract {
     mapping(uint => address) public partyOTAddresses;
     
     //partyOTAddress -> [symkey1, symkey2, symkey3]
-    mapping(address => string[]) public accessibleSymmetricKeysByUser;
+    mapping(address => PartyInfo) public accessibleSymmetricKeysByUser;
     
     //symmetricKey => signerAddress => signature
     mapping(bytes32=>mapping(address=>uint)) public signatures;
@@ -35,7 +39,7 @@ contract AnonymizedEncryptedSmartContract {
     string public guid;
 
     modifier onlyByPartiesToTheTransaction(bytes32 symmetricKeyHash) {
-        string[] accessibleKeys = accessibleSymmetricKeysByUser[msg.sender];
+        string[] accessibleKeys = accessibleSymmetricKeysByUser[msg.sender].accessibleSymmetricKeys;
         bool hasAccess = false;
         for(uint i=0;i<accessibleKeys.length;i++) {
             if(symmetricKeyHash == keccak256(accessibleKeys[i])) {
@@ -77,8 +81,11 @@ contract AnonymizedEncryptedSmartContract {
         partyOTAddresses[partyType] = partyAddress;
     }
     
-    function grantSymmetricKeyAccessToParty(address partyAddress, string accessibleSymKey ) internal {
-        accessibleSymmetricKeysByUser[partyAddress].push(accessibleSymKey);
+    function grantSymmetricKeyAccessToParty(address partyAddress, uint8 symKeyIndex, string accessibleSymKey ) internal {
+        string[] symKeys = accessibleSymmetricKeysByUser[partyAddress].accessibleSymmetricKeys;
+        if(symKeys.length < symKeyIndex+1)
+            symKeys.length = symKeyIndex+1;
+        symKeys[symKeyIndex]= accessibleSymKey;
     }
     
     function grantFieldAccessToSymmetricKey(string accessibleSymKey, uint8[] fieldEnumIndices) internal  {
@@ -97,7 +104,7 @@ contract AnonymizedEncryptedSmartContract {
         for(uint i=0;i<requiredParties.length;i++) {
             address party = partyOTAddresses[uint(requiredParties[i])];
 			//get the symmetric key for the Party
-			var symKeys = accessibleSymmetricKeysByUser[party];
+			var symKeys = accessibleSymmetricKeysByUser[party].accessibleSymmetricKeys;
 
             if(signatures[keccak256(symKeys[0])][party] == 0)
              return false;
@@ -107,7 +114,7 @@ contract AnonymizedEncryptedSmartContract {
     
     function resetSignature(uint8 partyEnumIndex) internal {
         address party = partyOTAddresses[partyEnumIndex];
-        var symmetricKeys = accessibleSymmetricKeysByUser[party];
+        var symmetricKeys = accessibleSymmetricKeysByUser[party].accessibleSymmetricKeys;
         for(uint i=0;i<symmetricKeys.length;i++) {
             signatures[keccak256(symmetricKeys[i])][party] = 0;
         }

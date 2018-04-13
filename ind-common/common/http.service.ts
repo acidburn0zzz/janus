@@ -1,7 +1,8 @@
+import { IHttpService } from './ihttp.service';
 var http = require('http');
 
-export class HttpUtil {
-    public static async RaiseHttpRequest(host: string, port: string, path: string, method: string, data: object): Promise<any> {
+export class HttpService implements IHttpService {
+    public async RaiseHttpRequest(host: string, port: string, path: string, method: string, data: object, timeout?: number): Promise<any> {
         var jsonPaylod = JSON.stringify(data);
         console.log("jsonPaylod", jsonPaylod);
 
@@ -11,20 +12,20 @@ export class HttpUtil {
             port: port, 
             path: path, 
             method: method, 
-            timeout: 120000,
+            timeout: timeout || 120000,
             headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(jsonPaylod)
             }
         };
-        console.log("post_options", post_options);
+        console.log("post_options", post_options);        
         // send the request
         var response: any = await this.httpRequest(post_options, jsonPaylod);
         console.log("Http response", response);
         return response;
     }
 
-    private static async httpRequest(params, postData) {
+    private async httpRequest(params, postData) {
         return new Promise(function (resolve, reject) {
         var req = http.request(params, function (res) {
             // reject on bad status

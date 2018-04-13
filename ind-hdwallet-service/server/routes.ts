@@ -94,4 +94,20 @@ router.post('/grantAccess', async (req: express.Request, res: express.Response, 
     res.send(responseData);
 });
 
+router.post('/postTransaction', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    let responseData = new indCommon.PostTransactionResponse();
+
+    try {
+        let requestData = new indCommon.PostTransactionRequest();
+        requestData.message = req.body.message;
+        requestData.signature = req.body.signature;
+        requestData.messageObject = JSON.parse(req.body.message);
+
+        responseData = addressObfuscator.postTransaction(requestData);
+    }
+    catch (error) {
+        responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;
+    }
+});
+
 export = router;

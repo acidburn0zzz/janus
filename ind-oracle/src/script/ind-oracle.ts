@@ -1,7 +1,9 @@
-import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, GrantAccessRequest} from './models';
+import { GrantAccessRequest} from './models';
 import { SmartContractService } from './smartcontract.service';
 import { AgentService } from './agent.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
+import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from "ind-common";
+import * as indCommon from 'ind-common';
 
 export class IndOracle {
 	provider: Provider;
@@ -11,8 +13,9 @@ export class IndOracle {
 	//networkName = "something";
 	agentService: AgentService;
 	smartContractService: SmartContractService;
+	httpService: indCommon.IHttpService;
 
-	constructor(nodeUrl: string, networkChainId: number, oraclePrivateKey: string) {
+	constructor(nodeUrl: string, networkChainId: number, oraclePrivateKey: string, httpService?: indCommon.IHttpService) {
 		console.log("In oracle constructor");
 		console.log("nodeUrl", nodeUrl);
 		console.log("networkChainId", networkChainId);
@@ -24,8 +27,9 @@ export class IndOracle {
 		this.oracleWallet = new Wallet(oraclePrivateKey, this.provider);
 		console.log("oracleWallet", this.oracleWallet);
 		this.agentService = new AgentService();
-		console.log("agentService created");
-		this.smartContractService = new SmartContractService(this.provider, this.oracleWallet, this.agentService);
+		console.log("agentService created");	
+		this.httpService = httpService || new indCommon.HttpService();	
+		this.smartContractService = new SmartContractService(this.provider, this.oracleWallet, this.agentService, this.httpService);
 		console.log("In oracle constructor: completed");
 	}
 	

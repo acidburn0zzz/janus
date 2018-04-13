@@ -7,7 +7,9 @@
 //       port: '5000',
 //     }
 //   };
-import { WalletRegistrationRequest, WalletUnRegistrationRequest} from './models';
+//import { WalletRegistrationRequest, WalletUnRegistrationRequest} from './models';
+import { WalletRegistrationRequest, WalletUnRegistrationRequest } from "ind-common";
+
 import * as constants from './constants';
 var fs = require('fs');
 //import * as data from '../walletAgents.json';

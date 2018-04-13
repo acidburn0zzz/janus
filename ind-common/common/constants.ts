@@ -1,5 +1,6 @@
 export let OK = "OK";
-export let errorInvalidSignature:string = "error: Invalid Signature";
+export let errorInvalidSignature: string = "error: Invalid Signature";
+export let errorInvalidHash: string = "error: The message hashes did not match";
 export let errorDecryptionFailed: string = "error: Decryption failed";
 export let errorEncryptionFailed: string = "error: Encryption failed";
 export let errorOTAGenFailed: string = "error: OTA gen failed";
