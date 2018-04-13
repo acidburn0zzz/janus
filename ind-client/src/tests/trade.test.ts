@@ -1,10 +1,10 @@
-import * as model from "../script/models" 
 import * as indClient from "../script/ind-client" 
 import * as constants from "../script/constants" 
 //import * as httpService from '../script/http.service';
 import * as mocha from 'mocha'
 import * as chai from 'chai'
-import { HttpService, Party, RegistrationData, WalletRegistrationRequest } from 'ind-common';
+import { Guid } from "guid-typescript";
+import { HttpService, Party, PartyType, RegistrationData, WalletRegistrationRequest } from 'ind-common';
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -40,6 +40,7 @@ describe('Trade tests', () => {
 	let oracleUrl: string;
     let client: indClient.IndClient;
     let testTradeNumber: number;
+    let guid: string;
     let httpService: HttpService;
 
     before(function () {
@@ -48,8 +49,9 @@ describe('Trade tests', () => {
             //add init here
             agentUrl = "localhost:4000";
             oracleUrl = "localhost:8000";
-            marketplaceAddress = "0xc3846686993466515c28504cf75a98cb777967ae";
-            tradeFactoryAddress = "0xc3846686993466515c28504cf75a98cb777967ae";
+            marketplaceAddress = "0x7904adfd948f5f99a987a86768f5decc1aecdea2";
+            tradeFactoryAddress = "0x7904adfd948f5f99a987a86768f5decc1aecdea2";
+            guid = Guid.create().toString();
             testTradeNumber = 0;
             httpService = new HttpService();
             console.log("directory:", process.cwd());
@@ -82,9 +84,9 @@ describe('Trade tests', () => {
         let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
         let sellerAddress: string = "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef";
         
-        let myParty = new Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
-        let otherParty = new Party({partyType:model.PartyType.Seller,partyAddress:sellerAddress,companyName:sellerCompanyName});
-        let response = await client.createTrade(myParty,otherParty, new Date(), "WTI", 10000, 50, "term1");
+        let myParty = new Party({partyType:PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
+        let otherParty = new Party({partyType:PartyType.Seller,partyAddress:sellerAddress,companyName:sellerCompanyName});
+        let response = await client.createTrade(guid, myParty, otherParty, new Date(), "WTI", 10000, 50, "term1");
         
         //verify
         assert.notEqual(response,null,"Trade Creation failed");
@@ -105,9 +107,9 @@ describe('Trade tests', () => {
         let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
         let brokerAddress: string = "0x843Bb18ea2b86ef3807E006723784435FF00e27F";
 
-        let myParty = new Party({partyType:model.PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
-        let parties = [new Party({partyType:model.PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
-        let response = await client.updateParty(testTradeNumber, myParty, parties);
+        let myParty = new Party({partyType:PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
+        let parties = [new Party({partyType:PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
+        let response = await client.updateParty(guid, myParty, parties);
         
         //verify
         assert.notEqual(response,null,"Update party failed");

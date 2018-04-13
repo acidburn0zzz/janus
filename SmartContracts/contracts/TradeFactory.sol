@@ -11,9 +11,14 @@ contract TradeFactory is GovernedSmartContractFactory, FactoryInterface {
         return nextTokenNumber;
     }
     
-    function getContract(uint tokenNumber) view public returns(address) {
-        return contracts[tokenNumber];
+    // function getContract(uint tokenNumber) view public returns(address) {
+    //     return contracts[tokenNumber];
+    // }
+
+    function getContract(string pGuid) view public returns(address) {
+        return contracts[keccak256(pGuid)];
     }
+
 
     function TradeFactory(address pRefTrade) public {
         oracleAddress = msg.sender;
@@ -23,23 +28,23 @@ contract TradeFactory is GovernedSmartContractFactory, FactoryInterface {
     
     function createTransaction(string pGuid, uint8 pParty1Type, address pParty1Address, string pParty1CompanyName, string pParty1CommonFieldsSymKey, string pParty1PaymentFieldsSymKey,
         uint8 pParty2Type, address pParty2Address, string pParty2CompanyName, string pParty2CommonFieldsSymKey, string pParty2PaymentFieldsSymKey
-        ) public onlyOracle returns (uint)  {
+        ) public onlyOracle returns (uint) {
         //var tradeProxy = address(new DelegateProxy(refTrade));
         //var tokenNumber = buyToken();
         TradeInterface trade = TradeInterface(address(new DelegateProxy(refTrade)));
         trade.initialize(this, pGuid, oracleAddress, buyToken());
         trade.updateParty(pParty1Type, pParty1Address, pParty1CompanyName, pParty1CommonFieldsSymKey, pParty1PaymentFieldsSymKey);
         trade.updateParty(pParty2Type, pParty2Address, pParty2CompanyName, pParty2CommonFieldsSymKey, pParty2PaymentFieldsSymKey);
-        contracts[trade.tradeNumber()] = address(trade);//tradeProxy;
+        contracts[keccak256(pGuid)] = address(trade);//tradeProxy;
         ContractCreated(trade.tradeNumber(), pGuid);
         return trade.tradeNumber();
     }
     
-    function raiseContractFieldUpdated(uint tokenNumber, string guid) public onlyContractOwner(tokenNumber) {
+    function raiseContractFieldUpdated(uint tokenNumber, string guid) public onlyContractOwner(guid) {
         ContractFieldUpdated(tokenNumber, guid);
     }
 
-    function raiseContractPartyUpdated(uint tokenNumber, string guid, uint partyType, address partyAddress) public onlyContractOwner(tokenNumber) {
+    function raiseContractPartyUpdated(uint tokenNumber, string guid, uint partyType, address partyAddress) public onlyContractOwner(guid) {
         ContractPartyUpdated(tokenNumber,guid,partyType,partyAddress);
     }
     

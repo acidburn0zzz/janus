@@ -17,11 +17,11 @@
           "type": "string"
         },
         {
-          "name": "pCommonFieldsSymKey",
+          "name": "pSymKey1",
           "type": "string"
         },
         {
-          "name": "pPaymentFieldsSymKey",
+          "name": "pSymKey2",
           "type": "string"
         }
       ],
@@ -39,6 +39,29 @@
         {
           "name": "",
           "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "SYMKEY_LIST",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
         }
       ],
       "payable": false,
@@ -73,14 +96,14 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.17;\r\n\r\ncontract ContractInterface {\r\n\r\n    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pCommonFieldsSymKey, string pPaymentFieldsSymKey) public;\r\n    function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string);\r\n    function getGuid() view public returns (string);\r\n}\r\n",
+  "source": "pragma solidity ^0.4.17;\r\n\r\ncontract ContractInterface {\r\n\r\n    mapping(uint=>uint8[]) public SYMKEY_LIST;\r\n\r\n    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pSymKey1, string pSymKey2) public;\r\n    function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string);\r\n    function getGuid() view public returns (string);\r\n}\r\n",
   "sourcePath": "C:\\Code\\BlockChain\\privy\\SmartContracts\\contracts\\ContractInterface.sol",
   "ast": {
     "attributes": {
       "absolutePath": "/C/Code/BlockChain/privy/SmartContracts/contracts/ContractInterface.sol",
       "exportedSymbols": {
         "ContractInterface": [
-          415
+          453
         ]
       }
     },
@@ -94,7 +117,7 @@
             ".17"
           ]
         },
-        "id": 387,
+        "id": 420,
         "name": "PragmaDirective",
         "src": "0:24:1"
       },
@@ -110,12 +133,68 @@
           "documentation": null,
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            415
+            453
           ],
           "name": "ContractInterface",
-          "scope": 416
+          "scope": 454
         },
         "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "name": "SYMKEY_LIST",
+              "scope": 453,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(uint256 => uint8[] storage ref)",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(uint256 => uint8[] storage ref)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint",
+                      "type": "uint256"
+                    },
+                    "id": 421,
+                    "name": "ElementaryTypeName",
+                    "src": "72:4:1"
+                  },
+                  {
+                    "attributes": {
+                      "length": null,
+                      "type": "uint8[] storage pointer"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint8",
+                          "type": "uint8"
+                        },
+                        "id": 422,
+                        "name": "ElementaryTypeName",
+                        "src": "78:5:1"
+                      }
+                    ],
+                    "id": 423,
+                    "name": "ArrayTypeName",
+                    "src": "78:7:1"
+                  }
+                ],
+                "id": 424,
+                "name": "Mapping",
+                "src": "64:22:1"
+              }
+            ],
+            "id": 425,
+            "name": "VariableDeclaration",
+            "src": "64:41:1"
+          },
           {
             "attributes": {
               "body": null,
@@ -127,7 +206,7 @@
               ],
               "name": "updateParty",
               "payable": false,
-              "scope": 415,
+              "scope": 453,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -139,7 +218,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "observerPartyIndex",
-                      "scope": 400,
+                      "scope": 438,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint8",
@@ -152,20 +231,20 @@
                           "name": "uint8",
                           "type": "uint8"
                         },
-                        "id": 388,
+                        "id": 426,
                         "name": "ElementaryTypeName",
-                        "src": "85:5:1"
+                        "src": "135:5:1"
                       }
                     ],
-                    "id": 389,
+                    "id": 427,
                     "name": "VariableDeclaration",
-                    "src": "85:24:1"
+                    "src": "135:24:1"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "partyAddress",
-                      "scope": 400,
+                      "scope": 438,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -178,20 +257,20 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 390,
+                        "id": 428,
                         "name": "ElementaryTypeName",
-                        "src": "111:7:1"
+                        "src": "161:7:1"
                       }
                     ],
-                    "id": 391,
+                    "id": 429,
                     "name": "VariableDeclaration",
-                    "src": "111:20:1"
+                    "src": "161:20:1"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "companyName",
-                      "scope": 400,
+                      "scope": 438,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -204,20 +283,20 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 392,
+                        "id": 430,
                         "name": "ElementaryTypeName",
-                        "src": "133:6:1"
+                        "src": "183:6:1"
                       }
                     ],
-                    "id": 393,
+                    "id": 431,
                     "name": "VariableDeclaration",
-                    "src": "133:18:1"
+                    "src": "183:18:1"
                   },
                   {
                     "attributes": {
                       "constant": false,
-                      "name": "pCommonFieldsSymKey",
-                      "scope": 400,
+                      "name": "pSymKey1",
+                      "scope": 438,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -230,20 +309,20 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 394,
+                        "id": 432,
                         "name": "ElementaryTypeName",
-                        "src": "153:6:1"
+                        "src": "203:6:1"
                       }
                     ],
-                    "id": 395,
+                    "id": 433,
                     "name": "VariableDeclaration",
-                    "src": "153:26:1"
+                    "src": "203:15:1"
                   },
                   {
                     "attributes": {
                       "constant": false,
-                      "name": "pPaymentFieldsSymKey",
-                      "scope": 400,
+                      "name": "pSymKey2",
+                      "scope": 438,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -256,19 +335,19 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 396,
+                        "id": 434,
                         "name": "ElementaryTypeName",
-                        "src": "181:6:1"
+                        "src": "220:6:1"
                       }
                     ],
-                    "id": 397,
+                    "id": 435,
                     "name": "VariableDeclaration",
-                    "src": "181:27:1"
+                    "src": "220:15:1"
                   }
                 ],
-                "id": 398,
+                "id": 436,
                 "name": "ParameterList",
-                "src": "84:125:1"
+                "src": "134:102:1"
               },
               {
                 "attributes": {
@@ -277,14 +356,14 @@
                   ]
                 },
                 "children": [],
-                "id": 399,
+                "id": 437,
                 "name": "ParameterList",
-                "src": "216:0:1"
+                "src": "243:0:1"
               }
             ],
-            "id": 400,
+            "id": 438,
             "name": "FunctionDefinition",
-            "src": "64:153:1"
+            "src": "114:130:1"
           },
           {
             "attributes": {
@@ -297,7 +376,7 @@
               ],
               "name": "getAccessibleSymmetricKeyForParty",
               "payable": false,
-              "scope": 415,
+              "scope": 453,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "public"
@@ -309,7 +388,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "partyAddress",
-                      "scope": 409,
+                      "scope": 447,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -322,20 +401,20 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 401,
+                        "id": 439,
                         "name": "ElementaryTypeName",
-                        "src": "266:7:1"
+                        "src": "293:7:1"
                       }
                     ],
-                    "id": 402,
+                    "id": 440,
                     "name": "VariableDeclaration",
-                    "src": "266:20:1"
+                    "src": "293:20:1"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "symKeyIndex",
-                      "scope": 409,
+                      "scope": 447,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -348,19 +427,19 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 403,
+                        "id": 441,
                         "name": "ElementaryTypeName",
-                        "src": "288:4:1"
+                        "src": "315:4:1"
                       }
                     ],
-                    "id": 404,
+                    "id": 442,
                     "name": "VariableDeclaration",
-                    "src": "288:16:1"
+                    "src": "315:16:1"
                   }
                 ],
-                "id": 405,
+                "id": 443,
                 "name": "ParameterList",
-                "src": "265:40:1"
+                "src": "292:40:1"
               },
               {
                 "children": [
@@ -368,7 +447,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "",
-                      "scope": 409,
+                      "scope": 447,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -381,24 +460,24 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 406,
+                        "id": 444,
                         "name": "ElementaryTypeName",
-                        "src": "327:6:1"
+                        "src": "354:6:1"
                       }
                     ],
-                    "id": 407,
+                    "id": 445,
                     "name": "VariableDeclaration",
-                    "src": "327:6:1"
+                    "src": "354:6:1"
                   }
                 ],
-                "id": 408,
+                "id": 446,
                 "name": "ParameterList",
-                "src": "326:8:1"
+                "src": "353:8:1"
               }
             ],
-            "id": 409,
+            "id": 447,
             "name": "FunctionDefinition",
-            "src": "223:112:1"
+            "src": "250:112:1"
           },
           {
             "attributes": {
@@ -411,7 +490,7 @@
               ],
               "name": "getGuid",
               "payable": false,
-              "scope": 415,
+              "scope": 453,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "public"
@@ -424,9 +503,9 @@
                   ]
                 },
                 "children": [],
-                "id": 410,
+                "id": 448,
                 "name": "ParameterList",
-                "src": "357:2:1"
+                "src": "384:2:1"
               },
               {
                 "children": [
@@ -434,7 +513,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "",
-                      "scope": 414,
+                      "scope": 452,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -447,34 +526,34 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 411,
+                        "id": 449,
                         "name": "ElementaryTypeName",
-                        "src": "381:6:1"
+                        "src": "408:6:1"
                       }
                     ],
-                    "id": 412,
+                    "id": 450,
                     "name": "VariableDeclaration",
-                    "src": "381:6:1"
+                    "src": "408:6:1"
                   }
                 ],
-                "id": 413,
+                "id": 451,
                 "name": "ParameterList",
-                "src": "380:8:1"
+                "src": "407:8:1"
               }
             ],
-            "id": 414,
+            "id": 452,
             "name": "FunctionDefinition",
-            "src": "341:48:1"
+            "src": "368:48:1"
           }
         ],
-        "id": 415,
+        "id": 453,
         "name": "ContractDefinition",
-        "src": "28:364:1"
+        "src": "28:391:1"
       }
     ],
-    "id": 416,
+    "id": 454,
     "name": "SourceUnit",
-    "src": "0:394:1"
+    "src": "0:421:1"
   },
   "compiler": {
     "name": "solc",
@@ -482,5 +561,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-03-16T09:02:29.659Z"
+  "updatedAt": "2018-04-09T22:36:29.244Z"
 }

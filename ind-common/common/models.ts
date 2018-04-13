@@ -265,10 +265,10 @@ export class Response {
 
 export class TransactionData {
   guid: string;
-  tradeDate: string;
-  qty: string;
+  tradeDate: Date;
+  qty: number;
   product: string;
-  price: string;
+  price: number;
   buyer: string;
   seller: string;
   broker: string;
@@ -285,14 +285,14 @@ export class TransactionInfo {
   otherParty: Party;
   functionList: Function[];
   
-  constructor(fields: Partial<TransactionData> & {}) {
+  constructor(fields: Partial<TransactionInfo> & {}) {
     Object.assign(this, fields);
   }
 }
 export class Function {
   name: string;
   params: string[];  
-  constructor(fields: Partial<TransactionData> & {}) {
+  constructor(fields: Partial<Function> & {}) {
     Object.assign(this, fields);
   }
 }

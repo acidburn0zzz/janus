@@ -30,7 +30,7 @@ export class OracleService {
   }
 
   async createTransaction(request: CreateTransactionRequest) {
-    var caller: Party = request.message.myParty;
+    var caller: Party = request.otherInfo.myParty;
     var response = await oracle.createTransaction(request);
     if(response && response.status == true) {
       var contractId: number = response.contractId;
