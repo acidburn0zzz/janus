@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
 import { GrantAccessRequest, GrantAccessResponse} from 'ind-oracle';
-import { Party, CreateTransactionRequest, CreateTransactionResponse,  
+import { Party, CreateTransactionRequest, CreateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
   WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-common';
 var oracle: OracleService;
 const router = express.Router();
@@ -86,6 +86,26 @@ router.post('/grantAccessToContract', async (req: express.Request, res: express.
     response = await oracle.grantAccessToContract(grantAccessRequest);
   } catch (error) {
     response = new GrantAccessResponse({status: false});
+    response.error = "ERROR: " + error;
+    console.log(error)
+  }
+  console.log(new Date(), "response", response);
+  res.send(response);
+});
+
+router.post('/getMeterSummary', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  let meterSummaryRequest = new MeterSummaryRequest({});
+  console.log("body", req.body);
+  meterSummaryRequest.message = req.body.message;
+  meterSummaryRequest.signature = req.body.signature;
+  console.log("meterSummaryRequest", meterSummaryRequest);
+  if(!oracle)
+    oracle = new OracleService();
+  var response: MeterSummaryResponse;
+  try {
+    response = await oracle.getMeterSummary(meterSummaryRequest);
+  } catch (error) {
+    response = new MeterSummaryResponse({status: false});
     response.error = "ERROR: " + error;
     console.log(error)
   }

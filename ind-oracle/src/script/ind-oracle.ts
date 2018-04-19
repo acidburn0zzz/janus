@@ -59,11 +59,4 @@ export class IndOracle {
 		return await this.smartContractService.grantAccessToContract(request);
 		//returns {error, list of transaction hashes, status};
 	}
-
-	async verifyIdentity(marketplaceAddress: string, factoryAddress: string, contractId: number, partyOTA: string, role: PartyType, signature: string) {
-		//inputs: mktplace address, factory address, contractId, onetime key, role of that OTA, signature
-
-
-		//return party;
-	}
 }

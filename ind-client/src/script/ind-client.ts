@@ -118,6 +118,7 @@ export class IndClient {
 
 	private buildCreateUpdateTradeRequestMsg(marketplaceAddress:string, tradeFactoryAddress:string, guid:string, myParty: Party, otherParty: Party, tradeDate: Date, product: string, qty: number, price: number, paymentTerm: string) {
 		let data:TransactionData = new TransactionData({});
+		data.timestamp = (new Date()).getTime();
 		data.guid = guid;
 		data.tradeDate = tradeDate;
 		data.product = product;
@@ -200,13 +201,6 @@ export class IndClient {
 			error = validationError;
 		}
 		return {transactionHashes:transactionHashes, status:status, error:error};
-	}
-
-	async verifyIdentity(marketplaceAddress: string, factoryAddress: string, contractId: number, partyOTA: string, role: PartyType, signature: string) {
-		//inputs: mktplace address, factory address, contractId, onetime key, role of that OTA, signature
-
-
-		//return party;
 	}
 
 	private validateConfig() {

@@ -260,14 +260,16 @@ export class PostTransactionResponse extends BaseResponse {
     }
 }
 
+export class Request {    
+  timestamp: number;
+}
 
 export class Response {    
   error: string;
   status: boolean;
 }
 
-
-export class TransactionData {
+export class TransactionData extends Request {
   guid: string;
   tradeDate: Date;
   qty: number;
@@ -279,6 +281,7 @@ export class TransactionData {
   messageHash: string;
   
   constructor(fields: Partial<TransactionData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -318,10 +321,11 @@ export class CreateTransactionResponse extends Response {
 }
 
 
-export class RegistrationData {
+export class RegistrationData extends Request {
   companyName: string;
   url: string;
   constructor(fields: Partial<RegistrationData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -340,9 +344,10 @@ export class WalletRegistrationResponse extends Response {
 }
 
 
-export class UnRegistrationData {
+export class UnRegistrationData extends Request {
   companyName: string;
   constructor(fields: Partial<RegistrationData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -355,6 +360,29 @@ export class WalletUnRegistrationRequest {
 }
 export class WalletUnRegistrationResponse extends Response {
   constructor(fields: Partial<WalletUnRegistrationResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+
+export class MeterSummaryData extends Request {
+  companyName: string;
+  factoryAddress: string;
+  constructor(fields: Partial<MeterSummaryData> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+export class MeterSummaryRequest {
+  message: MeterSummaryData;
+  signature: string;
+  constructor(fields: Partial<MeterSummaryRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class MeterSummaryResponse extends Response {
+  result: any;
+  constructor(fields: Partial<MeterSummaryResponse> & {}) {
     super();
     Object.assign(this, fields);
   }

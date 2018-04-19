@@ -28,6 +28,7 @@ export class SmartContractService {
 
   private async getOTKey(guid: string, companyName: string, hdWalletUrl: any) : Promise<any> {
     let signingMessage = {
+      timestamp: (new Date()).getTime(),
       guid: guid,
       companyName: companyName };
 
@@ -50,6 +51,7 @@ export class SmartContractService {
     partyOTAddress: string, partyBitcorePublicKey: string, hdWalletUrl: any): Promise<any> {
 
     var signingMessage = {
+      timestamp: (new Date()).getTime(),
       guid: guid,
       contractAddress: contractAddress,
       accessibleSymmetricKey: encryptedSymmetricKey,
@@ -154,7 +156,7 @@ export class SmartContractService {
         }
         //Create transaction from factory
         let overrideOptions = {
-           gasLimit: 2000000,
+           gasLimit: 3000000,
         };
         let factory: Contract = this.factoryContract(request.otherInfo.factoryAddress);
         console.log(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
@@ -281,16 +283,22 @@ export class SmartContractService {
 
   private verifySignature(message: object, signature: string) : boolean {    
     try {
-      let messageString: string = JSON.stringify(message,null,4);
-      //verify the original message was signed by the party
-      //let signerAddress: string = this.oracleWallet.verifyMessage(message, signature);
+      if(!message || !signature)
+        return false;
 
-      //TODO: verify permission of the address from the smart contract
-        
-      return true;
+      let messageString: string = JSON.stringify(message,null,4);
+      //verify the original message was signed by the party      
+      let signerAddress: string = this.oracleWallet.verifyMessage(messageString, signature);
+      if(signerAddress && message["timestamp"]) {
+        let currentTime = (new Date()).getTime();
+        if((currentTime - Number(message["timestamp"])) < constants.SignatureValidity_5Sec) {
+          //TODO: verify permission of the address from the smart contract
+          return true;
+        }
+      }
     } catch (error) {
       console.log(error);
-      return false;
     }
+    return false;    
   }
 }

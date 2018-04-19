@@ -4,7 +4,7 @@ import * as constants from "../script/constants"
 import * as mocha from 'mocha'
 import * as chai from 'chai'
 import { Guid } from "guid-typescript";
-import { HttpService, Party, PartyType, RegistrationData, WalletRegistrationRequest } from 'ind-common';
+import { HttpService, Party, PartyType, RegistrationData, WalletRegistrationRequest, MeterSummaryData, MeterSummaryRequest} from 'ind-common';
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -57,17 +57,17 @@ describe('Trade tests', () => {
             console.log("directory:", process.cwd());
             client = new indClient.IndClient(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl, httpService);
 
-            let message = new RegistrationData({companyName: "Mercuria", url: "localhost:4000"});
+            let message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Mercuria", url: "localhost:4000"});
             let request = new WalletRegistrationRequest({message: message});
             let response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Mercuria:", response);
 
-            message = new RegistrationData({companyName: "Shell", url: "localhost:4000"});
+            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Shell", url: "localhost:4000"});
             request = new WalletRegistrationRequest({message: message});
             response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Shell:", response);
 
-            message = new RegistrationData({companyName: "BP", url: "localhost:4000"});
+            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "BP", url: "localhost:4000"});
             request = new WalletRegistrationRequest({message: message});
             response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered BP:", response);
@@ -114,6 +114,23 @@ describe('Trade tests', () => {
         //verify
         assert.notEqual(response,null,"Update party failed");
         console.log(response);
+        assert.equal(response.status,true,response.error);
+    });
+
+    it('Read the meter summary', async function () {
+        this.timeout(0);
+        console.log("Read the meter summary test");
+
+        let companyName = "Mercuria";
+        //assert.notEqual(testTradeNumber,0,"Trade not exist");
+
+        let data: MeterSummaryData = new MeterSummaryData({timestamp: (new Date()).getTime(), companyName:companyName,factoryAddress:tradeFactoryAddress})
+        let request = new MeterSummaryRequest({message: data,signature:""});
+        let response = await httpService.RaiseHttpRequest("localhost", "8000", "/getMeterSummary", "POST", request);
+        console.log("Meter Summary for",companyName, ":", response);
+        
+        //verify
+        assert.notEqual(response,null,"Meter reading failed");
         assert.equal(response.status,true,response.error);
     });
 });
