@@ -1,4 +1,5 @@
 const bitcore = require('bitcore-lib');
+const Web3 = require("web3");
 
 export class Utils {
 
@@ -13,5 +14,9 @@ export class Utils {
         console.log("===" + header + "===");
         console.log(message);
         console.log("=== END", header, "END===");
+    }
+
+    public keccak256(data: string): string {
+        return Web3.utils.sha3(data);
     }
 }

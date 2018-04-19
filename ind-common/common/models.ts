@@ -208,7 +208,7 @@ export class GrantAccessResponse extends BaseResponse {
     "otherInfo": {
         "factoryAddress": "0x03334c41b",
         "marketplaceAddress": "0x5454565",
-        "contract": "Trade"
+        "contractName": "Trade"
         "myParty": Party,
         "otherParty": Party,
         "functionList": [
@@ -249,9 +249,13 @@ export class PostTransactionRequest extends BaseRequest {
 }
 
 export class PostTransactionResponse extends BaseResponse {
+
+    txnReceipts: Array<Object>;
+
     constructor(guid: string = "") {
         super(guid);
 
+        this.txnReceipts = new Array<Object>();
         this.error = constants.OK;
     }
 }

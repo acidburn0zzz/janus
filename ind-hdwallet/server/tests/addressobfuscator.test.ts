@@ -4,17 +4,26 @@ import * as chai from 'chai';
 import { Guid } from 'guid-typescript';
 
 import * as indCommon from 'ind-common';
-import { AddressObfuscator } from '../script/addressobfuscator';
+import { AddressObfuscatorOptions, AddressObfuscator } from '../script/addressobfuscator';
+import { SmartContractService } from '../services/smart-contract-service';
 
 const expect = chai.expect;
 const should = chai.should();
+const ethersUtils = ethers.utils;
 
 
 describe('address obfuscator', () => {
 
     it('should return a one time address for a given guid', () => {
 
-        let obfuscator = new AddressObfuscator();
+        let options: AddressObfuscatorOptions = {
+            blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
+            contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
+            oracleServiceUri: "uri",
+            vaultServiceUri: "vault"
+        };
+
+        let obfuscator = new AddressObfuscator(options);
         let addressRequest = new indCommon.OneTimeAddressRequest();
         let senderWallet = ethers.Wallet.createRandom();
         let messageObject = {
@@ -41,8 +50,15 @@ describe('encrypt decrypt methods', () => {
     /**
      * get the one time address for this test
      */
+    let options: AddressObfuscatorOptions = {
+        blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
+        contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
+        oracleServiceUri: "uri",
+        vaultServiceUri: "vault"
+    };
 
-    let obfuscator = new AddressObfuscator();
+
+    let obfuscator = new AddressObfuscator(options);
     let senderWallet = ethers.Wallet.createRandom();
     let addressRequest = new indCommon.OneTimeAddressRequest();
 
@@ -83,8 +99,8 @@ describe('encrypt decrypt methods', () => {
          */
 
         try {
-                    let requestEncrypt = new indCommon.EncryptDataRequest();
-        let encryptMessageObject = {
+            let requestEncrypt = new indCommon.EncryptDataRequest();
+            let encryptMessageObject = {
             guid: guidString,
             keys: [
                 { key: encryptedSymmetricKeyBuyer, fields: ["buyer", "seller", "price", "quantity", "uom"] },
@@ -224,4 +240,109 @@ describe('encrypt decrypt methods', () => {
         utils.writeFormattedMessage("Decrypted data by grant access", responseDecrypt.data);
 
     });
+});
+
+
+describe('post transaction', () => {
+
+    //create a sample request Object
+    let utils = new indCommon.Utils();
+    let senderWallet = ethers.Wallet.createRandom();
+
+    let options: AddressObfuscatorOptions = {
+        blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
+        contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
+        oracleServiceUri: "uri",
+        vaultServiceUri: "vault"
+    };
+    
+
+    let obfuscator = new AddressObfuscator(options);
+
+    let addressRequest = new indCommon.OneTimeAddressRequest();
+    let messageObject = {
+        guid: "9d6f99ce-f3ee-7c16-b729-038857d338ce",
+        companyName: "Shell Corporation"
+    };
+
+    addressRequest.message = JSON.stringify(messageObject);
+
+    addressRequest.signature = senderWallet.signMessage(addressRequest.message);
+    addressRequest.messageObject = messageObject;
+
+    let response = obfuscator.getOnetimeAddress(addressRequest);
+
+    it('should update data in a contract', async () => {
+        let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
+
+
+
+        request.data = {
+            guid: messageObject.guid,
+            tradeDate: "12/20/2017",
+            qty: "100000",
+            product: "WTI",
+            price: "55.0",
+            paymentTerm: "FOB",
+            messageHash: ""
+        };
+
+        request.Signature = "";
+
+        request.otherInfo = {
+            factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
+            contractName: "Trade",
+            functionList: [
+                "updateData"
+            ],
+            updateData: [
+                1,
+                "tradeDate",
+                "product",
+                "qty",
+                "price"
+            ]
+        };
+
+
+        let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+        request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
+        request.signature = senderWallet.signMessage(JSON.stringify(request.data));
+
+        let txnReceipt = await obfuscator.postTransaction(request);
+
+    });
+    
+    //it('should update payment terms in a contract', async () => {
+    //    let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
+
+    //    request.data = {
+    //        guid: messageObject.guid,
+    //        paymentTerm: "FOB",
+    //        messageHash: ""
+    //    };
+
+    //    request.Signature = "";
+
+    //    request.otherInfo = {
+    //        factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
+    //        contractName: "Trade",
+    //        functionList: [
+    //            "updatePaymentInfo"
+    //        ],
+    //        updatePaymentInfo: [
+    //            1,
+    //            "paymentTerm",
+    //        ]
+    //    };
+
+
+    //    let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+    //    request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
+    //    request.signature = senderWallet.signMessage(JSON.stringify(request.data));
+
+    //    let txReceipt = await obfuscator.postTransaction(request, new abiLoader.SendTransactionProperties());
+
+    //});
+
 });

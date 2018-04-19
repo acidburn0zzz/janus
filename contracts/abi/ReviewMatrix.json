@@ -1,0 +1,69 @@
+{
+  "contractName": "ReviewMatrix",
+  "abi": [],
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820d1b206724af09b3ca4698fbf541a1313f04b5f1fdcd6fc635c50a684394d458f0029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820d1b206724af09b3ca4698fbf541a1313f04b5f1fdcd6fc635c50a684394d458f0029",
+  "sourceMap": "28:75:9:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "28:75:9:-;;;;;",
+  "source": "pragma solidity ^0.4.17;\r\n\r\ncontract ReviewMatrix {\r\n    //TODO: Configure business rules here\r\n    \r\n}",
+  "sourcePath": "C:\\Forcefield\\privy\\SmartContracts\\contracts\\ReviewMatrix.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/C/Forcefield/privy/SmartContracts/contracts/ReviewMatrix.sol",
+      "exportedSymbols": {
+        "ReviewMatrix": [
+          973
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".17"
+          ]
+        },
+        "id": 972,
+        "name": "PragmaDirective",
+        "src": "0:24:9"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            973
+          ],
+          "name": "ReviewMatrix",
+          "nodes": [
+            null
+          ],
+          "scope": 974
+        },
+        "id": 973,
+        "name": "ContractDefinition",
+        "src": "28:75:9"
+      }
+    ],
+    "id": 974,
+    "name": "SourceUnit",
+    "src": "0:103:9"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-04-15T02:08:35.424Z"
+}

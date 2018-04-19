@@ -1,16 +1,16 @@
 "use strict";
 
-const constants = require('./build/hdwallet-constants.js');
-const asymmetricEncryption = require('./build/asymmetrickey-encryption.js');
-const symmetricEncryption = require('./build/symmetrickey-encryption.js');
-const models = require('./build/models.js');
-const utils = require('./build/utils.js');
-const ihttpService = require('./build/ihttp.service.js');
-const httpService = require('./build/http.service.js');
-const abiLoaderInterface = require('./build/script/abi-loader-interface');
+const constants = require('./build/common/constants.js');
+const asymmetricEncryption = require('./build/common/asymmetrickey-encryption.js');
+const symmetricEncryption = require('./build/common/symmetrickey-encryption.js');
+const models = require('./build/common/models.js');
+const utils = require('./build/common/utils.js');
+const ihttpService = require('./build/common/ihttp.service.js');
+const httpService = require('./build/common/http.service.js');
+const smartContractServiceInterface = require('./build/interfaces/smart-contract-service-interface');
 
-exports.AbiLoaderInterface = abiLoaderInterface;
-
+exports.SmartContractServiceInterface = smartContractServiceInterface.SmartContractServiceInterface;
+exports.SendTransactionProperties = smartContractServiceInterface.SendTransactionPropertiesInterface;
 exports.Constants = constants;
 exports.OneTimeAddressRequest = models.OneTimeAddressRequest;
 exports.OneTimeAddressResponse = models.OneTimeAddressResponse;

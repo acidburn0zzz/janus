@@ -1,0 +1,17 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\ind-abi-loader",
+    "\\ind-abi-loader\\src",
+    "\\ind-common",
+    "\\ind-common\\interfaces",
+    "\\ind-hdwallet",
+    "\\ind-hdwallet\\server",
+    "\\ind-hdwallet\\server\\script",
+    "\\ind-hdwallet\\server\\services",
+    "\\ind-hdwallet\\server\\tests",
+    "\\SmartContracts\\contracts"
+  ],
+  "SelectedNode": "\\ind-hdwallet\\server\\script\\smartContractEventEmitter.ts",
+  "PreviewInSolutionExplorer": false
+}

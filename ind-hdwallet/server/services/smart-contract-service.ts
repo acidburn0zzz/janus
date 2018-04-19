@@ -1,4 +1,5 @@
 import ethers = require('ethers');
+import * as indCommon from 'ind-common';
 
 const ethersUtils = ethers.utils;
 const walletObject = ethers.Wallet;
@@ -6,72 +7,76 @@ const walletObject = ethers.Wallet;
 const Web3 = require("web3");
 const solc = require("solc");
 const Tx = require('ethereumjs-tx');
+var fs = require('fs');
+var path_module = require('path');
+const utils = new indCommon.Utils();
 
-var config = require('../../config/hd-wallet.config');
-
-let contract: JSON = require('../../contracts/ContractInterface');
-
-export class sendTransactionProperties {
+export class SendTransactionProperties implements indCommon.SendTransactionPropertiesInterface {
+    guid: string;
     factoryAddress: string;
+    contractName: string;
     methodName: string;
     parameters: string[];
+    data: {};
     symmetricKeyIndex: number;
-    OneTimeAddress: string;
+    oneTimeAddress: string;
     signingWallet: ethers.Wallet;
-}
-
-export class SmartContractService {
-
-    private web3: any;
 
     constructor() {
+        this.data = new Object();
+    }
+}
+
+export class SmartContractService implements indCommon.SmartContractServiceInterface {
+
+    private web3: any;
+    private contractPath: string;
+    private provider: string;
+    private static _instance: indCommon.SmartContractServiceInterface;
+
+
+    private constructor(contractPath: string, provider: string) {
+        this.contractPath = contractPath;
+        this.provider = provider;
+
+
         this.getWeb3();
     }
 
     private getWeb3() {
-        this.web3 = new Web3(Web3.givenProvider || config.provider);
+        this.web3 = new Web3(Web3.givenProvider || this.provider);
     }
 
-    public sendTransaction(transactionProperties: sendTransactionProperties) {
+    public static getInstance(contractPath: string, provider: string) : indCommon.SmartContractServiceInterface {
+        this._instance = this._instance || new SmartContractService(contractPath, provider);
 
-        //get accessible symmetric key for each party
-        //getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string)
+            return this._instance;
+    }
 
-        let privateKey = new Buffer(transactionProperties.signingWallet.privateKey, 'hex');
+    public async sendTransaction(transactionProperties: indCommon.SendTransactionProperties): Promise<Object> {
+        //Check the method name and use decorators to find the right method to execute
 
-        let encondedCall: string = this.web3.eth.abi.encodeFunctionCall({
-            name: transactionProperties.methodName,
-            type: 'function',
-            inputs: [{
-                type: 'address',
-                name: 'partyAddress'
-            }, {
-                type: 'uint',
-                name: 'symKeyIndex'
-                }]
-        }, [transactionProperties.OneTimeAddress, transactionProperties.symmetricKeyIndex]);
+        try
+        {
+            let path = this.contractPath + '\\' + transactionProperties.contractName;
 
-        var rawTx = {
-            gasPrice: '0x09184e72a000',
-            gasLimit: '0x2710',
-            to: '0x0000000000000000000000000000000000000000',
-            value: '0x00',
-            data: encondedCall
+            utils.writeFormattedMessage("Inside Send Txn: Contract Path", path);
+
+            let x = require(path);
+
+            let contract = Object.create(x[transactionProperties.contractName].prototype);
+
+            let args = new Array<string>();
+            args.push('c:\\Forcefield\\privy\\contracts\\abi');
+            args.push(this.provider);
+
+            contract.constructor.apply(contract, args);
+
+            return await contract[transactionProperties.methodName](transactionProperties);
+
         }
-
-        var tx = new Tx(rawTx);
-        tx.sign(privateKey);
-
-        var serializedTx = tx.serialize();
-
-        // console.log(serializedTx.toString('hex'));
-        // 0xf889808609184e72a00082271094000000000000000000000000000000000000000080a47f74657374320000000000000000000000000000000000000000000000000000006000571ca08a8bbf888cfa37bbf0bb965423625641fc956967b81d12e23709cead01446075a01ce999b56a8a88504be365442ea61239198e23d1fce7d00fcfc5cd3b44b7215f
-
-        this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
-            .on('receipt', console.log);
-
-         // see eth.getTransactionReceipt() for details
-
-
+        catch (error) {
+            utils.writeFormattedMessage("Error in sendTransaction", error);
+        }
     }
 }

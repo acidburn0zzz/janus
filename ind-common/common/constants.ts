@@ -10,6 +10,8 @@ export let errorAcceptTradeFailed: string = "error: Accept trade failed";
 export let errorCancelTradeFailed: string = "error: Cancel trade failed";
 export let errorRequestObjectParseFailed: string = "error: Could not parse request object";
 export let errorRequestOtaFailed: string = "error: Could not find the one time address for the specified guid";
+export let errorPostTransaction: string = "error: PostTransaction failed";
+export let errorObfuscatorOptionsEmpty: string = "error: Address obfuscator options cannot be empty"; 
 
 
 //export let mecuriaMnemonic: string = "radar blur cabbage chef fix engine embark joy scheme fiction master release";

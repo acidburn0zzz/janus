@@ -1,9 +1,17 @@
 import * as express from 'express';
 import * as indCommon from 'ind-common';
-import { AddressObfuscator } from 'ind-hdwallet';
+import { AddressObfuscatorOptions, AddressObfuscator } from 'ind-hdwallet';
 
 const router = express.Router();
-const addressObfuscator = new AddressObfuscator.AddressObfuscator();
+
+let options: AddressObfuscatorOptions = {
+    blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
+    contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
+    oracleServiceUri: "uri",
+    vaultServiceUri: "vault"
+};
+
+const addressObfuscator = new AddressObfuscator.AddressObfuscator(options);
 
 router.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.render('index', {
@@ -99,9 +107,9 @@ router.post('/postTransaction', async (req: express.Request, res: express.Respon
 
     try {
         let requestData = new indCommon.PostTransactionRequest();
-        requestData.message = req.body.message;
+        requestData.data = req.body.data;
         requestData.signature = req.body.signature;
-        requestData.messageObject = JSON.parse(req.body.message);
+        requestData.otherInfo = JSON.parse(req.body.otherInfo);
 
         responseData = addressObfuscator.postTransaction(requestData);
     }

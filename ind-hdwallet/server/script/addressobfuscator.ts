@@ -1,17 +1,24 @@
 import * as indCommon from 'ind-common';
-import { AbiLoader } from 'ind-abi-loader';
+import ethers = require('ethers');
 
 import * as cachingService from '../services/wallet-caching-service';
 import * as vaultService from '../services/secure-enclave-service';
-import ethers = require('ethers');
+import { SmartContractEventEmitter } from './smartContractEventEmitter';
+import { SmartContractService, SendTransactionProperties } from '../services/smart-contract-service';
 
 const ethersUtils = ethers.utils;
 const walletObject = ethers.Wallet;
 const providers = ethers.providers;
-
-let utils = new indCommon.Utils();
+const utils = new indCommon.Utils();
 
 let addressIndex: number = -1;
+
+export interface AddressObfuscatorOptions {
+    oracleServiceUri: string;
+    vaultServiceUri: string;
+    contractsPath: string;
+    blockchainProvider: string;
+}
 
 /*
     For a given GUID, this class generates a one time deterministic wallet. The generated one time wallet
@@ -21,10 +28,22 @@ export class AddressObfuscator {
 
     private walletCache: cachingService.WalletCachingService;
     private secureEnclave: vaultService.SecureEnclaveService; 
+    private smartContractService: indCommon.SmartContractServiceInterface;
+    private eventEmitter: SmartContractEventEmitter;
 
-    constructor() {
+    constructor(options: AddressObfuscatorOptions) {
         this.walletCache = new cachingService.WalletCachingService();
         this.secureEnclave = new vaultService.SecureEnclaveService();
+
+        if (options.contractsPath.length == 0 || options.blockchainProvider.length == 0 || options.oracleServiceUri.length == 0 ||
+            options.vaultServiceUri.length == 0)
+            throw indCommon.Constants.errorObfuscatorOptionsEmpty;
+
+        this.smartContractService = SmartContractService.getInstance(options.contractsPath, options.blockchainProvider);
+    }
+
+    private onPostTransaction(postTxnProperties: indCommon.sendProperties) {
+        
     }
 
     /**
@@ -228,47 +247,75 @@ export class AddressObfuscator {
         return response;
     }
 
-    public postTransaction(request: indCommon.PostTransactionRequest): indCommon.Response {
+    public async postTransaction(request: indCommon.PostTransactionRequest):Promise<indCommon.Response> {
 
-        let response = new indCommon.PostTransactionResponse(request.messageObject.guid);
+        let response = new indCommon.PostTransactionResponse(request.data.guid);
 
         try {
-                //verify the message signature and get the public address of the signer
-                let verifiedAddress: string = this.verifyPayload(request.messageObject.data, request.signature);
+            //verify the message signature and get the public address of the signer
+            let verifiedAddress: string = this.verifyPayload(JSON.stringify(request.data), request.signature);
                 if (verifiedAddress === indCommon.Constants.errorInvalidSignature) {
 
                     response.error = indCommon.Constants.errorInvalidSignature;
                     return response;
                 }
 
-                //TODO: check the message hash
-                let message2Hash = JSON.stringify(request.otherInfo);
-                let messageHash = ethersUtils.keccak256(message2Hash);
+                // check the message hash
+                let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+                let messageHash = ethersUtils.keccak256(utf8Bytes);
 
-                if (message2Hash != request.data.messageHash) {
+                if (messageHash != request.data.messageHash) {
                     response.error = indCommon.Constants.errorInvalidHash;
                     return response;
                 }
 
                 //get the otadata object for the specified guid
-                let otaData = this.walletCache.getOneTimeAddress(request.messageObject.data.guid);
+                let otaData: indCommon.OneTimeAddressData = this.walletCache.getOneTimeAddress(request.data.guid);
 
                 if (otaData == null) {
                     response.error = indCommon.Constants.errorRequestOtaFailed;
                     return response;
                 }
 
-                //Load the ABI for the specified contract
-                let abiLoader: indCommon.AbiLoaderInterface = new AbiLoader();
-                let abi: string = abiLoader.loadAbi(request.contractName);
+                let postTxnProperties: indCommon.sendProperties = new SendTransactionProperties();
 
-                request.otherInfo.functionList.forEach(fn => {
-                    request.otherInfo[fn]
+                for (var property in request.data) {
+                    if (request.data.hasOwnProperty(property)) {
+                        if (property == "guid" || property == "messageHash")
+                            continue;
+
+                        postTxnProperties.data[property] = request.data[property];
+                    }
+                }
+
+                request.otherInfo.functionList.forEach(async fn => {
+
+                    postTxnProperties.guid = request.data.guid;
+                    postTxnProperties.factoryAddress = request.otherInfo.factoryAddress;
+                    postTxnProperties.methodName = fn;
+                    postTxnProperties.contractName = request.otherInfo.contractName;
+                    postTxnProperties.oneTimeAddress = "0xac39b311dceb2a4b2f5d8461c1cdaf756f4f7ae9"; //TODO: Use otaData.OTAddress;
+                    postTxnProperties.symmetricKeyIndex = request.otherInfo[fn][0];
+                    postTxnProperties.signingWallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
+                    postTxnProperties.parameters = request.otherInfo[fn].slice(1);
+
+                    let txnReceipt = await this.smartContractService.sendTransaction(postTxnProperties);
+
+                    response.txnReceipts.push({
+                        name: fn,
+                        txnReceipt: txnReceipt
+                    });
+
+                    utils.writeFormattedMessage("Transaction receipt for " + fn, response.txnReceipts);
                 });
         }
         catch (error) {
-            
+
+            utils.writeFormattedMessage("Error inside postTransaction", error);
+            response.error = indCommon.Constants.errorPostTransaction;
         }
+
+        return response;
     }
 
     //private methods

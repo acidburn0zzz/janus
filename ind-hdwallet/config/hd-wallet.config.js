@@ -4,5 +4,5 @@ module.exports = {
     companyName: "Shell Corporation",
     baseUrl: "http://localhost:",
     oracleUrl: "http://localhost:",
-    provider: "http://localhost:8545"
+    provider: "http://forcefield01.uksouth.cloudapp.azure.com:8545"
 };
