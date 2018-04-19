@@ -7,10 +7,7 @@ const models = require('./build/common/models.js');
 const utils = require('./build/common/utils.js');
 const ihttpService = require('./build/common/ihttp.service.js');
 const httpService = require('./build/common/http.service.js');
-const smartContractServiceInterface = require('./build/interfaces/smart-contract-service-interface');
 
-exports.SmartContractServiceInterface = smartContractServiceInterface.SmartContractServiceInterface;
-exports.SendTransactionProperties = smartContractServiceInterface.SendTransactionPropertiesInterface;
 exports.Constants = constants;
 exports.OneTimeAddressRequest = models.OneTimeAddressRequest;
 exports.OneTimeAddressResponse = models.OneTimeAddressResponse;

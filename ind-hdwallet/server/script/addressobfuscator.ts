@@ -294,7 +294,8 @@ export class AddressObfuscator {
                     postTxnProperties.factoryAddress = request.otherInfo.factoryAddress;
                     postTxnProperties.methodName = fn;
                     postTxnProperties.contractName = request.otherInfo.contractName;
-                    postTxnProperties.oneTimeAddress = "0xac39b311dceb2a4b2f5d8461c1cdaf756f4f7ae9"; //TODO: Use otaData.OTAddress;
+                    //postTxnProperties.oneTimeAddress = "0xac39b311dceb2a4b2f5d8461c1cdaf756f4f7ae9";
+                    postTxnProperties.oneTimeAddress = otaData.OTAddress;
                     postTxnProperties.symmetricKeyIndex = request.otherInfo[fn][0];
                     postTxnProperties.signingWallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
                     postTxnProperties.parameters = request.otherInfo[fn].slice(1);

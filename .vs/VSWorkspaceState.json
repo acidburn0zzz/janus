@@ -1,17 +1,18 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ind-abi-loader",
-    "\\ind-abi-loader\\src",
+    "\\contracts",
+    "\\contracts\\node_modules",
+    "\\contracts\\node_modules\\ind-common",
+    "\\contracts\\node_modules\\ind-common\\build",
+    "\\contracts\\node_modules\\ind-common\\build\\common",
+    "\\contracts\\src",
     "\\ind-common",
-    "\\ind-common\\interfaces",
-    "\\ind-hdwallet",
-    "\\ind-hdwallet\\server",
-    "\\ind-hdwallet\\server\\script",
-    "\\ind-hdwallet\\server\\services",
-    "\\ind-hdwallet\\server\\tests",
-    "\\SmartContracts\\contracts"
+    "\\ind-common\\common",
+    "\\ind-hdwallet-service",
+    "\\ind-hdwallet-service\\server",
+    "\\ind-oracle"
   ],
-  "SelectedNode": "\\ind-hdwallet\\server\\script\\smartContractEventEmitter.ts",
+  "SelectedNode": "\\contracts\\node_modules\\ind-common\\index.js",
   "PreviewInSolutionExplorer": false
 }
