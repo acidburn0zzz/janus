@@ -247,7 +247,7 @@ export class AddressObfuscator {
         return response;
     }
 
-    public async postTransaction(request: indCommon.PostTransactionRequest):Promise<indCommon.Response> {
+    public async postTransaction(request: indCommon.CreateUpdateTransactionRequest):Promise<indCommon.Response> {
 
         let response = new indCommon.PostTransactionResponse(request.data.guid);
 
@@ -288,17 +288,22 @@ export class AddressObfuscator {
                     }
                 }
 
-                request.otherInfo.functionList.forEach(async fn => {
+                //request.otherInfo.functionList.forEach(async fn => {
+                for(let i = 0; i<request.otherInfo.functionList.length;i++) {
+                    let fn = request.otherInfo.functionList[i];
+
+                    utils.writeFormattedMessage("Function data",fn);
 
                     postTxnProperties.guid = request.data.guid;
                     postTxnProperties.factoryAddress = request.otherInfo.factoryAddress;
-                    postTxnProperties.methodName = fn;
+                    postTxnProperties.methodName = fn.name;
                     postTxnProperties.contractName = request.otherInfo.contractName;
                     //postTxnProperties.oneTimeAddress = "0xac39b311dceb2a4b2f5d8461c1cdaf756f4f7ae9";
                     postTxnProperties.oneTimeAddress = otaData.OTAddress;
-                    postTxnProperties.symmetricKeyIndex = request.otherInfo[fn][0];
+                    //postTxnProperties.symmetricKeyIndex = request.otherInfo[fn][0];
+                    postTxnProperties.symmetricKeyIndex = parseInt(fn.params[0], 10);
                     postTxnProperties.signingWallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
-                    postTxnProperties.parameters = request.otherInfo[fn].slice(1);
+                    postTxnProperties.parameters = fn.params.slice(1);
 
                     let txnReceipt = await this.smartContractService.sendTransaction(postTxnProperties);
 
@@ -308,7 +313,8 @@ export class AddressObfuscator {
                     });
 
                     utils.writeFormattedMessage("Transaction receipt for " + fn, response.txnReceipts);
-                });
+                //});
+                }
         }
         catch (error) {
 

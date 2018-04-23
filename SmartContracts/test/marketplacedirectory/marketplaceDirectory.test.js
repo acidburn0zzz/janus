@@ -3,7 +3,7 @@ const MarketplaceDirectoryAbi = artifacts.require('./MarketplaceDirectory.sol')
 contract('MarketplaceDirectory', function(accounts) {
 
     // Defaults
-    const defaultConsortiumName = "ForceField ETRM Registry";
+    const defaultConsortiumName = "Janus Registry";
     const defaultConsortiumHash = web3.sha3(defaultConsortiumName);
     const defaultAccount = accounts[0];
 
@@ -92,7 +92,7 @@ contract('MarketplaceDirectory', function(accounts) {
 
         it ('should be possible to get the new participant', async() => { 
 
-            var participantDetails = await MarketplaceDirectory.participant(companyA);
+            var participantDetails = await MarketplaceDirectory.participant(companyA, defaultConsortiumName);
             
             assert.strictEqual(5, participantDetails.length);
             assert.strictEqual(defaultConsortiumHash, participantDetails[0]);
@@ -109,7 +109,7 @@ contract('MarketplaceDirectory', function(accounts) {
             assert.isNotNull(result);
             assert.isNotNull(result.tx);
 
-            var participantDetails = await MarketplaceDirectory.participant(companyA);
+            var participantDetails = await MarketplaceDirectory.participant(companyA, defaultConsortiumName);
             
             assert.strictEqual(5, participantDetails.length);
             assert.strictEqual(defaultConsortiumHash, participantDetails[0]);
@@ -126,7 +126,7 @@ contract('MarketplaceDirectory', function(accounts) {
             assert.isNotNull(result);
             assert.isNotNull(result.tx);
 
-            var participantDetails = await MarketplaceDirectory.participant(companyA);
+            var participantDetails = await MarketplaceDirectory.participant(companyA, defaultConsortiumName);
             
             assert.strictEqual(5, participantDetails.length);
             assert.strictEqual(defaultConsortiumHash, participantDetails[0]);
@@ -143,7 +143,7 @@ contract('MarketplaceDirectory', function(accounts) {
             assert.isNotNull(result);
             assert.isNotNull(result.tx);
 
-            var participantDetails = await MarketplaceDirectory.participant(companyB);
+            var participantDetails = await MarketplaceDirectory.participant(companyB, companyA);
 
             // console.log(participantDetails);
             // var hashedB = web3.sha3(companyB);

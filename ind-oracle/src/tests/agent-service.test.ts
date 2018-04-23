@@ -1,6 +1,5 @@
 import * as service from "../script/agent.service"
 import * as model from "../script/models" 
-import * as ethers from "ethers" 
 import * as mocha from 'mocha'
 import * as chai from 'chai'
 import { RegistrationData, WalletRegistrationRequest, UnRegistrationData, WalletUnRegistrationRequest } from "ind-common";

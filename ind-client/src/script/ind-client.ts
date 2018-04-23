@@ -2,7 +2,7 @@ import { SmartContractService } from './smartcontract.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
 import * as constants from './constants';
 import { error } from 'util';
-import { IHttpService, HttpService, Party, PartyType, TransactionData, TransactionInfo, Function, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
+import { IHttpService, HttpService, Party, PartyType, TransactionData, TransactionInfo, Function, CreateUpdateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
 const Web3 = require('web3');
 import * as ethUtil from 'ethereumjs-util';
 
@@ -140,6 +140,7 @@ export class IndClient {
 		let info:TransactionInfo = new TransactionInfo({});
 		info.marketplaceAddress = marketplaceAddress;
 		info.factoryAddress = tradeFactoryAddress;
+		info.contractName = "Trade";
 		info.myParty = myParty;
 		info.otherParty = otherParty;
 
@@ -156,7 +157,7 @@ export class IndClient {
 		let messageHash = "a34dadf";//web3.sha3(infoStr);
 		data.messageHash = messageHash;
 		
-		let request:CreateTransactionRequest = new CreateTransactionRequest({});
+		let request:CreateUpdateTransactionRequest = new CreateUpdateTransactionRequest({});
 		request.data = data;
 		request.otherInfo = info;
 

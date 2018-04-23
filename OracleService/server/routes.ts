@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
 import { GrantAccessRequest, GrantAccessResponse} from 'ind-oracle';
-import { Party, CreateTransactionRequest, CreateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
+import { Party, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
   WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-common';
 var oracle: OracleService;
 const router = express.Router();
@@ -53,7 +53,7 @@ router.post('/unRegisterWalletAgent', async (req: express.Request, res: express.
 });
 
 router.post('/createTransaction', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  let createTransactionRequest = new CreateTransactionRequest({});
+  let createTransactionRequest = new CreateUpdateTransactionRequest({});
   console.log("body", req.body);
   createTransactionRequest.data = req.body.data;
   createTransactionRequest.signature = req.body.signature;
@@ -61,11 +61,11 @@ router.post('/createTransaction', async (req: express.Request, res: express.Resp
   console.log("createTransactionRequest", createTransactionRequest);
   if(!oracle)
     oracle = new OracleService();
-  var response: CreateTransactionResponse;
+  var response: CreateUpdateTransactionResponse;
   try {
     response = await oracle.createTransaction(createTransactionRequest);
   } catch (error) {
-    response = new CreateTransactionResponse({ contractId: 0, status: false });
+    response = new CreateUpdateTransactionResponse({ contractId: 0, status: false });
     response.error = "ERROR: " + error;
     console.log(error)
   }

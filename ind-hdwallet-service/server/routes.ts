@@ -11,7 +11,7 @@ let options: AddressObfuscatorOptions = {
     vaultServiceUri: "vault"
 };
 
-const addressObfuscator = new AddressObfuscator.AddressObfuscator(options);
+const addressObfuscator = new AddressObfuscator(options);
 
 router.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.render('index', {
@@ -106,12 +106,13 @@ router.post('/postTransaction', async (req: express.Request, res: express.Respon
     let responseData = new indCommon.PostTransactionResponse();
 
     try {
-        let requestData = new indCommon.PostTransactionRequest();
+        let requestData = new indCommon.CreateUpdateTransactionRequest();
         requestData.data = req.body.data;
         requestData.signature = req.body.signature;
-        requestData.otherInfo = JSON.parse(req.body.otherInfo);
-
-        responseData = addressObfuscator.postTransaction(requestData);
+        //requestData.otherInfo = JSON.parse(req.body.otherInfo);
+        requestData.otherInfo = req.body.otherInfo;
+        
+        responseData = await addressObfuscator.postTransaction(requestData);
     }
     catch (error) {
         responseData.error = indCommon.Constants.errorRequestObjectParseFailed + " " + error;

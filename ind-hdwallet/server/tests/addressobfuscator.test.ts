@@ -272,9 +272,10 @@ describe('post transaction', () => {
 
     let response = obfuscator.getOnetimeAddress(addressRequest);
 
-    it('should update data in a contract', async () => {
-        let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
-
+    it('should update data in a contract', async function () {
+        this.timeout(0);
+        //let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
+        let request: indCommon.CreateUpdateTransactionRequest = new indCommon.CreateUpdateTransactionRequest({});        
 
 
         request.data = {
@@ -289,19 +290,30 @@ describe('post transaction', () => {
 
         request.Signature = "";
 
+        // request.otherInfo = {
+        //     factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
+        //     contractName: "Trade",
+        //     functionList: [
+        //         "updateData"
+        //     ],
+        //     updateData: [
+        //         1,
+        //         "tradeDate",
+        //         "product",
+        //         "qty",
+        //         "price"
+        //     ]
+        // };
+
+        let function1:indCommon.Function = new indCommon.Function({});
+		function1.name = "updateData";
+		function1.params = ["1", "tradeDate",
+			"product", "qty", "price"];
+        
         request.otherInfo = {
             factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
             contractName: "Trade",
-            functionList: [
-                "updateData"
-            ],
-            updateData: [
-                1,
-                "tradeDate",
-                "product",
-                "qty",
-                "price"
-            ]
+            functionList: [function1]
         };
 
 
@@ -313,16 +325,17 @@ describe('post transaction', () => {
 
     });
     
-    //it('should update payment terms in a contract', async () => {
-    //    let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
+    it('should update payment terms in a contract', async () => {
+       //let request: indCommon.PostTransactionRequest = new indCommon.PostTransactionRequest();
+       let request: indCommon.CreateUpdateTransactionRequest = new indCommon.CreateUpdateTransactionRequest({});
 
-    //    request.data = {
-    //        guid: messageObject.guid,
-    //        paymentTerm: "FOB",
-    //        messageHash: ""
-    //    };
+       request.data = {
+           guid: messageObject.guid,
+           paymentTerm: "FOB",
+           messageHash: ""
+       };
 
-    //    request.Signature = "";
+       request.Signature = "";
 
     //    request.otherInfo = {
     //        factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
@@ -336,13 +349,22 @@ describe('post transaction', () => {
     //        ]
     //    };
 
+        let function1:indCommon.Function = new indCommon.Function({});
+        function1.name = "updatePaymentInfo";
+        function1.params = ["2", "paymentTerm"];
 
-    //    let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
-    //    request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
-    //    request.signature = senderWallet.signMessage(JSON.stringify(request.data));
+        request.otherInfo = {
+            factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
+            contractName: "Trade",
+            functionList: [function1]
+        };
 
-    //    let txReceipt = await obfuscator.postTransaction(request, new abiLoader.SendTransactionProperties());
+        let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+        request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
+        request.signature = senderWallet.signMessage(JSON.stringify(request.data));
 
-    //});
+        let txReceipt = await obfuscator.postTransaction(request);
+
+    });
 
 });

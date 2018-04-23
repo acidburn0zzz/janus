@@ -96,26 +96,26 @@ describe('Trade tests', () => {
         testTradeNumber = response.tradeNumber;
     });
 
-    it('Update party to trade', async function () {
-        this.timeout(0);
-        console.log("In Update party to trade test");
+    // it('Update party to trade', async function () {
+    //     this.timeout(0);
+    //     console.log("In Update party to trade test");
 
-        assert.notEqual(testTradeNumber,0,"Trade not exist");
+    //     assert.notEqual(testTradeNumber,0,"Trade not exist");
 
-        let buyerCompanyName = "Mercuria";
-        let brokerCompanyName = "BP";
-        let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
-        let brokerAddress: string = "0x843Bb18ea2b86ef3807E006723784435FF00e27F";
+    //     let buyerCompanyName = "Mercuria";
+    //     let brokerCompanyName = "BP";
+    //     let buyerAddress: string = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
+    //     let brokerAddress: string = "0x843Bb18ea2b86ef3807E006723784435FF00e27F";
 
-        let myParty = new Party({partyType:PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
-        let parties = [new Party({partyType:PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
-        let response = await client.updateParty(guid, myParty, parties);
+    //     let myParty = new Party({partyType:PartyType.Buyer,partyAddress:buyerAddress,companyName:buyerCompanyName});
+    //     let parties = [new Party({partyType:PartyType.Broker,partyAddress:brokerAddress,companyName:brokerCompanyName})];
+    //     let response = await client.updateParty(guid, myParty, parties);
         
-        //verify
-        assert.notEqual(response,null,"Update party failed");
-        console.log(response);
-        assert.equal(response.status,true,response.error);
-    });
+    //     //verify
+    //     assert.notEqual(response,null,"Update party failed");
+    //     console.log(response);
+    //     assert.equal(response.status,true,response.error);
+    // });
 
     it('Read the meter summary', async function () {
         this.timeout(0);

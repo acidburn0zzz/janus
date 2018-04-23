@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 //import { } from './models';
 import { IndOracle, GrantAccessRequest } from 'ind-oracle';
-import { Party, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, 
+import { Party, CreateUpdateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, 
   MeterSummaryRequest, MeterSummaryResponse} from 'ind-common';
 var oracle: IndOracle;
 let oraclePrivateKey = "0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
@@ -44,7 +44,7 @@ export class OracleService {
 		return await oracle.unRegisterWalletAgent(request);
   }
 
-  async createTransaction(request: CreateTransactionRequest) {
+  async createTransaction(request: CreateUpdateTransactionRequest) {
     var caller: Party = request.otherInfo.myParty;
     var response = await oracle.createTransaction(request);
     if(response && response.status == true) {

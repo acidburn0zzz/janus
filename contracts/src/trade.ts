@@ -72,8 +72,8 @@ export class Trade extends BaseContract {
             utils.writeFormattedMessage("Private key", transactionProperties.signingWallet.privateKey);
 
             //TODO: uncomment before checking in
-            //let decryptedSymmetricKey: string = asymEncryp.decrypt(symmetricKey, transactionProperties.signingWallet.privateKey);
-            let privateKey = "0xb96e9ccb774cc33213cbcb2c69d3cdae17b0fe4888a1ccd343cbd1a17fd98b18";
+            let privateKey = transactionProperties.signingWallet.privateKey;
+            //let privateKey = "0xb96e9ccb774cc33213cbcb2c69d3cdae17b0fe4888a1ccd343cbd1a17fd98b18";
             let decryptedSymmetricKey: string = asymEncryp.decrypt(symmetricKey.slice(2), privateKey);
 
             utils.writeFormattedMessage("Decrypted Symmetric Key", decryptedSymmetricKey);
@@ -82,7 +82,7 @@ export class Trade extends BaseContract {
             let encryptedData = new Object();
 
             transactionProperties.parameters.forEach((element) => {
-                encryptedData[element] = symEncryp.encrypt(transactionProperties.data[element], decryptedSymmetricKey);
+                encryptedData[element] = symEncryp.encrypt(String(transactionProperties.data[element]), decryptedSymmetricKey);
                 utils.writeFormattedMessage("Decrypted Symmetric Key for " + element, encryptedData[element]);
             });
 
@@ -108,6 +108,9 @@ export class Trade extends BaseContract {
                 to: this.trade.options.address,
                 data: txnObject
             });
+	    
+            estimatedGas = estimatedGas + 20000;
+            utils.writeFormattedMessage("estimatedGas", estimatedGas);
 
             let signedTransaction = await this.web3.eth.accounts.signTransaction({
                 to: this.trade.options.address, data: txnObject,
@@ -142,8 +145,8 @@ export class Trade extends BaseContract {
             utils.writeFormattedMessage("Private key", transactionProperties.signingWallet.privateKey);
 
             //TODO: uncomment before checking in
-            //let decryptedSymmetricKey: string = asymEncryp.decrypt(symmetricKey, transactionProperties.signingWallet.privateKey);
-            let privateKey = "0xb96e9ccb774cc33213cbcb2c69d3cdae17b0fe4888a1ccd343cbd1a17fd98b18";
+            let privateKey = transactionProperties.signingWallet.privateKey;
+            //let privateKey = "0xb96e9ccb774cc33213cbcb2c69d3cdae17b0fe4888a1ccd343cbd1a17fd98b18";
             let decryptedSymmetricKey: string = asymEncryp.decrypt(symmetricKey.slice(2), privateKey);
 
             utils.writeFormattedMessage("Decrypted Symmetric Key", decryptedSymmetricKey);
@@ -176,6 +179,9 @@ export class Trade extends BaseContract {
                 to: this.trade.options.address,
                 data: txnObject
             });
+	    
+            estimatedGas = estimatedGas + 20000;
+            utils.writeFormattedMessage("estimatedGas", estimatedGas);
 
             let signedTransaction = await this.web3.eth.accounts.signTransaction({
                 to: this.trade.options.address, data: txnObject,
@@ -195,5 +201,5 @@ export class Trade extends BaseContract {
             throw error;
         }
 
-}
+    }
 }

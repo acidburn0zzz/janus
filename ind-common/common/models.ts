@@ -288,6 +288,7 @@ export class TransactionData extends Request {
 export class TransactionInfo {
   marketplaceAddress: string;
   factoryAddress: string;
+  contractName: string;
   myParty: Party;
   otherParty: Party;
   functionList: Function[];
@@ -303,18 +304,18 @@ export class Function {
     Object.assign(this, fields);
   }
 }
-export class CreateTransactionRequest {
+export class CreateUpdateTransactionRequest {
   data: TransactionData;
   signature: string;
   otherInfo: TransactionInfo;
-  constructor(fields: Partial<CreateTransactionRequest> & {}) {
+  constructor(fields: Partial<CreateUpdateTransactionRequest> & {}) {
     Object.assign(this, fields);
   }
 }
-export class CreateTransactionResponse extends Response {
+export class CreateUpdateTransactionResponse extends Response {
   contractId: number;
   transactionHash: Array<string>;
-  constructor(fields: Partial<CreateTransactionResponse> & {}) {
+  constructor(fields: Partial<CreateUpdateTransactionResponse> & {}) {
     super();
     Object.assign(this, fields);
   }
