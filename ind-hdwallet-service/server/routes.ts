@@ -1,5 +1,11 @@
 import * as express from 'express';
-import * as indCommon from 'ind-common';
+import * as Constants from '../../types/ind-common/common/constants';
+import { Utils } from '../../types/ind-common/common/utils';
+import {
+    OneTimeAddressRequest, OneTimeAddressResponse, OneTimeAddressData, DecryptDataRequest, DecryptDataResponse,
+    EncryptDataRequest, EncryptDataResponse, GrantAccessRequest, GrantAccessResponse, PostTransactionRequest, PostTransactionResponse
+} from '../../types/ind-common/common/models';
+
 import { AddressObfuscatorOptions, AddressObfuscator } from 'ind-hdwallet';
 
 const router = express.Router();

@@ -1,42 +1,63 @@
 import ethers = require('ethers');
-import * as indCommon from 'ind-common';
+import {
+    SmartContractServiceInterface, SendTransactionPropertiesInterface,
+    GrantAccessPropertiesInterface, ExecuteTransactionPropInterface
+} from 'ind-common/build/interfaces/smart-contract-service-interface';
+
+import { Utils } from 'ind-common/build/common/utils';
 
 const ethersUtils = ethers.utils;
 const walletObject = ethers.Wallet;
 
 const Web3 = require("web3");
-const solc = require("solc");
+
 const Tx = require('ethereumjs-tx');
 var fs = require('fs');
 var path_module = require('path');
-const utils = new indCommon.Utils();
+const utils = new Utils();
 
-export class SendTransactionProperties implements indCommon.SendTransactionPropertiesInterface {
+export class SendTransactionProperties implements SendTransactionPropertiesInterface {
     guid: string;
     factoryAddress: string;
     contractName: string;
     methodName: string;
+    signingWallet: ethers.Wallet;
     parameters: string[];
     data: {};
     symmetricKeyIndex: number;
     oneTimeAddress: string;
-    signingWallet: ethers.Wallet;
 
     constructor() {
         this.data = new Object();
     }
 }
 
-export class SmartContractService implements indCommon.SmartContractServiceInterface {
+export class GrantAccessProperties implements GrantAccessPropertiesInterface {
+    guid: string;
+    factoryAddress: string;
+    contractName: string;
+    methodName: string;
+    signingWallet: ethers.Wallet;
+    partyIndex: number;
+    otherPartyIndex: number;
+    partyCompanyName: string;
+    otherPartyCompanyName: string;
+    otherPartyBitcorePubKey: string;
+}
+
+
+export class SmartContractService implements SmartContractServiceInterface {
 
     private web3: any;
     private contractPath: string;
+    private abiPath: string;
     private provider: string;
-    private static _instance: indCommon.SmartContractServiceInterface;
+    private static _instance: SmartContractServiceInterface;
 
 
-    private constructor(contractPath: string, provider: string) {
+    private constructor(contractPath: string, abiPath: string, provider: string) {
         this.contractPath = contractPath;
+        this.abiPath = abiPath;
         this.provider = provider;
 
 
@@ -47,36 +68,64 @@ export class SmartContractService implements indCommon.SmartContractServiceInter
         this.web3 = new Web3(Web3.givenProvider || this.provider);
     }
 
-    public static getInstance(contractPath: string, provider: string) : indCommon.SmartContractServiceInterface {
-        this._instance = this._instance || new SmartContractService(contractPath, provider);
+    public static getInstance(contractPath: string, abiPath: string, provider: string) : SmartContractServiceInterface {
+        this._instance = this._instance || new SmartContractService(contractPath, abiPath, provider);
 
             return this._instance;
     }
 
-    public async sendTransaction(transactionProperties: indCommon.SendTransactionProperties): Promise<Object> {
-        //Check the method name and use decorators to find the right method to execute
+    public async sendTransaction(transactionProperties: SendTransactionProperties): Promise<Object> {
 
         try
         {
-            let path = this.contractPath + '\\' + transactionProperties.contractName;
+            let returnObject = await this.executeTransaction(transactionProperties);
 
-            utils.writeFormattedMessage("Inside Send Txn: Contract Path", path);
-
-            let x = require(path);
-
-            let contract = Object.create(x[transactionProperties.contractName].prototype);
-
-            let args = new Array<string>();
-            args.push('c:\\Forcefield\\privy\\contracts\\abi');
-            args.push(this.provider);
-
-            contract.constructor.apply(contract, args);
-
-            return await contract[transactionProperties.methodName](transactionProperties);
-
+            return returnObject;
         }
         catch (error) {
             utils.writeFormattedMessage("Error in sendTransaction", error);
         }
     }
+
+
+    public async grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<Object> {
+
+        try {
+            let returnObject = await this.executeTransaction(grantAccessProperties);
+
+            return returnObject;
+        }
+        catch (error) {
+            utils.writeFormattedMessage("Error in grantAccess", error);
+        }
+        
+    }
+
+    private async executeTransaction<T extends ExecuteTransactionPropInterface, S>(prop: T): Promise<S> {
+
+            try {
+                let path = this.contractPath + '\\' + prop.contractName;
+
+                let x = require(path);
+
+                let contract = Object.create(x[prop.contractName].prototype);
+
+                let args = new Array<string>();
+                args.push(this.abiPath);
+                args.push(this.provider);
+
+
+                contract.constructor.apply(contract, args);
+
+
+                utils.writeFormattedMessage("Inside executeTransaction, After calling constructor", prop);
+
+                return await contract[prop.methodName](prop);
+
+            }
+            catch (error) {
+                throw error;
+            }
+            
+        }
 }

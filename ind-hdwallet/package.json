@@ -4,7 +4,7 @@
   "description": "Indirection wallet",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && copy .\\index.js  ..\\ind-hdwallet-service\\node_modules\\ind-hdwallet  && xcopy /S/C/Y/I .\\build  ..\\ind-hdwallet-service\\node_modules\\ind-hdwallet\\build",
     "test": "mocha --require ts-node/register ./server/tests/*.test.ts"
   },
   "main": "./index.js",
@@ -41,7 +41,6 @@
     "guid-typescript": "^1.0.7",
     "morgan": "^1.9.0",
     "pug": "^2.0.0-rc.4",
-    "solc": "^0.4.21",
     "truffle-contract": "^3.0.1",
     "ts-node": "^4.1.0",
     "web3": "^1.0.0-beta.33"

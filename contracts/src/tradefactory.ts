@@ -1,5 +1,6 @@
 import ethers = require('ethers');
-import * as indCommon from 'ind-common';
+import { Utils } from 'ind-common/build/common/utils';
+
 import { BaseContract } from './base-contract';
 
 const ethersUtils = ethers.utils;
@@ -7,7 +8,7 @@ const walletObject = ethers.Wallet;
 
 const Web3 = require("web3");
 const Tx = require('ethereumjs-tx');
-const utils = new indCommon.Utils();
+const utils = new Utils();
 
 export class TradeFactory extends BaseContract {
 
@@ -18,7 +19,7 @@ export class TradeFactory extends BaseContract {
 
     public async getContract(guid: string, factoryAddress: string, signingWalletAddress: string): Promise<string> {
 
-        utils.writeFormattedMessage("Inside getContract", { guid: guid, facAddress: factoryAddress, walletAddress: signingWalletAddress } );
+        utils.writeFormattedMessage("Inside TradeFactory getContract", { guid: guid, facAddress: factoryAddress, walletAddress: signingWalletAddress } );
 
         //get the contract address using the guid
         let tradeFactoryString: string = this.loadAbi("TradeFactory", this.abiPath);

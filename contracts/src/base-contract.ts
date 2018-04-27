@@ -1,5 +1,6 @@
-import * as indCommon from 'ind-common';
-const utils = new indCommon.Utils();
+import { Utils } from 'ind-common/build/common/utils';
+
+const utils = new Utils();
 var fs = require('fs');
 const Web3 = require("web3");
 

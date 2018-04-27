@@ -1,19 +1,28 @@
-import ethers = require('ethers');
-
-export interface SendTransactionPropertiesInterface {
+export interface ExecuteTransactionPropInterface {
     guid: string;
     factoryAddress: string;
     contractName: string;
     methodName: string;
+    signingWallet: any;
+}
+
+export interface SendTransactionPropertiesInterface extends ExecuteTransactionPropInterface {
     parameters: string[];
     data: {};
     symmetricKeyIndex: number;
     oneTimeAddress: string;
-    signingWallet: ethers.Wallet;
+}
+
+export interface GrantAccessPropertiesInterface extends ExecuteTransactionPropInterface {
+    partyIndex: number;
+    otherPartyIndex: number;
+    partyCompanyName: string;
+    otherPartyCompanyName: string;
+    otherPartyBitcorePubKey: string;
 }
 
 export interface SmartContractServiceInterface {
     
-    getinstance(contractPath: string, provider: string): SmartContractServiceInterface;
     sendTransaction(transactionProperties: SendTransactionPropertiesInterface): Promise<Object>;
+    grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<Object>;
 }

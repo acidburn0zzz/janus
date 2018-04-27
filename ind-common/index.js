@@ -7,6 +7,7 @@ const models = require('./build/common/models.js');
 const utils = require('./build/common/utils.js');
 const ihttpService = require('./build/common/ihttp.service.js');
 const httpService = require('./build/common/http.service.js');
+const commonTypes = require('./build/common/common-types');
 
 exports.Constants = constants;
 exports.OneTimeAddressRequest = models.OneTimeAddressRequest;
@@ -18,6 +19,7 @@ exports.EncryptDataRequest = models.EncryptDataRequest;
 exports.EncryptDataResponse = models.EncryptDataResponse;
 exports.GrantAccessRequest = models.GrantAccessRequest;
 exports.GrantAccessResponse = models.GrantAccessResponse;
+exports.EncryptedSymKeyInfo = commonTypes.EncryptedSymKeyInfo;
 
 exports.PostTransactionRequest = models.PostTransactionRequest;
 exports.PostTransactionResponse = models.PostTransactionResponse;

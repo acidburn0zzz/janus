@@ -1,9 +1,10 @@
 import * as constants from './constants';
-import * as commontypes from './common-types';
+import * as commonTypes from './common-types';
 
 export class BaseRequest {
     public message: string;
     public signature: string;
+    marketPlaceRegistryAddress: string;
 }
 
 export class BaseResponse {
@@ -44,7 +45,7 @@ export class Party {
 }
 
 export class OneTimeAddressRequest extends BaseRequest {
-    public messageObject: commontypes.BaseMessageObject; 
+    public messageObject: commonTypes.BaseMessageObject; 
 }
 
 /**
@@ -111,7 +112,7 @@ export class OneTimeAddressData {
 
 
 export class DecryptDataRequest extends BaseRequest {
-    public messageObject: commontypes.DecryptDataRequestMessage;
+    public messageObject: commonTypes.DecryptDataRequestMessage;
 }
 
 export class DecryptDataResponse extends BaseResponse {
@@ -147,7 +148,7 @@ export class DecryptDataResponse extends BaseResponse {
 
 
 export class EncryptDataRequest extends BaseRequest {
-    public messageObject: commontypes.EncryptDataRequestMessage;
+    public messageObject: commonTypes.EncryptDataRequestMessage;
 }
 
 export class EncryptDataResponse extends BaseResponse {
@@ -164,25 +165,41 @@ export class EncryptDataResponse extends BaseResponse {
 
     message is a JSON object with the following shape
     {
-        "guid": "1234",
-        "accessibleSymmetricKey": "",
-        "partyOTAddress": "",
-        "partyBitcorePublicKey": "",
-        "contractAddress": "",
-        "companyName": ""
+        "data": {
+            "guid": "1234",
+            "messageHash": ""
+        },
+        "signature": "0x07c5afcc235567ccc94b94f997867eeca15573ff859b053aba5ce321cf76aeb92d4822fb0007ba58b4c41b"
+        "otherInfo": {
+                
+            }
     }
  */
 
 
 
 export class GrantAccessRequest extends BaseRequest {
-
-    public messageObject: commontypes.GrantAccessRequestMessage;
+    data: {
+        guid: string;
+        messageHash: string;
+    };
+    signature: string;
+    otherInfo: {
+        factoryAddress: string;
+        contractName: string;
+        methodName: string;
+        partyIndex: number,
+        otherPartyIndex: number,
+        partyCompanyName: string,
+        otherPartyCompanyName: string,
+        otherPartyBitcorePubKey: string
+    };
+    
 }
 
 export class GrantAccessResponse extends BaseResponse {
 
-    public partyEncryptedSymmetricKey: string;
+    public accessibleSymmetricKeys: commonTypes.EncryptedSymKeyInfo[];
 
     constructor(guid: string = "") {
         super(guid);
@@ -196,13 +213,15 @@ export class GrantAccessResponse extends BaseResponse {
 {
     "data": {
         "guid": "5465675565",
-        "tradeDate": "12/20/2017",
-        "qty": "100000",
-        "product": "WTI",
-        "price": "39.6",
-        "buyer": "Mercuria",
-        "seller": "Shell",
-        "messageHash": "65u56rytuy56454"
+        "messageHash": "65u56rytuy56454",
+        "fields": {
+            "tradeDate": "12/20/2017",
+            "qty": "100000",
+            "product": "WTI",
+            "price": "39.6",
+            "buyer": "Mercuria",
+            "seller": "Shell",
+        }
     },
     "signature": "0x07c5afcc235567ccc94b94f997867eeca15573ff859b053aba5ce321cf76aeb92d4822fb0007ba58b4c41b",
     "otherInfo": {
@@ -215,17 +234,19 @@ export class GrantAccessResponse extends BaseResponse {
                     "updateData",
                     "updatePaymentInfo"
         ],
-        "updateData": [
-                    "symmetricKeyIndex",
-                    "tradeDate",
-                    "product",
-                    "qty",
-                    "price"
-        ],
-        "updatePaymentInfo": [
-                    "symmetricKeyIndex",
-                    "paymentTerm"
-        ]
+        functionArgs: {
+            "updateData": [
+                        "symmetricKeyIndex",
+                        "tradeDate",
+                        "product",
+                        "qty",
+                        "price"
+            ],
+            "updatePaymentInfo": [
+                        "symmetricKeyIndex",
+                        "paymentTerm"
+            ]
+        }
     }
 }
 
@@ -236,15 +257,15 @@ export class PostTransactionRequest extends BaseRequest {
     data: {
         guid: string;
         messageHash: string;
+        fields: Object;
     };
     signature: string;
     otherInfo: {
         factoryAddress: string;
         marketPlaceAddress: string;
         contractName: string;
-        myParty: Party,
-        otherParty: Party,
         functionList: string[];
+        functionArgs: Object;
     };
 }
 
