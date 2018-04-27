@@ -331,8 +331,8 @@ export class AddressObfuscator {
                     let txnReceipt = await this.smartContractService.sendTransaction(postTxnProperties);
 
                     response.transactionHash.push(txnReceipt);
+                    utils.writeFormattedMessage("Transaction receipt for " + fn, txnReceipt);
 
-                    utils.writeFormattedMessage("Transaction receipt for " + fn, response.transactionHash);
                 });
         }
         catch (error) {

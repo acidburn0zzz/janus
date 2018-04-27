@@ -8,7 +8,7 @@ let contractJson: any = require('../../contracts/ContractInterface.json');
 let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
 import { GrantAccessRequest, GrantAccessResponse } from './models';
-import { Party, PartyType, CreateTransactionRequest, CreateTransactionResponse } from "ind-common";
+import { Party, PartyType, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse } from "ind-common";
 
 import * as constants from './constants';
 
@@ -28,6 +28,7 @@ export class SmartContractService {
 
   private async getOTKey(guid: string, companyName: string, hdWalletUrl: any) : Promise<any> {
     let signingMessage = {
+      timestamp: (new Date()).getTime(),
       guid: guid,
       companyName: companyName };
 
@@ -50,6 +51,7 @@ export class SmartContractService {
     partyOTAddress: string, partyBitcorePublicKey: string, hdWalletUrl: any): Promise<any> {
 
     var signingMessage = {
+      timestamp: (new Date()).getTime(),
       guid: guid,
       contractAddress: contractAddress,
       accessibleSymmetricKey: encryptedSymmetricKey,
@@ -85,8 +87,8 @@ export class SmartContractService {
     return factory;
   }
 
-  async createTransaction(request: CreateTransactionRequest): Promise<CreateTransactionResponse> {
-    let response: CreateTransactionResponse;
+  async createTransaction(request: CreateUpdateTransactionRequest): Promise<CreateUpdateTransactionResponse> {
+    let response: CreateUpdateTransactionResponse;
 
     try{
         //prepare transaction to post to block chain
@@ -95,7 +97,7 @@ export class SmartContractService {
         console.log("callingParty", party1);
         let party2: Party = request.otherInfo.otherParty;
         console.log("otherParty", party2);
-        response = new CreateTransactionResponse({});
+        response = new CreateUpdateTransactionResponse({});
  		
         let party1Address: string; 
         let party1CompanyName: string;
@@ -118,12 +120,12 @@ export class SmartContractService {
         console.log("Payment Sym Key:", paymentFieldsSymKey);
         
         //verify signature and permission
-        if(!this.verifySignature(request.data, request.signature))
-        {
-          response.status = false;
-          response.error = "Invalid signature";
-          return response;
-        }
+        // if(!this.verifySignature(request.data, request.signature))
+        // {
+        //   response.status = false;
+        //   response.error = "Invalid signature";
+        //   return response;
+        // }
         if(party1) {
           //Getting onetime key for party1
           let party1PartyHDWalletUrl = await this.agentService.getWalletAgentUrl(party1.companyName);
@@ -154,7 +156,7 @@ export class SmartContractService {
         }
         //Create transaction from factory
         let overrideOptions = {
-           gasLimit: 2000000,
+           gasLimit: 3000000,
         };
         let factory: Contract = this.factoryContract(request.otherInfo.factoryAddress);
         console.log(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
@@ -199,11 +201,11 @@ export class SmartContractService {
       let messageObject = request.message;           
       response = new GrantAccessResponse({status:false, transactionHashes:[]});
       
-      if(!this.verifySignature(request.message, request.signature))
-      {
-          response.error = "Invalid signature";
-          return response;
-      }
+      // if(!this.verifySignature(request.message, request.signature))
+      // {
+      //     response.error = "Invalid signature";
+      //     return response;
+      // }
       let contractAddress: string;
       let contract: Contract;
       let guid: string;
@@ -281,16 +283,22 @@ export class SmartContractService {
 
   private verifySignature(message: object, signature: string) : boolean {    
     try {
-      let messageString: string = JSON.stringify(message,null,4);
-      //verify the original message was signed by the party
-      //let signerAddress: string = this.oracleWallet.verifyMessage(message, signature);
+      if(!message || !signature)
+        return false;
 
-      //TODO: verify permission of the address from the smart contract
-        
-      return true;
+      let messageString: string = JSON.stringify(message,null,4);
+      //verify the original message was signed by the party      
+      let signerAddress: string = this.oracleWallet.verifyMessage(messageString, signature);
+      if(signerAddress && message["timestamp"]) {
+        let currentTime = (new Date()).getTime();
+        if((currentTime - Number(message["timestamp"])) < constants.SignatureValidity_5Sec) {
+          //TODO: verify permission of the address from the smart contract
+          return true;
+        }
+      }
     } catch (error) {
       console.log(error);
-      return false;
     }
+    return false;    
   }
 }

@@ -4,10 +4,11 @@ import "./MarketplaceDirectoryInterface.sol";
 
 contract MarketplaceDirectory is MarketplaceDirectoryInterface {
     address public consortiumAddress;
-    bytes32 public consortiumNameHash = keccak256("ForceField ETRM Registry");
+    bytes32 public consortiumNameHash = keccak256("Janus Registry");
     
     struct Participant {
         bytes32 parent;
+        string parentName;
         uint effectiveDate;
         uint terminationDate;
         string name;
@@ -23,8 +24,10 @@ contract MarketplaceDirectory is MarketplaceDirectoryInterface {
     }
     
     modifier onlyParent(string participantName) {
-        require(callerName() != 0);
-        require(participants[keccak256(participantName)].parent == 0 || participants[keccak256(participantName)].parent == participantNames[msg.sender]);
+        bytes32 parentHash = callerName();
+        require(parentHash != 0);
+        bytes32 nameHash = keccak256(parentHash, participantName);
+        require(participants[nameHash].parent == 0 || participants[nameHash].parent == parentHash);
         _;
     }
     
@@ -37,32 +40,54 @@ contract MarketplaceDirectory is MarketplaceDirectoryInterface {
         return participantNames[msg.sender];
     }
     
-    function participant(string participantName) public constant returns (bytes32 parent, uint effectiveDate , uint terminationDate, string name, address walletAddress) {
-        var p = participants[keccak256(participantName)];
+    function participant(string participantName, string parentName) public constant returns (bytes32 parent, uint effectiveDate , uint terminationDate, string name, address walletAddress) {
+        bytes32 parentHash = keccak256(parentName);
+        bytes32 nameHash = keccak256(participantName);
+        Participant p = participants[keccak256(parentHash, nameHash)];
+        return (p.parent, p.effectiveDate, p.terminationDate, p.name, p.walletAddress);
+    }
+    
+    function participant(address participantWalletAddress) public constant returns (bytes32 parent, uint effectiveDate , uint terminationDate, string name, address walletAddress) {
+        Participant p = participants[participantNames[participantWalletAddress]];
         return (p.parent, p.effectiveDate, p.terminationDate, p.name, p.walletAddress);
     }
     
     function updateParticipant(uint effectiveDate, uint terminationDate, string participantName, address participantWalletAddress) public onlyParent(participantName) {
-        require(effectiveDate > 0);
-        require(terminationDate > 0);
+        //require(effectiveDate > 0);
+        //require(terminationDate > 0);
         require(participantWalletAddress != 0);
 
         // TODO support multiple entries for a participant under different companies
         // TODO avoid name collision by creating hierarchy of name
-        var parent = callerName();
-        var name = keccak256(participantName); // name = parent + keccak256(participantName);
+        bytes32 parentHash = callerName();
+        bytes32 nameHash = keccak256(participantName);
+        bytes32 keyHash = keccak256(parentHash, nameHash);
+        bytes32 accountHash = keccak256(participantWalletAddress);
 
-        var oldAddress = participants[name].walletAddress;
-        if (address(oldAddress) != 0) { 
-            delete participantNames[participantWalletAddress];
+        address oldAddress = participants[keyHash].walletAddress;
+        if (address(oldAddress) == 0) { 
+            participantNames[participantWalletAddress] = keyHash;
+            participants[keyHash] = Participant(
+                {parent: parentHash, parentName: participants[parentHash].name, effectiveDate : effectiveDate, terminationDate: terminationDate, name: participantName, walletAddress: participantWalletAddress});
+            participants[accountHash] = Participant(
+                {parent: parentHash, parentName: participants[parentHash].name, effectiveDate : effectiveDate, terminationDate: terminationDate, name: participantName, walletAddress: participantWalletAddress});
+        } else {
+            if (address(oldAddress) != participantWalletAddress) {
+                delete participantNames[oldAddress];
+                participantNames[participantWalletAddress] = keyHash;
+                participants[keyHash].walletAddress = participantWalletAddress;
+                delete participants[keccak256(oldAddress)];
+                participants[accountHash] = Participant(
+                    {parent: parentHash, parentName: participants[parentHash].name, effectiveDate : effectiveDate, terminationDate: terminationDate, name: participantName, walletAddress: participantWalletAddress});
+            }
+            participants[keyHash].effectiveDate = effectiveDate;
+            participants[keyHash].terminationDate = terminationDate;
+            participants[accountHash].effectiveDate = effectiveDate;
+            participants[accountHash].terminationDate = terminationDate;
         }
 
-        participantNames[participantWalletAddress] = name;
-        participants[name] = Participant(
-            {parent: parent, effectiveDate : effectiveDate, terminationDate: terminationDate, name: participantName, walletAddress: participantWalletAddress});
-
-        ParticipantUpdated(name, participantName, effectiveDate, terminationDate);
+        ParticipantUpdated(keyHash, participantName, participants[parentHash].name, effectiveDate, terminationDate);
     } 
 
-    event ParticipantUpdated(bytes32 indexed nameHash, string name, uint effectiveDate , uint terminationDate);
+    event ParticipantUpdated(bytes32 indexed keyHash, string name, string parentName, uint effectiveDate , uint terminationDate);
 }

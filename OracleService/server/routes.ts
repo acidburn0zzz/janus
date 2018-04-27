@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
 import { GrantAccessRequest, GrantAccessResponse} from 'ind-oracle';
-import { Party, CreateTransactionRequest, CreateTransactionResponse,  
+import { Party, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
   WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-common';
 var oracle: OracleService;
 const router = express.Router();
@@ -53,7 +53,7 @@ router.post('/unRegisterWalletAgent', async (req: express.Request, res: express.
 });
 
 router.post('/createTransaction', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  let createTransactionRequest = new CreateTransactionRequest({});
+  let createTransactionRequest = new CreateUpdateTransactionRequest({});
   console.log("body", req.body);
   createTransactionRequest.data = req.body.data;
   createTransactionRequest.signature = req.body.signature;
@@ -61,11 +61,11 @@ router.post('/createTransaction', async (req: express.Request, res: express.Resp
   console.log("createTransactionRequest", createTransactionRequest);
   if(!oracle)
     oracle = new OracleService();
-  var response: CreateTransactionResponse;
+  var response: CreateUpdateTransactionResponse;
   try {
     response = await oracle.createTransaction(createTransactionRequest);
   } catch (error) {
-    response = new CreateTransactionResponse({ contractId: 0, status: false });
+    response = new CreateUpdateTransactionResponse({ contractId: 0, status: false });
     response.error = "ERROR: " + error;
     console.log(error)
   }
@@ -86,6 +86,26 @@ router.post('/grantAccessToContract', async (req: express.Request, res: express.
     response = await oracle.grantAccessToContract(grantAccessRequest);
   } catch (error) {
     response = new GrantAccessResponse({status: false});
+    response.error = "ERROR: " + error;
+    console.log(error)
+  }
+  console.log(new Date(), "response", response);
+  res.send(response);
+});
+
+router.post('/getMeterSummary', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  let meterSummaryRequest = new MeterSummaryRequest({});
+  console.log("body", req.body);
+  meterSummaryRequest.message = req.body.message;
+  meterSummaryRequest.signature = req.body.signature;
+  console.log("meterSummaryRequest", meterSummaryRequest);
+  if(!oracle)
+    oracle = new OracleService();
+  var response: MeterSummaryResponse;
+  try {
+    response = await oracle.getMeterSummary(meterSummaryRequest);
+  } catch (error) {
+    response = new MeterSummaryResponse({status: false});
     response.error = "ERROR: " + error;
     console.log(error)
   }

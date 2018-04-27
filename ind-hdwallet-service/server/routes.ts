@@ -118,7 +118,7 @@ router.post('/postTransaction', async (req: express.Request, res: express.Respon
         let requestData = new PostTransactionRequest({});
         requestData.data = req.body.data;
         requestData.signature = req.body.signature;
-        requestData.transactionInfo = JSON.parse(req.body.otherInfo);
+        requestData.transactionInfo = JSON.parse(req.body.transactionInfo);
 
         responseData = await addressObfuscator.postTransaction(requestData, new SendTransactionProperties());
     }

@@ -1,6 +1,4 @@
 import * as service from "../script/oracle.service"
-import * as ethers from "ethers" 
-//import * as oracle from "ind-oracle" 
 import * as common from "ind-common" 
 import * as mocha from 'mocha'
 import * as chai from 'chai'

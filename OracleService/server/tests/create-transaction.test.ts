@@ -1,6 +1,4 @@
 import * as service from "../script/oracle.service"
-import * as ethers from "ethers" 
-import * as oracle from "ind-oracle" 
 import * as common from "ind-common" 
 
 import * as mocha from 'mocha'
@@ -48,7 +46,7 @@ describe.only('Create transaction tests', () => {
         this.timeout(0);
         console.log("In create black trade test");
         
-        let request: common.CreateTransactionRequest = new common.CreateTransactionRequest();
+        let request: common.CreateUpdateTransactionRequest = new common.CreateUpdateTransactionRequest();
         request.data = new common.TransactionData();
         request.data.guid = "12dfdfg";
         request.otherInfo = new common.TransactionInfo();

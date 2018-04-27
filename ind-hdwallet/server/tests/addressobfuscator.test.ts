@@ -302,38 +302,4 @@ describe('execute transactions', () => {
         let txnReceipt = await obfuscator.postTransaction(request, postTxnProperties);
 
     });
-
-    //it('should grant access to a new party', async function() {
-
-    //    let request: GrantAccessRequest = new GrantAccessRequest();
-
-    //    let transactionProperties: GrantAccessProperties = new GrantAccessProperties();
-
-    //    request.data = {
-    //        guid: messageObject.guid,
-    //        messageHash: ""
-    //    };
-
-    //    request.signature = "";
-
-    //    request.otherInfo = {
-    //        factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
-    //        contractName: "Trade",
-    //        methodName: "grantAccess",
-    //        partyIndex: 2,
-    //        otherPartyIndex: 3,
-    //        partyCompanyName: "Shell Corporation",
-    //        otherPartyCompanyName: "Acme brokers",
-    //        otherPartyBitcorePubKey: ""
-    //    };
-
-
-    //    let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
-    //    request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
-    //    request.signature = senderWallet.signMessage(JSON.stringify(request.data));
-
-    //    utils.writeFormattedMessage("Before calling grantAccess", transactionProperties);
-    //    let txnReceipt = await obfuscator.grantAccess(request, transactionProperties);
-
-    //});
 });

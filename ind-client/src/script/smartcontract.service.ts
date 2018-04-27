@@ -1,7 +1,7 @@
 declare var require: any
 declare const Buffer
 import { Contract, utils, Wallet, Provider, providers, Interface } from "ethers";
-import { IHttpService, Party, PartyType, TransactionData, CreateTransactionRequest, CreateTransactionResponse, 
+import { IHttpService, Party, PartyType, TransactionData, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse, 
   GrantAccessData, GrantAccessRequest, GrantAccessResponse } from 'ind-common';
 import { Guid } from "guid-typescript";
 const Web3 = require('web3');
@@ -11,7 +11,7 @@ let contractJson: any = require('../../contracts/ContractInterface.json');
 let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
 import * as constants from './constants';
-import { CreateTransactionPath } from "./constants";
+//import { CreateTransactionPath } from "./constants";
 
 declare var web3: any;
 
@@ -23,13 +23,13 @@ export class SmartContractService {
     this.httpService = httpService;
   }
 
-  async createTrade(oracleUrl: string, request: CreateTransactionRequest): Promise<any> {
+  async createTrade(oracleUrl: string, request: CreateUpdateTransactionRequest): Promise<any> {
     let response;
     try{  
       let urlParts: string[] = oracleUrl.split(':');
       let host: string = urlParts[0];
       let port: number = Number(urlParts[1]);
-      let resp: CreateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
+      let resp: CreateUpdateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
       response = {tradeNumber:resp.contractId,transactionhash:resp.transactionHash,status:resp.status,error:resp.error};      
     }
     catch (error) {
@@ -79,12 +79,17 @@ export class SmartContractService {
     return response;
   }
 
-  async updateTrade(agentUrl: string, request: CreateTransactionRequest): Promise<any> {
+  async updateTrade(agentUrl: string, request: CreateUpdateTransactionRequest): Promise<any> {
     let response;
     try{      
       //prepare transaction to send to hd wallet
-      //console.log(resp);
+      let urlParts: string[] = agentUrl.split(':');
+      let host: string = urlParts[0];
+      let port: number = Number(urlParts[1]);
+      let resp: CreateUpdateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.UpdateTransactionPath, constants.UpdateTransactionMethod, request);
+      console.log(resp);
       //response = {transactionHash:resp.transactionHash,status:resp.status,error:resp.error};
+      //response = {tradeNumber:resp.contractId,transactionhash:resp.transactionHash,status:resp.status,error:resp.error};
       response = {status:true,transactionHashes:["1234567890"]};      
     }
     catch (error) {
