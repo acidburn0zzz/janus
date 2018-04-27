@@ -10,6 +10,7 @@ export class BaseRequest {
 export class BaseResponse {
     public guid: string;
     public error: string;
+    status: boolean;
 
     constructor(guid: string = "") {
         this.guid = guid;
@@ -252,52 +253,10 @@ export class GrantAccessResponse extends BaseResponse {
 
  */
 
-export class PostTransactionRequest extends BaseRequest {
-
-    data: {
-        guid: string;
-        messageHash: string;
-        fields: Object;
-    };
-    signature: string;
-    otherInfo: {
-        factoryAddress: string;
-        marketPlaceAddress: string;
-        contractName: string;
-        functionList: string[];
-        functionArgs: Object;
-    };
-}
-
-export class PostTransactionResponse extends BaseResponse {
-
-    txnReceipts: Array<Object>;
-
-    constructor(guid: string = "") {
-        super(guid);
-
-        this.txnReceipts = new Array<Object>();
-        this.error = constants.OK;
-    }
-}
-
-
-export class Response {    
-  error: string;
-  status: boolean;
-}
-
-
 export class TransactionData {
   guid: string;
-  tradeDate: Date;
-  qty: number;
-  product: string;
-  price: number;
-  buyer: string;
-  seller: string;
-  broker: string;
   messageHash: string;
+  businessData: Object;
   
   constructor(fields: Partial<TransactionData> & {}) {
     Object.assign(this, fields);
@@ -306,36 +265,50 @@ export class TransactionData {
 export class TransactionInfo {
   marketplaceAddress: string;
   factoryAddress: string;
-  myParty: Party;
-  otherParty: Party;
-  functionList: Function[];
+  contractName?: string;
+  myParty?: Party;
+  otherParty?: Party;
+  functionList: FunctionInfo[];
   
   constructor(fields: Partial<TransactionInfo> & {}) {
     Object.assign(this, fields);
   }
 }
-export class Function {
+export class FunctionInfo {
   name: string;
   params: string[];  
-  constructor(fields: Partial<Function> & {}) {
+  constructor(fields: Partial<FunctionInfo> & {}) {
     Object.assign(this, fields);
   }
 }
 export class CreateTransactionRequest {
   data: TransactionData;
   signature: string;
-  otherInfo: TransactionInfo;
+  transactionInfo: TransactionInfo;
   constructor(fields: Partial<CreateTransactionRequest> & {}) {
     Object.assign(this, fields);
   }
 }
-export class CreateTransactionResponse extends Response {
+export class CreateTransactionResponse extends BaseResponse {
   contractId: number;
   transactionHash: Array<string>;
   constructor(fields: Partial<CreateTransactionResponse> & {}) {
     super();
     Object.assign(this, fields);
   }
+}
+
+export class PostTransactionRequest extends CreateTransactionRequest {
+
+    
+}
+
+export class PostTransactionResponse extends CreateTransactionResponse {
+
+    constructor(fields: Partial<CreateTransactionResponse> & {}) {
+        super(fields);
+        Object.assign(this, fields);
+    }
 }
 
 
@@ -353,13 +326,12 @@ export class WalletRegistrationRequest {
     Object.assign(this, fields);
   }
 }
-export class WalletRegistrationResponse extends Response {
+export class WalletRegistrationResponse extends BaseResponse {
   constructor(fields: Partial<WalletRegistrationResponse> & {}) {
     super();
     Object.assign(this, fields);
   }
 }
-
 
 export class UnRegistrationData {
   companyName: string;
@@ -374,7 +346,7 @@ export class WalletUnRegistrationRequest {
     Object.assign(this, fields);
   }
 }
-export class WalletUnRegistrationResponse extends Response {
+export class WalletUnRegistrationResponse extends BaseResponse {
   constructor(fields: Partial<WalletUnRegistrationResponse> & {}) {
     super();
     Object.assign(this, fields);

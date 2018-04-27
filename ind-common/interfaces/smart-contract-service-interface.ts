@@ -1,3 +1,5 @@
+import { EncryptedSymKeyInfo } from '../common/common-types';
+
 export interface ExecuteTransactionPropInterface {
     guid: string;
     factoryAddress: string;
@@ -23,6 +25,6 @@ export interface GrantAccessPropertiesInterface extends ExecuteTransactionPropIn
 
 export interface SmartContractServiceInterface {
     
-    sendTransaction(transactionProperties: SendTransactionPropertiesInterface): Promise<Object>;
-    grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<Object>;
+    sendTransaction(transactionProperties: SendTransactionPropertiesInterface): Promise<string>;
+    grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<EncryptedSymKeyInfo[]>;
 }

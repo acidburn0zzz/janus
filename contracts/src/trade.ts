@@ -71,7 +71,7 @@ export class Trade extends BaseContract {
         }
     }
 
-    public async updateData(txnProps: SendTransactionPropertiesInterface): Promise<Object> {
+    public async updateData(txnProps: SendTransactionPropertiesInterface): Promise<string> {
 
         utils.writeFormattedMessage("Inside updateData", txnProps);
 
@@ -142,7 +142,7 @@ export class Trade extends BaseContract {
 
             utils.writeFormattedMessage("Send Transaction Receipt", txnReceipt);
 
-            return txnReceipt;
+            return txnReceipt.transactionHash;
         }
         catch (error) {
             utils.writeFormattedMessage("Error in updateData", error);
@@ -150,7 +150,7 @@ export class Trade extends BaseContract {
         }
     }
 
-    public async updatePaymentInfo(txnProps: SendTransactionPropertiesInterface): Promise<Object> {
+    public async updatePaymentInfo(txnProps: SendTransactionPropertiesInterface): Promise<string> {
 
         try {
             let symmetricKey = await this.getAccessibleSymmetricKeyForParty(txnProps.guid, txnProps.factoryAddress,
@@ -212,7 +212,7 @@ export class Trade extends BaseContract {
 
             utils.writeFormattedMessage("Send Transaction Receipt", txnReceipt);
 
-            return txnReceipt;
+            return txnReceipt.transactionHash;
 
         }
         catch (error) {

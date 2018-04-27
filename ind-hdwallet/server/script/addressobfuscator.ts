@@ -280,7 +280,7 @@ export class AddressObfuscator {
 
     public async postTransaction(request: PostTransactionRequest, postTxnProperties: SendTransactionPropertiesInterface): Promise<PostTransactionResponse> {
 
-        let response = new PostTransactionResponse(request.data.guid);
+        let response = new PostTransactionResponse({ guid: request.data.guid });
 
         try {
             //verify the message signature and get the public address of the signer
@@ -292,7 +292,7 @@ export class AddressObfuscator {
                 }
 
                 // check the message hash
-                let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+                let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.transactionInfo));
                 let messageHash = ethersUtils.keccak256(utf8Bytes);
 
                 if (messageHash != request.data.messageHash) {
@@ -317,26 +317,22 @@ export class AddressObfuscator {
                     }
                 }
 
-                request.otherInfo.functionList.forEach(async fn => {
+                request.transactionInfo.functionList.forEach(async fn => {
 
                     postTxnProperties.guid = request.data.guid;
-                    postTxnProperties.factoryAddress = request.otherInfo.factoryAddress;
-                    postTxnProperties.methodName = fn;
-                    postTxnProperties.contractName = request.otherInfo.contractName;
+                    postTxnProperties.factoryAddress = request.transactionInfo.factoryAddress;
+                    postTxnProperties.methodName = fn.name;
+                    postTxnProperties.contractName = request.transactionInfo.contractName;
                     //postTxnProperties.oneTimeAddress = "0xac39b311dceb2a4b2f5d8461c1cdaf756f4f7ae9";
                     postTxnProperties.oneTimeAddress = otaData.OTAddress;
-                    postTxnProperties.symmetricKeyIndex = request.otherInfo.functionArgs[fn][0];
+                    postTxnProperties.symmetricKeyIndex = parseInt(fn.params[0], 10);
+                    postTxnProperties.parameters = fn.params.slice(1);
                     postTxnProperties.signingWallet = this.getWallet(otaData.signerCompany, otaData.walletPath);
-                    postTxnProperties.parameters = request.otherInfo.functionArgs[fn].slice(1);
-
                     let txnReceipt = await this.smartContractService.sendTransaction(postTxnProperties);
 
-                    response.txnReceipts.push({
-                        name: fn,
-                        txnReceipt: txnReceipt
-                    });
+                    response.transactionHash.push(txnReceipt);
 
-                    utils.writeFormattedMessage("Transaction receipt for " + fn, response.txnReceipts);
+                    utils.writeFormattedMessage("Transaction receipt for " + fn, response.transactionHash);
                 });
         }
         catch (error) {

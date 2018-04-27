@@ -4,6 +4,8 @@ import {
     GrantAccessPropertiesInterface, ExecuteTransactionPropInterface
 } from 'ind-common/build/interfaces/smart-contract-service-interface';
 
+import { EncryptedSymKeyInfo } from 'ind-common/build/common/common-types';
+
 import { Utils } from 'ind-common/build/common/utils';
 
 const ethersUtils = ethers.utils;
@@ -74,11 +76,11 @@ export class SmartContractService implements SmartContractServiceInterface {
             return this._instance;
     }
 
-    public async sendTransaction(transactionProperties: SendTransactionProperties): Promise<Object> {
+    public async sendTransaction(transactionProperties: SendTransactionProperties): Promise<string> {
 
         try
         {
-            let returnObject = await this.executeTransaction(transactionProperties);
+            let returnObject = await this.executeTransaction(transactionProperties) as string;
 
             return returnObject;
         }
@@ -88,10 +90,10 @@ export class SmartContractService implements SmartContractServiceInterface {
     }
 
 
-    public async grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<Object> {
+    public async grantAccess(grantAccessProperties: GrantAccessPropertiesInterface): Promise<EncryptedSymKeyInfo[]> {
 
         try {
-            let returnObject = await this.executeTransaction(grantAccessProperties);
+            let returnObject = await this.executeTransaction(grantAccessProperties) as EncryptedSymKeyInfo[];
 
             return returnObject;
         }
@@ -101,7 +103,7 @@ export class SmartContractService implements SmartContractServiceInterface {
         
     }
 
-    private async executeTransaction<T extends ExecuteTransactionPropInterface, S>(prop: T): Promise<S> {
+    private async executeTransaction<T extends ExecuteTransactionPropInterface>(prop: T): Promise<Object> {
 
             try {
                 let path = this.contractPath + '\\' + prop.contractName;

@@ -8,7 +8,8 @@ import * as Constants from 'ind-common/build/common/constants';
 import { Utils } from 'ind-common/build/common/utils';
 import {
     OneTimeAddressRequest, OneTimeAddressResponse, OneTimeAddressData, DecryptDataRequest, DecryptDataResponse,
-    EncryptDataRequest, EncryptDataResponse, GrantAccessRequest, GrantAccessResponse, PostTransactionRequest, PostTransactionResponse
+    EncryptDataRequest, EncryptDataResponse, GrantAccessRequest, GrantAccessResponse, PostTransactionRequest, PostTransactionResponse,
+    TransactionData, FunctionInfo, TransactionInfo
 } from 'ind-common/build/common/models';
 
 import { AsymmetricKeyEncryption } from 'ind-common/build/common/asymmetrickey-encryption';
@@ -223,45 +224,39 @@ describe('execute transactions', () => {
     let response = obfuscator.getOnetimeAddress(addressRequest);
 
     it('should update data in a contract', async function() {
+        this.timeout(0);
 
-        let request: PostTransactionRequest = new PostTransactionRequest();
+        let request: PostTransactionRequest = new PostTransactionRequest({});
 
         let postTxnProperties: SendTransactionProperties = new SendTransactionProperties();
 
-        request.data = {
-            guid: messageObject.guid,
-            messageHash: "",
-            fields: {
-                tradeDate: "12/20/2017",
-                qty: "100000",
-                product: "WTI",
-                price: "55.0",
-                paymentTerm: "FOB",
-            }
+        let transactionData = new TransactionData({});
+        transactionData.guid = messageObject.guid;
+        transactionData.businessData = {
+            tradeDate: "12/20/2017",
+            qty: "100000",
+            product: "WTI",
+            price: "55.0",
+            paymentTerm: "FOB",
         };
+
+        request.data = transactionData;
 
         request.signature = "";
 
-        request.otherInfo = {
+        let functionInfo: FunctionInfo = new FunctionInfo({});
+        functionInfo.name = "updateData";
+        functionInfo.params = ["1", "tradeDate", "product", "qty", "price"];
+
+        request.transactionInfo = {
             factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
-            marketPlaceAddress: "",
+            marketplaceAddress: "",
             contractName: "Trade",
-            functionList: [
-                "updateData"
-            ],
-            functionArgs: {
-                updateData: [
-                    1,
-                    "tradeDate",
-                    "product",
-                    "qty",
-                    "price"
-                ]
-            }
+            functionList: [functionInfo]
         };
 
 
-        let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.otherInfo));
+        let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.transactionInfo));
         request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
         request.signature = senderWallet.signMessage(JSON.stringify(request.data));
 
@@ -269,7 +264,45 @@ describe('execute transactions', () => {
         let txnReceipt = await obfuscator.postTransaction(request, postTxnProperties);
 
     });
-    
+
+    it('should update payment terms in a contract', async () => {
+        this.timeout(0);
+
+        let request: PostTransactionRequest = new PostTransactionRequest({});
+
+        let postTxnProperties: SendTransactionProperties = new SendTransactionProperties();
+
+        let transactionData = new TransactionData({});
+        transactionData.guid = messageObject.guid;
+        transactionData.businessData = {
+            paymentTerm: "FOB",
+        };
+
+        request.data = transactionData;
+
+        request.signature = "";
+
+        let functionInfo: FunctionInfo = new FunctionInfo({});
+        functionInfo.name = "updatePaymentInfo";
+        functionInfo.params = ["1", "paymentTerm"];
+
+        request.transactionInfo = {
+            factoryAddress: "0x7904adfd948f5f99a987a86768f5decc1aecdea2",
+            marketplaceAddress: "",
+            contractName: "Trade",
+            functionList: [functionInfo]
+        };
+
+
+        let utf8Bytes = ethersUtils.toUtf8Bytes(JSON.stringify(request.transactionInfo));
+        request.data.messageHash = ethersUtils.keccak256(utf8Bytes);
+        request.signature = senderWallet.signMessage(JSON.stringify(request.data));
+
+        //we are injecting the postTxnProperties because the end user might use a different implementation
+        let txnReceipt = await obfuscator.postTransaction(request, postTxnProperties);
+
+    });
+
     //it('should grant access to a new party', async function() {
 
     //    let request: GrantAccessRequest = new GrantAccessRequest();
