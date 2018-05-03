@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 //import { } from './models';
-import { IndOracle, GrantAccessRequest } from 'ind-oracle';
-import { Party, CreateUpdateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, 
+import { IndOracle, GrantAccessToContractRequest } from 'ind-oracle';
+import { Party, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest, 
   MeterSummaryRequest, MeterSummaryResponse} from 'ind-common';
 var oracle: IndOracle;
 let oraclePrivateKey = "0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
@@ -44,19 +44,19 @@ export class OracleService {
 		return await oracle.unRegisterWalletAgent(request);
   }
 
-  async createTransaction(request: CreateUpdateTransactionRequest) {
-    var caller: Party = request.otherInfo.myParty;
+  async createTransaction(request: CreateTransactionRequest) {
+    var caller: Party = request.transactionInfo.myParty;
     var response = await oracle.createTransaction(request);
     if(response && response.status == true) {
       var contractId: number = response.contractId;
       console.log("Created contractId", contractId);
-      this.countUsage(request.otherInfo.factoryAddress, caller.companyName);
+      this.countUsage(request.transactionInfo.factoryAddress, caller.companyName);
     }
     console.log("response", response);
     return response;
   }
 
-  async grantAccessToContract(request: GrantAccessRequest) {
+  async grantAccessToContract(request: GrantAccessToContractRequest) {
 		return await oracle.grantAccessToContract(request);
   }
 

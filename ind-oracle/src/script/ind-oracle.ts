@@ -1,8 +1,8 @@
-import { GrantAccessRequest} from './models';
+import { GrantAccessToContractRequest, GrantAccessToContractResponse} from './models';
 import { SmartContractService } from './smartcontract.service';
 import { AgentService } from './agent.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
-import { Party, PartyType, CreateUpdateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from "ind-common";
+import { Party, PartyType, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from "ind-common";
 import * as indCommon from 'ind-common';
 
 export class IndOracle {
@@ -22,7 +22,7 @@ export class IndOracle {
 		console.log("oraclePrivateKey", oraclePrivateKey);
 		this.nodeUrl = nodeUrl;
 		this.networkChainId = networkChainId;
-		this.provider = this.forceFieldProvider();
+		this.provider = this.getProvider(nodeUrl, networkChainId);
 		console.log("provider", this.provider);
 		this.oracleWallet = new Wallet(oraclePrivateKey, this.provider);
 		console.log("oracleWallet", this.oracleWallet);
@@ -33,11 +33,11 @@ export class IndOracle {
 		console.log("In oracle constructor: completed");
 	}
 	
-	forceFieldProvider(): Provider {
-		var provider = new providers.JsonRpcProvider(this.nodeUrl,
+	getProvider(nodeUrl: string, networkChainId: number): Provider {
+		var provider = new providers.JsonRpcProvider(nodeUrl,
 		  {
-			chainId: this.networkChainId//,
-			//name: this.networkName
+			chainId: networkChainId//,
+			//name: networkName
 		  });
 		return provider;
 	}
@@ -50,12 +50,12 @@ export class IndOracle {
 		return await this.agentService.unRegisterWalletAgent(request);
 	}
 
-	async createTransaction(request: CreateUpdateTransactionRequest) {
+	async createTransaction(request: CreateTransactionRequest) {
 		return await this.smartContractService.createTransaction(request);
 		//returns {contractId, error, transaction hash, status};
 	}
 
-	async grantAccessToContract(request: GrantAccessRequest) {
+	async grantAccessToContract(request: GrantAccessToContractRequest) {
 		return await this.smartContractService.grantAccessToContract(request);
 		//returns {error, list of transaction hashes, status};
 	}

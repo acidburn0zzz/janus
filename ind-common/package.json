@@ -5,7 +5,7 @@
   "main": "./index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsc && copy .\\index.js  ..\\contracts\\node_modules\\ind-common && copy .\\index.js  ..\\ind-hdwallet\\node_modules\\ind-common\\ && copy .\\index.js  ..\\ind-hdwallet-service\\node_modules\\ind-common\\ && xcopy /S/C/Y/I .\\build ..\\contracts\\node_modules\\ind-common\\build && xcopy /S/C/Y/I .\\build ..\\ind-hdwallet\\node_modules\\ind-common\\build && xcopy /S/C/Y/I .\\build ..\\ind-hdwallet-service\\node_modules\\ind-common\\build"
+    "build": "tsc"
   },
   "keywords": [
     "indirection",

@@ -14,8 +14,8 @@ const router = express.Router();
 
 let options: AddressObfuscatorOptions = {
     blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
-    contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
-    abiPath: "c:\\Forcefield\\Privy\\Contracts\\abi",
+    contractsPath: "C:\\Code\\BlockChain\\privy\\contracts\\build",
+    abiPath: "C:\\Code\\BlockChain\\privy\\contracts\\abi",
     oracleServiceUri: "uri",
     vaultServiceUri: "vault"
 };
@@ -118,7 +118,7 @@ router.post('/postTransaction', async (req: express.Request, res: express.Respon
         let requestData = new PostTransactionRequest({});
         requestData.data = req.body.data;
         requestData.signature = req.body.signature;
-        requestData.transactionInfo = JSON.parse(req.body.transactionInfo);
+        requestData.transactionInfo = req.body.transactionInfo;//JSON.parse(req.body.transactionInfo);
 
         responseData = await addressObfuscator.postTransaction(requestData, new SendTransactionProperties());
     }

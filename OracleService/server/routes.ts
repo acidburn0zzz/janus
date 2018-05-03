@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { OracleService } from './script/oracle.service';
-import { GrantAccessRequest, GrantAccessResponse} from 'ind-oracle';
-import { Party, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
+import { GrantAccessToContractRequest, GrantAccessToContractResponse} from 'ind-oracle';
+import { Party, CreateTransactionRequest, CreateTransactionResponse, MeterSummaryRequest, MeterSummaryResponse, 
   WalletRegistrationRequest, WalletRegistrationResponse, WalletUnRegistrationRequest, WalletUnRegistrationResponse } from 'ind-common';
 var oracle: OracleService;
 const router = express.Router();
@@ -53,19 +53,19 @@ router.post('/unRegisterWalletAgent', async (req: express.Request, res: express.
 });
 
 router.post('/createTransaction', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  let createTransactionRequest = new CreateUpdateTransactionRequest({});
+  let createTransactionRequest = new CreateTransactionRequest({});
   console.log("body", req.body);
   createTransactionRequest.data = req.body.data;
   createTransactionRequest.signature = req.body.signature;
-  createTransactionRequest.otherInfo = req.body.otherInfo;
+  createTransactionRequest.transactionInfo = req.body.transactionInfo;
   console.log("createTransactionRequest", createTransactionRequest);
   if(!oracle)
     oracle = new OracleService();
-  var response: CreateUpdateTransactionResponse;
+  var response: CreateTransactionResponse;
   try {
     response = await oracle.createTransaction(createTransactionRequest);
   } catch (error) {
-    response = new CreateUpdateTransactionResponse({ contractId: 0, status: false });
+    response = new CreateTransactionResponse({ contractId: 0, status: false });
     response.error = "ERROR: " + error;
     console.log(error)
   }
@@ -74,18 +74,18 @@ router.post('/createTransaction', async (req: express.Request, res: express.Resp
 });
 
 router.post('/grantAccessToContract', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  let grantAccessRequest = new GrantAccessRequest({});
+  let grantAccessToContractRequest = new GrantAccessToContractRequest({});
   console.log("body", req.body);
-  grantAccessRequest.message = req.body.message;
-  grantAccessRequest.signature = req.body.signature;
-  console.log("grantAccessRequest", grantAccessRequest);
+  grantAccessToContractRequest.message = req.body.message;
+  grantAccessToContractRequest.signature = req.body.signature;
+  console.log("grantAccessToContractRequest", grantAccessToContractRequest);
   if(!oracle)
     oracle = new OracleService();
-  var response: GrantAccessResponse;
+  var response: GrantAccessToContractResponse;
   try {
-    response = await oracle.grantAccessToContract(grantAccessRequest);
+    response = await oracle.grantAccessToContract(grantAccessToContractRequest);
   } catch (error) {
-    response = new GrantAccessResponse({status: false});
+    response = new GrantAccessToContractResponse({status: false});
     response.error = "ERROR: " + error;
     console.log(error)
   }

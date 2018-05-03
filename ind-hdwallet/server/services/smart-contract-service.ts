@@ -105,11 +105,26 @@ export class SmartContractService implements SmartContractServiceInterface {
 
     private async executeTransaction<T extends ExecuteTransactionPropInterface>(prop: T): Promise<Object> {
 
+        console.log(prop);
             try {
-                let path = this.contractPath + '\\' + prop.contractName;
-
-                let x = require(path);
-
+                // let path = this.contractPath + '\\' + prop.contractName.toLowerCase();
+                // console.log("prop.contractName",prop.contractName.toLowerCase());
+                // console.log("path", path);
+                // let z = require("C:\\Code\\BlockChain\\privy\\ind-hdwallet-service\\build\\trade.js");
+                // console.log("z", z);
+                // let y = require("C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js");
+                // console.log("y", y);
+                //let path = this.contractPath + '\\' + prop.contractName.toLowerCase()+ ".js";
+                //console.log("path", path);
+                //let path1 = path.replace(/\\/g, "\\\\",);
+                //console.log("path1", path1);
+                //let y = require(path1);
+                //console.log("y", y);
+                //let path = "C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js";
+                //console.log("path", path);
+                //let x = require(this.contractPath.replace(/\\/g, "\\\\") + '\\\\' + prop.contractName.toLowerCase()+".js");
+                let x = require("C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js");
+                console.log("x", x);
                 let contract = Object.create(x[prop.contractName].prototype);
 
                 let args = new Array<string>();
@@ -126,6 +141,7 @@ export class SmartContractService implements SmartContractServiceInterface {
 
             }
             catch (error) {
+                console.log(error);
                 throw error;
             }
             

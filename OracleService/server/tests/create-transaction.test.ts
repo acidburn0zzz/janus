@@ -46,7 +46,7 @@ describe.only('Create transaction tests', () => {
         this.timeout(0);
         console.log("In create black trade test");
         
-        let request: common.CreateUpdateTransactionRequest = new common.CreateUpdateTransactionRequest();
+        let request: common.CreateTransactionRequest = new common.CreateTransactionRequest();
         request.data = new common.TransactionData();
         request.data.guid = "12dfdfg";
         request.otherInfo = new common.TransactionInfo();

@@ -7,8 +7,8 @@ let factoryJson: any = require('../../contracts/FactoryInterface.json');
 let contractJson: any = require('../../contracts/ContractInterface.json');
 let marketplaceDirectoryJson: any = require('../../contracts/MarketplaceDirectoryInterface.json');
 
-import { GrantAccessRequest, GrantAccessResponse } from './models';
-import { Party, PartyType, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse } from "ind-common";
+import { GrantAccessToContractRequest, GrantAccessToContractResponse } from './models';
+import { Party, PartyType, CreateTransactionRequest, CreateTransactionResponse } from "ind-common";
 
 import * as constants from './constants';
 
@@ -87,17 +87,17 @@ export class SmartContractService {
     return factory;
   }
 
-  async createTransaction(request: CreateUpdateTransactionRequest): Promise<CreateUpdateTransactionResponse> {
-    let response: CreateUpdateTransactionResponse;
+  async createTransaction(request: CreateTransactionRequest): Promise<CreateTransactionResponse> {
+    let response: CreateTransactionResponse;
 
     try{
         //prepare transaction to post to block chain
-        let infoObject = request.otherInfo;           
-        let party1: Party = request.otherInfo.myParty;
+        let infoObject = request.transactionInfo;           
+        let party1: Party = request.transactionInfo.myParty;
         console.log("callingParty", party1);
-        let party2: Party = request.otherInfo.otherParty;
+        let party2: Party = request.transactionInfo.otherParty;
         console.log("otherParty", party2);
-        response = new CreateUpdateTransactionResponse({});
+        response = new CreateTransactionResponse({});
  		
         let party1Address: string; 
         let party1CompanyName: string;
@@ -158,7 +158,7 @@ export class SmartContractService {
         let overrideOptions = {
            gasLimit: 3000000,
         };
-        let factory: Contract = this.factoryContract(request.otherInfo.factoryAddress);
+        let factory: Contract = this.factoryContract(request.transactionInfo.factoryAddress);
         console.log(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
           party2.partyType, party2Address, party2CompanyName, party2CommonFieldsEncSymKey, party2PaymentFieldsEncSymKey, overrideOptions);
         let tx = await factory.createTransaction(guid, party1.partyType, party1Address, party1CompanyName, party1CommonFieldsEncSymKey, party1PaymentFieldsEncSymKey,
@@ -193,13 +193,13 @@ export class SmartContractService {
     return response;
   }
 
-  async grantAccessToContract(request: GrantAccessRequest): Promise<GrantAccessResponse> {
-    let response: GrantAccessResponse;
+  async grantAccessToContract(request: GrantAccessToContractRequest): Promise<GrantAccessToContractResponse> {
+    let response: GrantAccessToContractResponse;
 
     try{
       //prepare transaction to post to block chain
       let messageObject = request.message;           
-      response = new GrantAccessResponse({status:false, transactionHashes:[]});
+      response = new GrantAccessToContractResponse({status:false, transactionHashes:[]});
       
       // if(!this.verifySignature(request.message, request.signature))
       // {

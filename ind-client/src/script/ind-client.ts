@@ -2,7 +2,7 @@ import { SmartContractService } from './smartcontract.service';
 import { Contract, utils, Wallet, Provider, providers } from "ethers";
 import * as constants from './constants';
 import { error } from 'util';
-import { IHttpService, HttpService, Party, PartyType, TransactionData, TransactionInfo, Function, CreateUpdateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
+import { IHttpService, HttpService, Party, PartyType, TransactionData, TransactionInfo, FunctionInfo, CreateTransactionRequest, WalletRegistrationRequest, WalletUnRegistrationRequest } from 'ind-common';
 const Web3 = require('web3');
 import * as ethUtil from 'ethereumjs-util';
 
@@ -120,22 +120,19 @@ export class IndClient {
 		let data:TransactionData = new TransactionData({});
 		data.timestamp = (new Date()).getTime();
 		data.guid = guid;
-		data.tradeDate = tradeDate;
-		data.product = product;
-		data.qty = qty;
-		data.price = price;
-		data.paymentTerm = paymentTerm;
 
-		if(myParty.partyType == PartyType.Buyer) {
-			data.buyer = myParty.companyName;			
-		} else if(myParty.partyType == PartyType.Seller) {
-			data.seller = myParty.companyName;			
-		}
-		if(otherParty.partyType == PartyType.Buyer) {
-			data.buyer = otherParty.companyName;			
-		} else if(otherParty.partyType == PartyType.Seller) {
-			data.seller = otherParty.companyName;			
-		}
+		// data.tradeDate = tradeDate;
+		// data.product = product;
+		// data.qty = qty;
+		// data.price = price;
+		// data.paymentTerm = paymentTerm;
+		data.businessData = {
+            tradeDate: tradeDate,
+            qty: qty,
+            product: product,
+            price: price,
+            paymentTerm: paymentTerm,
+        };
 
 		let info:TransactionInfo = new TransactionInfo({});
 		info.marketplaceAddress = marketplaceAddress;
@@ -144,11 +141,11 @@ export class IndClient {
 		info.myParty = myParty;
 		info.otherParty = otherParty;
 
-		let function1:Function = new Function({});
+		let function1:FunctionInfo = new FunctionInfo({});
 		function1.name = "updateData";
 		function1.params = ["1", "tradeDate",
 			"product", "qty", "price"];
-		let function2:Function = new Function({});
+		let function2:FunctionInfo = new FunctionInfo({});
 		function2.name = "updatePaymentInfo";
 		function2.params = ["2", "paymentTerm"];
 
@@ -157,9 +154,9 @@ export class IndClient {
 		let messageHash = "a34dadf";//web3.sha3(infoStr);
 		data.messageHash = messageHash;
 		
-		let request:CreateUpdateTransactionRequest = new CreateUpdateTransactionRequest({});
+		let request:CreateTransactionRequest = new CreateTransactionRequest({});
 		request.data = data;
-		request.otherInfo = info;
+		request.transactionInfo = info;
 
 		return request;
 	}

@@ -48,7 +48,7 @@ contract AnonymizedEncryptedSmartContract {
             }
         }
         if(!hasAccess)
-            revert;
+            revert();
             
         _;    
     }

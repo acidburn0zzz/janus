@@ -16,7 +16,8 @@ export class BaseContract {
     }
 
     protected getWeb3() {
-        this.web3 = new Web3(Web3.givenProvider || this.provider );
+        if(!this.web3)
+            this.web3 = new Web3(Web3.givenProvider || this.provider );
     }
 
     public loadAbi(name: string, path: string) {

@@ -4,7 +4,7 @@
   "description": "Indirection wallet",
   "private": true,
   "scripts": {
-    "build": "tsc && copy .\\index.js  ..\\ind-hdwallet-service\\node_modules\\ind-hdwallet  && xcopy /S/C/Y/I .\\build  ..\\ind-hdwallet-service\\node_modules\\ind-hdwallet\\build",
+    "build": "tsc",
     "test": "mocha --require ts-node/register ./server/tests/*.test.ts"
   },
   "main": "./index.js",

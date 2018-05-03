@@ -52,6 +52,18 @@ contract MarketplaceDirectory is MarketplaceDirectoryInterface {
         return (p.parent, p.effectiveDate, p.terminationDate, p.name, p.walletAddress);
     }
     
+    function isParticipantActive(string participantName, string parentName, uint asofDate) public constant returns (bool) {
+        bytes32 parentHash = keccak256(parentName);
+        bytes32 nameHash = keccak256(participantName);
+        Participant p = participants[keccak256(parentHash, nameHash)];
+        return ((p.effectiveDate == 0 || p.effectiveDate <= asofDate) && (p.terminationDate == 0 || p.terminationDate >= asofDate));
+    }
+    
+    function isParticipantActive(address participantWalletAddress, uint asofDate) public constant returns (bool) {
+        Participant p = participants[participantNames[participantWalletAddress]];
+        return ((p.effectiveDate == 0 || p.effectiveDate <= asofDate) && (p.terminationDate == 0 || p.terminationDate >= asofDate));
+    }
+
     function updateParticipant(uint effectiveDate, uint terminationDate, string participantName, address participantWalletAddress) public onlyParent(participantName) {
         //require(effectiveDate > 0);
         //require(terminationDate > 0);

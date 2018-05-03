@@ -280,7 +280,7 @@ export class AddressObfuscator {
 
     public async postTransaction(request: PostTransactionRequest, postTxnProperties: SendTransactionPropertiesInterface): Promise<PostTransactionResponse> {
 
-        let response = new PostTransactionResponse({ guid: request.data.guid });
+        let response = new PostTransactionResponse({ guid: request.data.guid, transactionHash: [] });
 
         try {
             //verify the message signature and get the public address of the signer
@@ -317,8 +317,11 @@ export class AddressObfuscator {
                     }
                 }
 
-                request.transactionInfo.functionList.forEach(async fn => {
+                //request.transactionInfo.functionList.forEach(async fn => {
+                for(let i = 0; i<request.transactionInfo.functionList.length;i++) {
+                    let fn = request.transactionInfo.functionList[i];
 
+                    utils.writeFormattedMessage("Function data",fn);
                     postTxnProperties.guid = request.data.guid;
                     postTxnProperties.factoryAddress = request.transactionInfo.factoryAddress;
                     postTxnProperties.methodName = fn.name;
@@ -333,7 +336,8 @@ export class AddressObfuscator {
                     response.transactionHash.push(txnReceipt);
                     utils.writeFormattedMessage("Transaction receipt for " + fn, txnReceipt);
 
-                });
+                //});
+                }
         }
         catch (error) {
 

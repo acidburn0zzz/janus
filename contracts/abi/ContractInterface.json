@@ -97,10 +97,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.17;\r\n\r\ncontract ContractInterface {\r\n\r\n    mapping(uint=>uint8[]) public SYMKEY_LIST;\r\n\r\n    function updateParty(uint8 observerPartyIndex, address partyAddress, string companyName, string pSymKey1, string pSymKey2) public;\r\n    function getAccessibleSymmetricKeyForParty(address partyAddress, uint symKeyIndex) view public returns (string);\r\n    function getGuid() view public returns (string);\r\n}\r\n",
-  "sourcePath": "C:\\Forcefield\\privy\\SmartContracts\\contracts\\ContractInterface.sol",
+  "sourcePath": "c:\\Code\\BlockChain\\privy\\SmartContracts\\contracts\\ContractInterface.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/C/Forcefield/privy/SmartContracts/contracts/ContractInterface.sol",
+      "absolutePath": "/c/Code/BlockChain/privy/SmartContracts/contracts/ContractInterface.sol",
       "exportedSymbols": {
         "ContractInterface": [
           453
@@ -561,5 +561,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-04-15T02:08:35.422Z"
+  "updatedAt": "2018-04-24T05:06:44.371Z"
 }

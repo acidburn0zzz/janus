@@ -29,8 +29,8 @@ describe('address obfuscator', () => {
 
         let options: AddressObfuscatorOptions = {
             blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
-            contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
-            abiPath: "c:\\Forcefield\\Privy\\Contracts\\abi",
+            contractsPath: "C:\\Code\\BlockChain\\privy\\Contracts\\build",
+            abiPath: "C:\\Code\\BlockChain\\privy\\Contracts\\abi",
             oracleServiceUri: "uri",
             vaultServiceUri: "vault"
         };
@@ -64,8 +64,8 @@ describe('encrypt decrypt methods', () => {
      */
     let options: AddressObfuscatorOptions = {
         blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
-        contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
-        abiPath: "c:\\Forcefield\\Privy\\Contracts\\abi",
+        contractsPath: "C:\\Code\\BlockChain\\privy\\Contracts\\build",
+        abiPath: "C:\\Code\\BlockChain\\privy\\Contracts\\abi",
         oracleServiceUri: "uri",
         vaultServiceUri: "vault"
     };
@@ -201,8 +201,8 @@ describe('execute transactions', () => {
 
     let options: AddressObfuscatorOptions = {
         blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
-        contractsPath: "c:\\Forcefield\\Privy\\Contracts\\build",
-        abiPath: "c:\\Forcefield\\Privy\\Contracts\\abi",
+        contractsPath: "C:\\Code\\BlockChain\\privy\\Contracts\\build",
+        abiPath: "C:\\Code\\BlockChain\\privy\\Contracts\\abi",
         oracleServiceUri: "uri",
         vaultServiceUri: "vault"
     };

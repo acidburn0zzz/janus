@@ -1,8 +1,8 @@
 declare var require: any
 declare const Buffer
 import { Contract, utils, Wallet, Provider, providers, Interface } from "ethers";
-import { IHttpService, Party, PartyType, TransactionData, CreateUpdateTransactionRequest, CreateUpdateTransactionResponse, 
-  GrantAccessData, GrantAccessRequest, GrantAccessResponse } from 'ind-common';
+import { IHttpService, Party, PartyType, TransactionData, CreateTransactionRequest, CreateTransactionResponse, 
+  GrantAccessToContractData, GrantAccessToContractRequest, GrantAccessToContractResponse } from 'ind-common';
 import { Guid } from "guid-typescript";
 const Web3 = require('web3');
 
@@ -23,13 +23,13 @@ export class SmartContractService {
     this.httpService = httpService;
   }
 
-  async createTrade(oracleUrl: string, request: CreateUpdateTransactionRequest): Promise<any> {
+  async createTrade(oracleUrl: string, request: CreateTransactionRequest): Promise<any> {
     let response;
     try{  
       let urlParts: string[] = oracleUrl.split(':');
       let host: string = urlParts[0];
       let port: number = Number(urlParts[1]);
-      let resp: CreateUpdateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
+      let resp: CreateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.CreateTransactionPath, constants.CreateTransactionMethod, request);
       response = {tradeNumber:resp.contractId,transactionhash:resp.transactionHash,status:resp.status,error:resp.error};      
     }
     catch (error) {
@@ -45,7 +45,7 @@ export class SmartContractService {
 
     try{
       //prepare transaction to send to oracle
-      // let signingMessage = new GrantAccessData({});
+      // let signingMessage = new GrantAccessToContractData({});
       // signingMessage.marketplaceAddress = marketplaceAddress;
       // signingMessage.factoryAddress = tradeFactoryAddress;
       // signingMessage.contractId = contractId;
@@ -58,7 +58,7 @@ export class SmartContractService {
       // if(!userAccount)
       //   throw new Error(constants.errorInvalidUserAccount);
       // signature = await this.internalSign(unsignedData, String(userAccount));
-      // let request = new GrantAccessRequest({
+      // let request = new GrantAccessToContractRequest({
       //   message: signingMessage,
       //   signature: signature
       // });
@@ -66,7 +66,7 @@ export class SmartContractService {
       // let urlParts: string[] = oracleUrl.split(':');
       // let host: string = urlParts[0];
       // let port: number = Number(urlParts[1]);
-      // let resp: GrantAccessResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.GrantAccessPath, constants.GrantAccessMethod, request);
+      // let resp: GrantAccessToContractResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.GrantAccessPath, constants.GrantAccessMethod, request);
       // console.log(resp);
       // response = {transactionHash:resp.transactionHash,status:resp.status,error:resp.error}; 
       response = {status:true,transactionHashes:["1234567890"]};     
@@ -79,14 +79,14 @@ export class SmartContractService {
     return response;
   }
 
-  async updateTrade(agentUrl: string, request: CreateUpdateTransactionRequest): Promise<any> {
+  async updateTrade(agentUrl: string, request: CreateTransactionRequest): Promise<any> {
     let response;
     try{      
       //prepare transaction to send to hd wallet
       let urlParts: string[] = agentUrl.split(':');
       let host: string = urlParts[0];
       let port: number = Number(urlParts[1]);
-      let resp: CreateUpdateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.UpdateTransactionPath, constants.UpdateTransactionMethod, request);
+      let resp: CreateTransactionResponse = await this.httpService.RaiseHttpRequest(host, String(port), constants.UpdateTransactionPath, constants.UpdateTransactionMethod, request);
       console.log(resp);
       //response = {transactionHash:resp.transactionHash,status:resp.status,error:resp.error};
       //response = {tradeNumber:resp.contractId,transactionhash:resp.transactionHash,status:resp.status,error:resp.error};

@@ -1,6 +1,10 @@
 import * as constants from './constants';
 import * as commonTypes from './common-types';
 
+export class BaseData {    
+  timestamp: number;
+}
+
 export class BaseRequest {
     public message: string;
     public signature: string;
@@ -253,12 +257,13 @@ export class GrantAccessResponse extends BaseResponse {
 
  */
 
-export class TransactionData {
+export class TransactionData extends BaseData {
   guid: string;
   messageHash: string;
   businessData: Object;
   
   constructor(fields: Partial<TransactionData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -312,10 +317,11 @@ export class PostTransactionResponse extends CreateTransactionResponse {
 }
 
 
-export class RegistrationData {
+export class RegistrationData extends BaseData {
   companyName: string;
   url: string;
   constructor(fields: Partial<RegistrationData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -333,9 +339,10 @@ export class WalletRegistrationResponse extends BaseResponse {
   }
 }
 
-export class UnRegistrationData {
+export class UnRegistrationData extends BaseData {
   companyName: string;
   constructor(fields: Partial<RegistrationData> & {}) {
+    super();
     Object.assign(this, fields);
   }
 }
@@ -348,6 +355,29 @@ export class WalletUnRegistrationRequest {
 }
 export class WalletUnRegistrationResponse extends BaseResponse {
   constructor(fields: Partial<WalletUnRegistrationResponse> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+
+export class MeterSummaryData extends BaseData {
+  companyName: string;
+  factoryAddress: string;
+  constructor(fields: Partial<MeterSummaryData> & {}) {
+    super();
+    Object.assign(this, fields);
+  }
+}
+export class MeterSummaryRequest {
+  message: MeterSummaryData;
+  signature: string;
+  constructor(fields: Partial<MeterSummaryRequest> & {}) {
+    Object.assign(this, fields);
+  }
+}
+export class MeterSummaryResponse extends BaseResponse {
+  result: any;
+  constructor(fields: Partial<MeterSummaryResponse> & {}) {
     super();
     Object.assign(this, fields);
   }
