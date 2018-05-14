@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\build",
+    "\\node_modules\\ind-common",
+    "\\server",
+    "\\server\\script",
+    "\\server\\services"
+  ],
+  "SelectedNode": "\\server\\script\\addressobfuscator.ts",
+  "PreviewInSolutionExplorer": false
+}

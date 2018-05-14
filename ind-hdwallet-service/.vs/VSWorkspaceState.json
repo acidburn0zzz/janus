@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\bin",
+    "\\node_modules\\ind-hdwallet",
+    "\\node_modules\\ind-hdwallet\\build",
+    "\\node_modules\\ind-hdwallet\\build\\script",
+    "\\server"
+  ],
+  "SelectedNode": "\\server",
+  "PreviewInSolutionExplorer": false
+}
