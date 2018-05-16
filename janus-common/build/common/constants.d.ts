@@ -1,0 +1,14 @@
+export declare let OK: string;
+export declare let errorInvalidSignature: string;
+export declare let errorInvalidHash: string;
+export declare let errorDecryptionFailed: string;
+export declare let errorEncryptionFailed: string;
+export declare let errorOTAGenFailed: string;
+export declare let errorTradeNumberNotFound: string;
+export declare let errorContractIdNotFound: string;
+export declare let errorAcceptTradeFailed: string;
+export declare let errorCancelTradeFailed: string;
+export declare let errorRequestObjectParseFailed: string;
+export declare let errorRequestOtaFailed: string;
+export declare let errorPostTransaction: string;
+export declare let errorObfuscatorOptionsEmpty: string;

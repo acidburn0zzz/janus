@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OK = "OK";
+exports.errorInvalidSignature = "error: Invalid Signature";
+exports.errorInvalidHash = "error: The message hashes did not match";
+exports.errorDecryptionFailed = "error: Decryption failed";
+exports.errorEncryptionFailed = "error: Encryption failed";
+exports.errorOTAGenFailed = "error: OTA gen failed";
+exports.errorTradeNumberNotFound = "error: Trade number not found";
+exports.errorContractIdNotFound = "error: Contract Id not found";
+exports.errorAcceptTradeFailed = "error: Accept trade failed";
+exports.errorCancelTradeFailed = "error: Cancel trade failed";
+exports.errorRequestObjectParseFailed = "error: Could not parse request object";
+exports.errorRequestOtaFailed = "error: Could not find the one time address for the specified guid";
+exports.errorPostTransaction = "error: PostTransaction failed";
+exports.errorObfuscatorOptionsEmpty = "error: Address obfuscator options cannot be empty";
+//export let mecuriaMnemonic: string = "radar blur cabbage chef fix engine embark joy scheme fiction master release";
+//export let shellMnemonic: string = "buyer try humor into improve thrive fruit funny skate velvet vanish live";
+//export let trafiMnemonic: string = "volume roast script mind garbage embark lizard utility else blur year dentist";
+//export let bpMnemonic: string = "foil feed pool urban pupil eyebrow step guess plug palace lion neutral";
+//export let kochMnemonic: string = "type either sock busy quote sugar bullet wish use visit magnet innocent";
+//export let acmeSAASVendorMnemonic: string = "twenty neither hill property whisper frozen angry peace industry easily return switch";
+//# sourceMappingURL=constants.js.map
