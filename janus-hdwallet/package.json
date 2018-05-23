@@ -29,7 +29,7 @@
     "app-root-path": "^2.0.1",
     "azure-storage": "^2.7.0",
     "bitcore-ecies": "^1.0.3",
-    "bitcore-lib": "^0.15.0",
+    "bitcore-lib": "^0.14.0",
     "body-parser": "^1.17.1",
     "command-line-args": "^4.0.7",
     "cookie-parser": "^1.4.3",
@@ -43,6 +43,7 @@
     "truffle-contract": "^3.0.1",
     "ts-node": "^4.1.0",
     "web3": "^1.0.0-beta.33",
-    "@manosamy/janus-common": "file:../janus-common"
+    "@manosamy/janus-common": "file:../janus-common",
+    "@manosamy/janus-contracts": "file:../janus-contracts"
   }
 }

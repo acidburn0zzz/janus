@@ -17,12 +17,13 @@ const walletObject = ethers.Wallet;
 const Web3 = require("web3");
 const Tx = require('ethereumjs-tx');
 const utils = new Utils();
+var tradeAbi: any = require("../abi/Trade.json");
 
 export class Trade extends BaseContract {
 
 
     private trade: any;
-    private tradeAbi: any;
+    //private tradeAbi: any;
 
     constructor(abiPath: string, provider: string) {
         super(abiPath, provider);
@@ -36,9 +37,9 @@ export class Trade extends BaseContract {
         if (!this.trade) {
             utils.writeFormattedMessage("Inside Trade getContract", { guid: guid, facAddress: factoryAddress, walletAddress: signingWalletAddress });
 
-            let tradeString: string = this.loadAbi("Trade", this.abiPath);
-            this.tradeAbi = JSON.parse(tradeString);
-            this.trade = new this.web3.eth.Contract(this.tradeAbi.abi);
+            //let tradeString: string = this.loadAbi("Trade", this.abiPath);
+            //this.tradeAbi = JSON.parse(tradeString);
+            this.trade = new this.web3.eth.Contract(tradeAbi.abi);
 
             //get the contract address using the guid
             let tradeFactoryContract = new TradeFactory(this.abiPath, this.provider);
@@ -114,7 +115,7 @@ export class Trade extends BaseContract {
 
             let functionAbi: any;
 
-            this.tradeAbi.abi.forEach(element => {
+            tradeAbi.abi.forEach(element => {
                 if (element.name == txnProps.methodName) {
                     functionAbi = element;
                 }
@@ -190,7 +191,7 @@ export class Trade extends BaseContract {
 
             let functionAbi: any;
 
-            this.tradeAbi.abi.forEach(element => {
+            tradeAbi.abi.forEach(element => {
                 if (element.name == txnProps.methodName) {
                     functionAbi = element;
                 }

@@ -47,8 +47,8 @@ describe('Trade tests', () => {
         this.timeout(0);
         var fn = mochaAsyncBeforeHook(async function () {
             //add init here
-            agentUrl = "localhost:4000";
-            oracleUrl = "localhost:8000";
+            agentUrl = "10.0.0.3:4000";
+            oracleUrl = "10.0.0.2:8000";
             marketplaceAddress = "0x7904adfd948f5f99a987a86768f5decc1aecdea2";
             tradeFactoryAddress = "0x7904adfd948f5f99a987a86768f5decc1aecdea2";
             guid = Guid.create().toString();
@@ -57,19 +57,19 @@ describe('Trade tests', () => {
             console.log("directory:", process.cwd());
             client = new indClient.IndClient(marketplaceAddress, tradeFactoryAddress, agentUrl, oracleUrl, httpService);
 
-            let message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Mercuria", url: "localhost:4000"});
+            let message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Mercuria", url: "10.0.0.3:4000"});
             let request = new WalletRegistrationRequest({message: message});
-            let response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            let response = await httpService.RaiseHttpRequest("10.0.0.2", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Mercuria:", response);
 
-            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Shell", url: "localhost:4000"});
+            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "Shell", url: "10.0.0.3:4000"});
             request = new WalletRegistrationRequest({message: message});
-            response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            response = await httpService.RaiseHttpRequest("10.0.0.2", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered Shell:", response);
 
-            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "BP", url: "localhost:4000"});
+            message = new RegistrationData({timestamp: (new Date()).getTime(), companyName: "BP", url: "10.0.0.3:4000"});
             request = new WalletRegistrationRequest({message: message});
-            response = await httpService.RaiseHttpRequest("localhost", "8000", "/registerWalletAgent", "POST", request);
+            response = await httpService.RaiseHttpRequest("10.0.0.2", "8000", "/registerWalletAgent", "POST", request);
             console.log("Registered BP:", response);
         });
         return fn();
@@ -126,7 +126,7 @@ describe('Trade tests', () => {
 
         let data: MeterSummaryData = new MeterSummaryData({timestamp: (new Date()).getTime(), companyName:companyName,factoryAddress:tradeFactoryAddress})
         let request = new MeterSummaryRequest({message: data,signature:""});
-        let response = await httpService.RaiseHttpRequest("localhost", "8000", "/getMeterSummary", "POST", request);
+        let response = await httpService.RaiseHttpRequest("10.0.0.2", "8000", "/getMeterSummary", "POST", request);
         console.log("Meter Summary for",companyName, ":", response);
         
         //verify

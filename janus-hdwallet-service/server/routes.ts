@@ -1,6 +1,8 @@
 import * as express from 'express';
 import * as Constants from '@manosamy/janus-common/build/common/constants';
 import { Utils } from '@manosamy/janus-common/build/common/utils';
+import * as root from 'app-root-path';
+
 import {
     OneTimeAddressRequest, OneTimeAddressResponse, OneTimeAddressData, DecryptDataRequest, DecryptDataResponse,
     EncryptDataRequest, EncryptDataResponse, GrantAccessRequest, GrantAccessResponse, PostTransactionRequest, PostTransactionResponse
@@ -14,8 +16,8 @@ const router = express.Router();
 
 let options: AddressObfuscatorOptions = {
     blockchainProvider: "http://forcefield01.uksouth.cloudapp.azure.com:8545",
-    contractsPath: "C:\\Code\\BlockChain\\privy\\contracts\\build",
-    abiPath: "C:\\Code\\BlockChain\\privy\\contracts\\abi",
+    contractsPath: `${root}/../janus-contracts/build`,//"C:\\Code\\BlockChain\\privy\\contracts\\build",
+    abiPath: ".\\janus-contracts\\abi",//"C:\\Code\\BlockChain\\privy\\contracts\\abi",
     oracleServiceUri: "uri",
     vaultServiceUri: "vault"
 };

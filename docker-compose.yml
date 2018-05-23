@@ -1,0 +1,43 @@
+version: '3.2'
+services:
+  oracle-service:
+    build:
+      context: ./
+      dockerfile: "oracle.dockerfile"
+    image: "oracle-service:latest"
+    networks:
+      janus_net:
+        ipv4_address: '10.0.0.2'
+    ports:
+      - 8000:8000
+  hdwallet-service:
+    build:
+      context: ./
+      dockerfile: "hdwallet.dockerfile"
+    image: "hdwallet-service:latest"
+    networks:
+      janus_net:
+        ipv4_address: '10.0.0.3'
+    ports:
+      - 4000:4000
+  # client-test:
+  #   build:
+  #     context: ./
+  #     dockerfile: "clienttest.dockerfile"
+  #   depends_on:
+  #     - oracle-service
+  #     - hdwallet-service
+  #   image: "client-test:latest"
+  #   networks:
+  #     janus_net:
+  #       ipv4_address: '10.0.0.4'
+  #   ports:
+  #     - 9000:9000
+
+networks:
+  janus_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.0.0/16

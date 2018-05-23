@@ -8,6 +8,7 @@ const walletObject = ethers.Wallet;
 const Web3 = require("web3");
 const Tx = require('ethereumjs-tx');
 const utils = new indCommon.Utils();
+var marketplaceDirectoryAbi: any = require("../abi/MarketplaceDirectoryInterface.json");
 
 export class MarketplaceDirectory extends BaseContract {
 
@@ -23,8 +24,8 @@ export class MarketplaceDirectory extends BaseContract {
         utils.writeFormattedMessage("Inside getContract", { marketplaceDirectoryAddress: marketplaceDirectoryAddress, walletAddress: signingWalletAddress } );
 
         //get the contract instance
-        let marketplaceDirectoryString: string = this.loadAbi("MarketplaceDirectoryInterface", this.abiPath);
-        let marketplaceDirectoryAbi = JSON.parse(marketplaceDirectoryString);
+        //let marketplaceDirectoryString: string = this.loadAbi("MarketplaceDirectoryInterface", this.abiPath);
+        //let marketplaceDirectoryAbi = JSON.parse(marketplaceDirectoryString);
         let marketplaceDirectory = new this.web3.eth.Contract(marketplaceDirectoryAbi.abi);
 
         marketplaceDirectory.options.address = marketplaceDirectoryAddress;

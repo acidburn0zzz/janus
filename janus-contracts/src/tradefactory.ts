@@ -9,6 +9,7 @@ const walletObject = ethers.Wallet;
 const Web3 = require("web3");
 const Tx = require('ethereumjs-tx');
 const utils = new Utils();
+var tradeFactoryAbi: any = require("../abi/TradeFactory.json");
 
 export class TradeFactory extends BaseContract {
 
@@ -22,8 +23,8 @@ export class TradeFactory extends BaseContract {
         utils.writeFormattedMessage("Inside TradeFactory getContract", { guid: guid, facAddress: factoryAddress, walletAddress: signingWalletAddress } );
 
         //get the contract address using the guid
-        let tradeFactoryString: string = this.loadAbi("TradeFactory", this.abiPath);
-        let tradeFactoryAbi = JSON.parse(tradeFactoryString);
+        //let tradeFactoryString: string = this.loadAbi("TradeFactory", this.abiPath);
+        //let tradeFactoryAbi = JSON.parse(tradeFactoryString);
         let tradeFactory = new this.web3.eth.Contract(tradeFactoryAbi.abi);
 
         let tradeAddress: string = "";

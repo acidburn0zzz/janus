@@ -7,6 +7,7 @@ import {
 import { EncryptedSymKeyInfo } from '@manosamy/janus-common/build/common/common-types';
 
 import { Utils } from '@manosamy/janus-common/build/common/utils';
+var contracts = require('@manosamy/janus-contracts');
 
 const ethersUtils = ethers.utils;
 const walletObject = ethers.Wallet;
@@ -123,9 +124,11 @@ export class SmartContractService implements SmartContractServiceInterface {
                 //let path = "C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js";
                 //console.log("path", path);
                 //let x = require(this.contractPath.replace(/\\/g, "\\\\") + '\\\\' + prop.contractName.toLowerCase()+".js");
-                let x = require("C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js");
-                console.log("x", x);
-                let contract = Object.create(x[prop.contractName].prototype);
+                //let x = require("C:\\Code\\BlockChain\\privy\\contracts\\build\\trade.js");
+		        //let x = require(“\\Users\\mano\\quorum\\janus\\janus-contracts\\build\\trade.js”);
+
+                //console.log("x", x);
+                let contract = Object.create(contracts[prop.contractName].prototype);
 
                 let args = new Array<string>();
                 args.push(this.abiPath);
