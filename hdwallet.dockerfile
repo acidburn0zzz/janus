@@ -30,7 +30,7 @@ COPY ./janus-hdwallet-service /janus-hdwallet-service/
 WORKDIR ../janus-hdwallet-service
 RUN npm run build
 
-EXPOSE 4000
+EXPOSE 4000-4999
 
 #ENTRYPOINT [ "node ./build/compiled.js" ]
 ENTRYPOINT [ "npm", "start" ]
