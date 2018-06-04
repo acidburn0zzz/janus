@@ -1,0 +1,22 @@
+{
+  "name": "@manosamy/janus-setup",
+  "version": "0.0.1",
+  "description": "Initialize Janus contracts",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Oracle",
+    "HDWallet",
+    "Indirection",
+    "Privacy"
+  ],
+  "author": "Consensys",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "web3": "^1.0.0-beta.34",
+    "@manosamy/janus-common": "file:../janus-common",
+    "@manosamy/janus-contracts": "file:../janus-contracts"
+  }
+}

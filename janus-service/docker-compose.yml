@@ -6,7 +6,7 @@ services:
       dockerfile: "oracle.dockerfile"
     image: "oracle-service:latest"
     networks:
-      janus_net:
+      nnodes_janus_net:
        ipv4_address: '10.0.0.2'
     ports:
       - 8000:8000
@@ -19,7 +19,7 @@ services:
     depends_on:
       - oracle-service
     networks:
-      janus_net:
+      nnodes_janus_net:
         ipv4_address: '10.0.0.5'
     environment:
       - PORT=4000
@@ -31,7 +31,7 @@ services:
     depends_on:
       - oracle-service
     networks:
-      janus_net:
+      nnodes_janus_net:
         ipv4_address: '10.0.0.6'
     environment:
       - PORT=4004
@@ -43,7 +43,7 @@ services:
     depends_on:
       - oracle-service
     networks:
-      janus_net:
+      nnodes_janus_net:
         ipv4_address: '10.0.0.7'
     environment:
       - PORT=4008
@@ -65,9 +65,12 @@ services:
   #     - 9000:9000
 
 networks:
-  janus_net:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 10.0.0.0/16
+  # janus_net:
+    # driver: bridge
+    # ipam:
+    #   driver: default
+    #   config:
+    #   - subnet: 10.0.0.0/16
+  nnodes_janus_net:
+    external: true
+
