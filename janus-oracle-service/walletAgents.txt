@@ -1,9 +1,0 @@
-{
-    "Mercuria": {
-      "host": "localhost",
-      "port": "4000"
-    }, "Shell": {
-      "host": "localhost",
-      "port": "5000"
-    }
-}
