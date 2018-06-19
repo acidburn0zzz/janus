@@ -1,0 +1,34 @@
+{
+  "name": "janus",
+  "version": "0.0.1",
+  "description": "Indirection service",
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --require ts-node/register ./tests/*.test.ts"
+  },
+  "keywords": [
+    "Janus",
+    "HDWallet",
+    "Indirection",
+    "Privacy"
+  ],
+  "author": "Consensys",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.1.2",
+    "@types/mocha": "^2.2.48",
+    "@types/node": "^8.5.6",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.1",
+    "ts-loader": "^3.2.0",
+    "typescript": "^2.2.1"
+  },
+  "dependencies": {
+    "bitcore-lib": "^0.14.0",
+    "ethers": "^2.1.3",
+    "guid-typescript": "^1.0.7",
+    "ts-node": "^4.0.2",
+    "web3": "^0.20.1"
+  }
+}
