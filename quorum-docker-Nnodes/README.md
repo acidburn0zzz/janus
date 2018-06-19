@@ -27,7 +27,7 @@ I've got the size of the final image down to ~~391MB~~ 308MB from over 890MB. It
 
 Change to the *Nnodes/* directory. Edit the `ips` variable in *setup.sh* to list two or more IP addresses on the Docker network that will host nodes:
 
-    ips=("172.13.0.2" "172.13.0.3" "172.13.0.4")
+    ips=("10.0.0.11" "10.0.0.12" "10.0.0.13")
 
 The IP addresses are needed for Constellation to work. Now run,
 
@@ -56,7 +56,7 @@ If you have Geth installed on the host machine you can do the following from the
 
 Otherwise, the following will achieve the same thing, attaching via the Geth instance in the container.  If you do this, you'll have to copy transaction scripts used below into the *qdata_N* directories manually.
 
-    docker exec -it Nnodes_node_1_1 geth attach /qdata/dd/geth.ipc
+    docker exec -it nnodes_node_1_1 geth attach /qdata/dd/geth.ipc
 
 ### Making transactions
 

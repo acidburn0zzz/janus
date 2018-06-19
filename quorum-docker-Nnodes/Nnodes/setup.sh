@@ -21,8 +21,8 @@
 #### Configuration options #############################################
 
 # One Docker container will be configured for each IP address in $ips
-subnet="172.13.0.0/16"
-ips=("172.13.0.2" "172.13.0.3" "172.13.0.4")
+subnet="10.0.0.0/24"
+ips=("10.0.0.11" "10.0.0.12" "10.0.0.13")
 
 # Docker image name
 image=quorum
@@ -186,11 +186,11 @@ do
     volumes:
       - './$qd:/qdata'
     networks:
-      quorum_net:
+      janus_net:
         ipv4_address: '$ip'
     ports:
-      - $((n+22000)):8545
-      - $((n+27000)):9000
+      - "$((n+22000)):8545"
+      - "$((n+27000)):9000"
     user: '$uid:$gid'
 EOF
 
@@ -200,7 +200,7 @@ done
 cat >> docker-compose.yml <<EOF
 
 networks:
-  quorum_net:
+  janus_net:
     driver: bridge
     ipam:
       driver: default
