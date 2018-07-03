@@ -42,14 +42,14 @@ describe('file-directory-provider tests', () => {
     });
 
     it('add a key to directory', async function () {        
-        let directoryProvider = new FileDirectoryProvider();
+        let directoryProvider = new FileDirectoryProvider(".");
         assert.notEqual(directoryProvider,null,"DirectoryProvider not created");
         await directoryProvider.addCompanyKey(companyName, "publicAddress", testAddress);
     });
 
     it('read key from directory', async function () {
         //storing a key
-        let directoryProvider = new FileDirectoryProvider();
+        let directoryProvider = new FileDirectoryProvider(".");
         assert.notEqual(directoryProvider,null,"DirectoryProvider not created");
         await directoryProvider.addCompanyKey(companyName, "publicAddress", testAddress);
         
@@ -60,7 +60,7 @@ describe('file-directory-provider tests', () => {
     });
 
     it('add multiple keys to directory', async function () {
-        let directoryProvider = new FileDirectoryProvider();
+        let directoryProvider = new FileDirectoryProvider(".");
         assert.notEqual(directoryProvider,null,"DirectoryProvider not created");
         await directoryProvider.addCompanyKey(companyName, "publicAddress", testAddress);
         await directoryProvider.addCompanyKey(companyName, "shhKey", testPublicKey);
@@ -68,7 +68,7 @@ describe('file-directory-provider tests', () => {
 
     it('read multiple keys to directory', async function () {     
         //storing keys
-        let directoryProvider = new FileDirectoryProvider();
+        let directoryProvider = new FileDirectoryProvider(".");
         assert.notEqual(directoryProvider,null,"DirectoryProvider not created");
         await directoryProvider.addCompanyKey(companyName, "publicAddress", testAddress);
         await directoryProvider.addCompanyKey(companyName, "shhKey", testPublicKey);
