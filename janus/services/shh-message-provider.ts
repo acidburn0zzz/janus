@@ -21,8 +21,10 @@ export class ShhMessageProvider implements IMessageProvider {
         this.myPrvKeyId = ShhKeyId;
         if(!this.myPrvKeyId) {
             this.myPrvKeyId = process.env["ShhKeyId"];
-            if(!this.myPrvKeyId)
+            if(!this.myPrvKeyId) {
+                //console.log("new key creates in message provider");
                 this.myPrvKeyId = this.shh.newKeyPair();
+            }
         }
 
         if(this.myPrvKeyId)

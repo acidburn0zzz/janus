@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/janus-test2/index.js",
+            "program": "${workspaceFolder}/janus-example/index.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
