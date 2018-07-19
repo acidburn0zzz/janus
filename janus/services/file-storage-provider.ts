@@ -66,3 +66,4 @@ export class FileStorageProvider implements IStorageProvider {
         return txnRef + "_" + networkId;
     }
 }
+export default FileStorageProvider;

@@ -6,8 +6,9 @@ export class SimpleSigner implements ISigner {
     private wallet: Wallet; 
     private web3;
 
-    constructor(web3, privateKey) {
-        this.web3 = web3;
+    constructor(privateKey) {
+        let nodeUrl = process.env.NODE_URL;
+        this.web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl));
         this.wallet = new Wallet(privateKey, this.web3.currentProvider);
     }
 
@@ -19,3 +20,5 @@ export class SimpleSigner implements ISigner {
     }
 
 }
+
+export default SimpleSigner;

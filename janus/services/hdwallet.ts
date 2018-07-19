@@ -15,85 +15,41 @@ export class Hdwallet {
     private directoryProvider: IDirectoryProvider;
     private messageProvider: IMessageProvider
     private storageProvider: IStorageProvider;
-    private simpleSigner: ISigner;
+    private signer: ISigner;
     private companyName: string;
     private mnemonics: string;
-    private nodeUrl: string;
     private smartContractService: ISmartContractService;
     private onetimeKeyGenerator: OnetimeKeyGeneratorService;
     private web3;
-    private callbackMap: Map<string, (response) => void>;
-    private fundingAccount: string;
 
-    constructor(companyName: string, mnemonic: string, nodeUrl: string, directoryProvider: IDirectoryProvider, 
-        messageProvider: IMessageProvider, storageProvider: IStorageProvider, simpleSigner: ISigner) {
+    constructor(companyName: string, mnemonic: string, directoryProvider: IDirectoryProvider, 
+        messageProvider: IMessageProvider, storageProvider: IStorageProvider, signer: ISigner, web3) {
         this.companyName = companyName;
         this.mnemonics = mnemonic;
-        this.nodeUrl = nodeUrl;
         this.directoryProvider = directoryProvider;
         this.messageProvider = messageProvider;
         this.storageProvider = storageProvider;
-        this.simpleSigner = simpleSigner;
+        this.signer = signer;
+        this.web3 = web3;
+                   
+        //if(!this.web3)
+            //TODO: throw error
+
+        //this.smartContractService = new SmartContractService(this.web3);
         
-        //console.log(this.directoryProvider);
-        if(this.nodeUrl)
-            this.web3 = new Web3(new Web3.providers.HttpProvider(this.nodeUrl));
+        if(this.mnemonics)
+            this.onetimeKeyGenerator = new OnetimeKeyGeneratorService(this.mnemonics, this.storageProvider);
 
-        this.smartContractService = new SmartContractService(this.web3);
-        this.onetimeKeyGenerator = new OnetimeKeyGeneratorService(this.mnemonics, this.storageProvider);
-
-        this.callbackMap = new Map<string, (message) => void>();
         this.messageProvider.watch(async (err, message) => { await this.onMessage(err, message); });  
-        
-        this.fundingAccount = this.web3.eth.accounts[0];
+        console.log("HDWallet initialized");
     }
 
-    public async requestOnetimeKeys(txnRef: string, networkId: string, parties: Array<string>, callback: (response) => void) {
-        let partiesKeyMap = new Array<{partyName:string,onetimeKey:OnetimeKey}>();
-        //parties.forEach(function (value, index, array) {
-        for(let i = 0; i<parties.length;i++) {
-            let value = parties[i];
-            if(value) {
-                partiesKeyMap.push({partyName:value, onetimeKey: null});
-            }
-        //});
-        }
-        await this.storageProvider.storeOnetimeKeyMap(txnRef, networkId, partiesKeyMap);
-
-        this.registerCallback(txnRef, callback);
-
-        //parties.forEach(function (value, index, array) {
-        for(let i = 0; i<parties.length;i++) {
-            let value = parties[i];
-            if(value) {
-                //Post OTA request for party
-                let fromPublicKey = await this.directoryProvider.getCompanyKey(this.companyName, "shhKey");
-                let toPublicKey = await this.directoryProvider.getCompanyKey(value, "shhKey");
-                if(toPublicKey) {
-
-                    let requestMsg = new OnetimeKeyRequest({transactionId:txnRef, networkId:networkId, sender:this.companyName, recepient:value});
-                    let msgString = JSON.stringify(requestMsg);
-                    let signature = await this.simpleSigner.sign(msgString);
-                    let message = new Message({type: MessageType.OnetimeKeyRequest, payload: msgString, signature: signature});
-
-                    await this.messageProvider.postMessage(fromPublicKey,toPublicKey,JSON.stringify(message));
-                }
-            }
-        //});
-        }
-    }
-
-    public async getOnetimeKeys(txnRef: string, networkId) {
-        //Reading from storage provider
-        return await this.storageProvider.readOnetimeKeyMap(txnRef, networkId);
-    }
-
-    public async signTransaction(txnRef: string, networkId: string, txn: any ): Promise<string> {
+    public async signTransaction(txnRef: string, networkId: string, txn: any ): Promise<{signedTx: string, signedTxObj: any, rawTx: any}> {
         let signedObj;
         if(this.onetimeKeyGenerator && txn) {
             signedObj = await this.onetimeKeyGenerator.signTransaction(txnRef, networkId, txn, this.web3);
         }
-        return signedObj.signedTx;
+        return signedObj;
     }
 
     public async signMessage(txnRef: string, networkId: string, message: string): Promise<string> {
@@ -104,38 +60,8 @@ export class Hdwallet {
         return signature;
     }
 
-    public async postTransaction(txnRef: string, networkId: string, txn: any ): Promise<any> {
-        let response;
-        if(this.onetimeKeyGenerator && txn) {
-            if(!txn["gasPrice"])
-                txn["gasPrice"] = 0;
-            if(!txn["gas"] && !txn["gasLimit"]) {
-                var block = this.web3.eth.getBlock("latest");
-                txn["gasLimit"] = block.gasLimit;
-            }
-            let signedObj = await this.onetimeKeyGenerator.signTransaction(txnRef, networkId, txn, this.web3);
-            //console.log("SignedTx",signedObj.signedTx);
-            await this.fundAccountIfNeeded(signedObj.rawTx["from"]);
-            response = await this.web3.eth.sendRawTransaction(signedObj.signedTx);
-        }
-        return response;
-    }
-
-    private async fundAccountIfNeeded(address: string) {
-        let balance = await this.web3.eth.getBalance(address);
-        //console.log("account", address);
-        //console.log("balance", balance);
-        if(!balance || balance.lt(this.web3.toWei(0.05,"ether"))) {
-            console.log("funding...");
-            let amount = this.web3.toWei(0.1,"ether");
-            let tx = await this.web3.eth.sendTransaction({from:this.fundingAccount, to:address, value:amount});
-            console.log("tx hash:", tx);
-            //let confirmedTxn = await this.web3.currentProvider.waitForTransaction(tx.hash, 20000);
-            //console.log("confirmedTxn", confirmedTxn);
-        }
-    }
-
     private async onMessage(err, message) {
+        //console.log("In hdwallet onMessage:",message);
         if(err || !message) {
             console.log("Message:",message);
             console.log("Error:",err);
@@ -152,12 +78,13 @@ export class Hdwallet {
         
         if(msgType == MessageType.OnetimeKeyRequest) {
             await this.processOnetimeKeyRequest(payload, result.signerAddress);
-        } else if(msgType == MessageType.OnetimeKeyResponse) {
-            await this.processOnetimeKeyResponse(payload, result.signerAddress);
         }
     }
 
     private async processOnetimeKeyRequest(payload: string, fromAddress: string) {
+        if(!this.onetimeKeyGenerator)
+            return;
+
         let request = new OnetimeKeyRequest(JSON.parse(payload));
         
         //TODO: verify requester "fromAddress"
@@ -167,7 +94,7 @@ export class Hdwallet {
                 
         let responseMsg = new OnetimeKeyResponse({transactionId:request.transactionId, networkId:request.networkId, sender:this.companyName, onetimeKey: key});
         let msgString = JSON.stringify(responseMsg);
-        let signature = await this.simpleSigner.sign(msgString);
+        let signature = await this.signer.sign(msgString);
         let message = new Message({type: MessageType.OnetimeKeyResponse, payload: msgString, signature: signature});
 
         let fromPublicKey = await this.directoryProvider.getCompanyKey(this.companyName, "shhKey");
@@ -175,54 +102,5 @@ export class Hdwallet {
         //console.log("Sending response with key:", key);
         //console.log("Sending response for txnRef:", request.transactionId);
         await this.messageProvider.postMessage(fromPublicKey,toPublicKey,JSON.stringify(message));
-    }
-
-    private async processOnetimeKeyResponse(payload: string, fromAddress: string) {
-        let response = new OnetimeKeyResponse(JSON.parse(payload));
-        
-        //TODO: verify responder "fromAddress"
-
-        //console.log("Onetime key response received for txnRef:", response.transactionId, " from", response.sender);
-        //console.log("Response received:", response);
-        await this.storageProvider.storeOnetimeKeyMap(response.transactionId, response.networkId, [{partyName:response.sender, onetimeKey:response.onetimeKey}]);
-
-        let result = await this.storageProvider.readOnetimeKeyMap(response.transactionId, response.networkId);
-        //console.log("Result:",result);
-        //console.log("Result:",JSON.stringify(result));
-        
-        if(this.checkIfKeyMapHasAllKeys(result.partyKeyMap)) {
-            this.invokeCallback(response.transactionId, result);
-            this.unregisterCallback(response.transactionId);
-        }
-    }
-
-    private checkIfKeyMapHasAllKeys(keyMap: Array<{partyName:string,onetimeKey:OnetimeKey}>): boolean {
-        let hasAllKey = true;
-        for(let i = 0; i<keyMap.length;i++) {
-            let keyMapItem = keyMap[i];
-            if(keyMapItem && !keyMapItem.onetimeKey) {
-                hasAllKey = false;
-                break;
-            }
-        }
-        return hasAllKey;
-    }
-
-    private registerCallback(transactionId: string, callback: (response: any) => void) {
-        if (transactionId && callback)
-            this.callbackMap.set(transactionId, callback);
-    }
-
-    private unregisterCallback(transactionId: string) {
-        if (transactionId)
-            this.callbackMap.delete(transactionId);
-    }
-
-    private invokeCallback(transactionId: string, response: any) {
-        if (transactionId && this.callbackMap.has(transactionId)){
-            let callback = this.callbackMap.get(transactionId);
-            if(callback)
-                callback(response);
-        }
     }
 }

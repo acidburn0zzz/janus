@@ -1,0 +1,14 @@
+{
+    "Bob_comp": {
+        "shhKeyId": "396d5775779350461035babdbfa34f790ae8da75b7e8fad48ff40b0d2e87abb8",
+        "shhKey": "0x04a2a0520da254e6407a107b8cf3be5a1c277cdb13d18c1a5ec8ab191699506ad8ced79936660ac369e44d16edf0b073a645f4c73f79a407d3e9f48d8cb7c1073e"
+    },
+    "Alise_comp": {
+        "shhKeyId": "f5cda5e0d5d30fc60a5c8246a5c7f4e6051ab04453313bbfbbd5bf14012244ed",
+        "shhKey": "0x0481ae6ac639da04738159691fe11e29c5ccb46de74f1dcb5b99d208542d3ce213f3d89bc61473964e673ee3f71bea2884fc96d2e2a816fdd65bdd8193aa17c18c"
+    },
+    "Tom_comp": {
+        "shhKeyId": "3e4c23fe8dff15259b34e49448800225d9ed935e45c5b7b73d3e5b89d75f2b8f",
+        "shhKey": "0x04669fa543d8f6002ed68e15f581f4ad0aa8a34efe6c4088da100b553d6c91cd012da06681d862c62e513dcc82cfd93823eae6ae6a3734cf59ec702e761e7b60f7"
+    }
+}

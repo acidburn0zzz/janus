@@ -1,0 +1,183 @@
+swagger: '2.0'
+info:
+  version: "0.0.1"
+  title: Janus
+# during dev, should point to your local machine
+host: 0.0.0.0:10000
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /requestOnetimeKeys:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hdwallet-service
+    post:
+      summary: Request onetime keys from a list of parties for a transaction
+      # used as the method requestOnetimeKeys of the controller
+      operationId: requestOnetimeKeys
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Transaction reference and parties list for onetime keys request
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/RequestOTA"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ObjectResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /getOnetimeKeys:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hdwallet-service
+    post:
+      summary: Get the onetime keys, which was already requested with requestOnetimeKeys api for a transaction
+      # used as the method getOnetimeKeys of the controller
+      operationId: getOnetimeKeys
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Transaction reference to get onetime keys
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GetOTA"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ObjectResponse"
+            #type: string
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /signTransaction:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hdwallet-service
+    post:
+      summary: Signs the given transaction object with onetime key and return signed transaction object
+      # used as the method signTransaction of the controller
+      operationId: signTransaction
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: The transaction to sign with onetime key
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/TxRequest"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SignedTxResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /postTransaction:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hdwallet-service
+    post:
+      summary: Signs the given transaction object with onetime key and post to block chain
+      # used as the method postTransaction of the controller
+      operationId: postTransaction
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: The transaction to sign with onetime key and post
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/TxRequest"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ObjectResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  RequestOTA:
+    required:
+      - txnRef
+      - parties
+    properties:
+      txnRef:
+        type: string
+      networkId:
+        type: string
+      parties:
+        type: array
+        items:
+          type: string
+  GetOTA:
+    required:
+      - txnRef
+    properties:
+      txnRef:
+        type: string
+      networkId:
+        type: string
+  TxRequest:
+    required:
+      - txnRef
+      - txn
+    properties:
+      txnRef:
+        type: string
+      networkId:
+        type: string
+      txn:
+        type: object
+  # Response:
+  #   properties:
+  #     response:
+  #       res: object
+  SignedTxResponse:
+    properties:
+      signedTx:
+        type: string
+  ObjectResponse:
+    properties:
+      response:
+        type: object
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
