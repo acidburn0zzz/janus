@@ -1,5 +1,6 @@
 import ethers = require('ethers');
 var Tx = require('ethereumjs-tx');
+import { OnetimeKey } from "../common/models";
 
 export class Utils {
     public async verifySignature(message: string, signature: string): Promise<{isValid: boolean, signerAddress: string, error: string}>{
@@ -46,5 +47,25 @@ export class Utils {
         const mp = new Map;
         Object.keys(obj). forEach (k => { mp.set(k, obj[k]) });
         return mp;
+    }
+
+    public checkIfKeyMapHasAllKeys(keyMap: Array<{partyName:string,onetimeKey:OnetimeKey}>): boolean {
+        let hasAllKey = true;
+        for(let i = 0; i<keyMap.length;i++) {
+            let keyMapItem = keyMap[i];
+            if(keyMapItem && !keyMapItem.onetimeKey) {
+                hasAllKey = false;
+                break;
+            }
+        }
+        return hasAllKey;
+    }
+
+    public async sleep(ms) {
+        await this._sleep(ms);
+    }
+    
+    private _sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 }

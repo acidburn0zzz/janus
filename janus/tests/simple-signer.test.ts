@@ -46,7 +46,7 @@ describe('simple-signer tests', () => {
     });
 
     it('sign test message', async function () {        
-        let simpleSigner = new SimpleSigner(web3, privateKey);
+        let simpleSigner = new SimpleSigner(privateKey);
         let testMessage = "test message";
         assert.notEqual(simpleSigner,null,"SimpleSigner not created");
         let signature = await simpleSigner.sign(testMessage);

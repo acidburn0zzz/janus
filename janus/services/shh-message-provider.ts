@@ -1,4 +1,5 @@
 import { IMessageProvider } from "../interfaces/imessage-provider";
+import { IDirectoryProvider } from "../interfaces/idirectory-provider";
 var Web3 = require("web3");
 
 export class ShhMessageProvider implements IMessageProvider {
@@ -12,17 +13,20 @@ export class ShhMessageProvider implements IMessageProvider {
     private publicMessFilterId;
     private callback: (err, message) => void;
     
-    constructor(web3, ShhKeyId) {
-        var self = this;
-        this.web3 = web3;
+    public async init(directoryProvider, directoryKey) {
+        let companyName = process.env.COMPANY_NAME
+        let nodeUrl = process.env.NODE_URL;
+        this.web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl));
         this.shh = this.web3.shh;
-        //console.log("Shh version:", this.shh.version());
+        console.log("Shh version:", this.shh.version());
         
-        this.myPrvKeyId = ShhKeyId;
+        this.myPrvKeyId = await directoryProvider.getCompanyKey(companyName, directoryKey);
+        
+        console.log("myPrvKeyId", this.myPrvKeyId);
         if(!this.myPrvKeyId) {
-            this.myPrvKeyId = process.env["ShhKeyId"];
+            this.myPrvKeyId = process.env[directoryKey];
             if(!this.myPrvKeyId) {
-                //console.log("new key creates in message provider");
+                console.log("new key creates in message provider");
                 this.myPrvKeyId = this.shh.newKeyPair();
             }
         }
@@ -55,6 +59,7 @@ export class ShhMessageProvider implements IMessageProvider {
         //console.log("publicMessFilterId", this.publicMessFilterId);
     }
     private async onMessage(err, res) {
+        //console.log("In msg provider onMessage:",res);
         let message;
         if(!err) {
             let payload = this.web3.toAscii(res["payload"]);
@@ -84,7 +89,7 @@ export class ShhMessageProvider implements IMessageProvider {
     }
 
     public async postMessage(from:string, to:string, message:string){
-        //console.log("Posting message:", message);
+        console.log("Posting message:", message);
         //console.log("Posting message to:", to, ", from:", from);
         if(to) {
             this.shh.post({
@@ -111,3 +116,4 @@ export class ShhMessageProvider implements IMessageProvider {
         this.callback = callback;
     }
 }
+export default ShhMessageProvider;

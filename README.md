@@ -18,8 +18,9 @@ Change to top level directory
 docker build -f janusexample.dockerfile -t janus-client .
 
 4. Configure janus-example:
+Change to ./example/janus-docker-Nnodes/JNnodes directory
 
-Change to ./example/janus-client/JNnodes directory
+Node: quorum nodes should be running now, in order to proceed with the below steps
 
 Edit the `ips` variable in *setup.sh* to list two or more IP addresses on the Docker network that will host hdwallet services:
 ips=("10.0.0.2" "10.0.0.3" "10.0.0.4")
@@ -37,10 +38,28 @@ Edit janusconfig.json file in each of the jdata_* folder to specify unique mnemo
 
 5. Start hdwallet services:
 
-Change to ./example/janus-client/JNnodes directory
+Change to ./example/janus-docker-Nnodes/JNnodes directory
 docker-compose up -d
 
 6. Running script
 
-#TODO:
-#Provide steps to run scripts that will request onetime keys, deploy a test contract and update its data.
+# To run scripts that request onetime keys, deploy a test contract and update its data.
+
+1. Request onetime key from first instance of janus.
+docker exec -it jnnodes_janus-service_1_1 node /janus-client/onetime_key_req.js --txnRef <txnRef> --parties <companyName1> <companyName2>
+Eg:
+docker exec -it jnnodes_janus-service_1_1 node /janus-client/onetime_key_req.js --txnRef 12345 --parties Bob_comp Tom_comp
+
+2. Deploy test contract from first instance of janus.
+docker exec -it jnnodes_janus-service_1_1 node /janus-client/deploy_test_contract.js --txnRef <txnRef> --p1 <OTA_for_company1> --p2 <OTA_for_company2>
+Eg:
+docker exec -it jnnodes_janus-service_1_1 node /janus-client/deploy_test_contract.js --txnRef 12345 --p1 0x54C57ae841886D815e054225b9075C87058F366c --p2 0x54C57ae841886D815e054225b9075C87058F366c
+
+3. Update test contract from second instance of janus.
+docker exec -it jnnodes_janus-service_2_1 node /janus-client/update_test_contract.js --txnRef <txnRef> --address <contractAddress> --value <int_value>
+Eg:
+docker exec -it jnnodes_janus-service_2_1 node /janus-client/update_test_contract.js --txnRef 12345 --address 0x8293c42e60dc2ca171657e899cc2f944404477a6 --value 112
+
+<!-- node onetime_key_req.js --txnRef 12345 --parties Bob_comp Tom_comp
+node deploy_test_contract.js --txnRef 12345 --p1 0x54C57ae841886D815e054225b9075C87058F366c --p2 0x54C57ae841886D815e054225b9075C87058F366c
+node update_test_contract.js --txnRef 12345 --address 0x8293c42e60dc2ca171657e899cc2f944404477a6 --value 8 -->

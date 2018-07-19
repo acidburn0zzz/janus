@@ -20,14 +20,14 @@ export class FileDirectoryProvider implements IDirectoryProvider {
         if(fs.existsSync(directoryFilePath)) {
             contents = fs.readFileSync(directoryFilePath, 'utf8');
         }
-        console.log("contents", contents);
+        //console.log("contents", contents);
         if(contents) {
             const fileEntries = JSON.parse(contents);            
             Object.keys(fileEntries).forEach(key => {
                 this.keyMap.set(key, utils.objToMap(fileEntries[key]));
             });
         }
-        console.log("keyMap", this.keyMap);
+        //console.log("keyMap", this.keyMap);
     }
 
     public async addCompanyKey(companyName:string, keyName:string, key:string) {
@@ -56,3 +56,4 @@ export class FileDirectoryProvider implements IDirectoryProvider {
         return null;
     }
 }
+export default FileDirectoryProvider;
