@@ -1,5 +1,7 @@
 import { ISmartContractService } from "../interfaces/ismart-contract-service";
 var Web3 = require("web3");
+import { Utils } from "../services/utils";
+const utils = new Utils();
 
 export class SmartContractService implements ISmartContractService {
     private web3;
@@ -9,16 +11,16 @@ export class SmartContractService implements ISmartContractService {
     }
 
     public async verifyAccount(address: string, companyName: string): Promise<{status: boolean, error: string}> {
+        //Implement the custom verification logic here
+        
         return {status: true, error: ""};
     }
 
     public async getTransactionReceipt(txnHash, interval) {
         let attempt = 1;
         let maxAttent = 10;
-        var transactionReceiptAsync;
-        interval = interval ? interval : 500;
-        
-        return await this.transactionReceiptAsync(txnHash, interval, attempt, maxAttent);
+        let defaultInterval = 500;
+        return await this.transactionReceiptAsync(txnHash, interval || defaultInterval, attempt, maxAttent);
     };
 
     private async transactionReceiptAsync(txnHash, interval, attempt, maxAttent) {
@@ -29,11 +31,10 @@ export class SmartContractService implements ISmartContractService {
             attempt = attempt+1;
             if(attempt > maxAttent) {
                 console.log("Stopping");
-                return {error: "Failed to get receipt"}
+                receipt = {error: "Failed to get receipt"}
             } else {
-                setTimeout(async () => {
-                    receipt = await this.transactionReceiptAsync(txnHash, interval, attempt, maxAttent);
-                }, interval);
+                await utils.sleep(interval);
+                receipt = await this.transactionReceiptAsync(txnHash, interval, attempt, maxAttent);                
             }
         } 
         return receipt;

@@ -40,8 +40,8 @@ export class Janus {
         if(this.nodeUrl)
             this.web3 = new Web3(new Web3.providers.HttpProvider(this.nodeUrl));
             
-        //if(!this.web3)
-            //TODO: throw error
+        if(!this.web3)
+            throw "Web3 instance is null";
 
         this.smartContractService = new SmartContractService(this.web3);
         
