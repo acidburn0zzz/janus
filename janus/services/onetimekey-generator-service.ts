@@ -17,7 +17,7 @@ export class OnetimeKeyGeneratorService {
     }
     
     public async getOnetimeKey(txnRef: string, networkId: string): Promise<OnetimeKey> {
-        let onetimeKeyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId);
+        let onetimeKeyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId, true);
         
         if(onetimeKeyData) 
             return {networkId: onetimeKeyData.networkId, address: onetimeKeyData.onetimeAddress, publicKey: onetimeKeyData.onetimePublicKey};
@@ -28,7 +28,7 @@ export class OnetimeKeyGeneratorService {
     public async signTransaction(txnRef: string, networkId: string, txn: any, web3): Promise<{signedTx: string, signedTxObj: any, rawTx: any}> {
         let signedTx;
         let txnObj;
-        let keyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId);
+        let keyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId, false);
         
         if(keyData && txn) {
             let wallet = walletObject.fromMnemonic(this.mnemonics, keyData.derivedPath);
@@ -47,7 +47,7 @@ export class OnetimeKeyGeneratorService {
 
     public async signMessage(txnRef: string, networkId: string, message: string): Promise<string> {
         let signature;
-        let keyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId);
+        let keyData = await this.createOrGetOnetimeKeyFromStorage(txnRef, networkId, false);
         if(keyData) {
             var wallet = walletObject.fromMnemonic(this.mnemonics, keyData.derivedPath);
             signature = wallet.signMessage(message);
@@ -55,9 +55,9 @@ export class OnetimeKeyGeneratorService {
         return signature;
     }
 
-    private async createOrGetOnetimeKeyFromStorage(txnRef: string, networkId: string) {
+    private async createOrGetOnetimeKeyFromStorage(txnRef: string, networkId: string, canCreate: boolean) {
         let result = await this.walletCache.readOnetimeKeyPath(txnRef, networkId);
-        if(!result) {
+        if(!result && canCreate) {
             let walletPath: string = this.getNextAddressPath();
             //Create a new wallet object from a given mnemonic.
             var wallet = walletObject.fromMnemonic(this.mnemonics, walletPath);

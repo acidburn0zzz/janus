@@ -34,11 +34,11 @@ export class Utils {
         if (txn["gasPrice"])
             rawTx["gasPrice"] = ethers.utils.hexlify(txn["gasPrice"]);
         else
-            rawTx["gasPrice"] = "0x0";
+            rawTx["gasPrice"] = "0x00";
         if (txn["data"])
             rawTx["data"] = txn["data"];
         if (txn["chainId"])
-            rawTx["chainId"] = ethers.Utils.hexlify(txn["chainId"]);
+            rawTx["chainId"] = ethers.utils.hexlify(txn["chainId"]);
         
         return new Tx(rawTx);
     }

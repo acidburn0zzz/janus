@@ -1,9 +1,6 @@
-import { OnetimeKeyGeneratorService } from "../services/onetimekey-generator-service"
-import { FileStorageProvider } from "../services/file-storage-provider"
-import * as model from "../common/models" 
+import { SmartContractService } from "../services/smart-contract-service"
 import * as mocha from 'mocha'
 import * as chai from 'chai'
-import { Guid } from "guid-typescript";
 
 var assert = require('assert');
 const expect = chai.expect;
@@ -31,12 +28,8 @@ var mochaAsyncBeforeHook = (fn) => {
     };
 };
 
-describe('Hdwallet tests', () => {
-    var agentSevice;
-    let companyName = "Mercuria";
-    let nodeUrl = "http://localhost:22001";
-    let networkId = "1";
-
+describe('smart-contract-service tests', () => {
+    
     before(function () {
         this.timeout(0);
         var fn = mochaAsyncBeforeHook(async () => {
@@ -45,9 +38,14 @@ describe('Hdwallet tests', () => {
         return fn();
     });
 
-    // it('Get Onetime keys', async function () {
-    //     this.timeout(0);
-    //     //console.log("Get Onetime keys");
-    // });
+    it('verify Account', async function () {
+        this.timeout(0);
+        let smartContractService = new SmartContractService(null);
+        let result = await smartContractService.verifyAccount("0x54C57ae841886D815e054225b9075C87058F366c", "company1");
+        
+        assert.notEqual(result,null,"failed to verify account");
+        assert.equal(result.status,true,"address not valid");
+        assert.equal(result.error,"",result.error);
+    });
 
 });

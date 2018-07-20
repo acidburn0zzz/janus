@@ -32,10 +32,10 @@ export class Hdwallet {
         this.signer = signer;
         this.web3 = web3;
                    
-        //if(!this.web3)
-            //TODO: throw error
+        if(!this.web3)
+            throw "Web3 instance is null";
 
-        //this.smartContractService = new SmartContractService(this.web3);
+        this.smartContractService = new SmartContractService(this.web3);
         
         if(this.mnemonics)
             this.onetimeKeyGenerator = new OnetimeKeyGeneratorService(this.mnemonics, this.storageProvider);
@@ -87,8 +87,11 @@ export class Hdwallet {
 
         let request = new OnetimeKeyRequest(JSON.parse(payload));
         
-        //TODO: verify requester "fromAddress"
-        
+        //verify requester "fromAddress"
+        let verifyResult = await this.smartContractService.verifyAccount(fromAddress, request.sender);
+        if(!verifyResult.status) //invalid request
+            return;
+
         //console.log("Onetime key request received for txnRef:", request.transactionId, " from", request.sender);
         let key: OnetimeKey = await this.onetimeKeyGenerator.getOnetimeKey(request.transactionId, request.networkId);
                 
