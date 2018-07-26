@@ -29,7 +29,7 @@ Edit the `nodeIps` variable in *setup.sh* to list IP addresses on which node is 
 nodeIps=("10.0.0.11" "10.0.0.12" "10.0.0.13")
 
 Edit the `companyNames` variables in *setup.sh* to list the company names corresponding to hdwallet configured above.
-companyNames=("Bob_comp" "Alise_comp" "Tom Comp")
+companyNames=("Bob_comp" "Alise_comp" "Tom_comp")
 
 Run setup file in terminal window
 ./setup.sh
@@ -56,9 +56,9 @@ Eg:
 docker exec -it jnnodes_janus-service_1_1 node /janus-client/deploy_test_contract.js --txnRef 12345 --p1 0x54C57ae841886D815e054225b9075C87058F366c --p2 0x54C57ae841886D815e054225b9075C87058F366c
 
 3. Update test contract from second instance of janus.
-docker exec -it jnnodes_janus-service_2_1 node /janus-client/update_test_contract.js --txnRef <txnRef> --address <contractAddress> --value <int_value>
+docker exec -it jnnodes_janus-service_3_1 node /janus-client/update_test_contract.js --txnRef <txnRef> --address <contractAddress> --value <int_value>
 Eg:
-docker exec -it jnnodes_janus-service_2_1 node /janus-client/update_test_contract.js --txnRef 12345 --address 0x8293c42e60dc2ca171657e899cc2f944404477a6 --value 112
+docker exec -it jnnodes_janus-service_3_1 node /janus-client/update_test_contract.js --txnRef 12345 --address 0x8293c42e60dc2ca171657e899cc2f944404477a6 --value 112
 
 <!-- node onetime_key_req.js --txnRef 12345 --parties Bob_comp Tom_comp
 node deploy_test_contract.js --txnRef 12345 --p1 0x54C57ae841886D815e054225b9075C87058F366c --p2 0x54C57ae841886D815e054225b9075C87058F366c
