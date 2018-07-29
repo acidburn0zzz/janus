@@ -1,6 +1,8 @@
 import { IMessageProvider } from "../interfaces/imessage-provider";
 import { IDirectoryProvider } from "../interfaces/idirectory-provider";
 var Web3 = require("web3");
+var ethers = require('ethers');
+var fs = require('fs');
 
 export class ShhMessageProvider implements IMessageProvider {
     private web3;
@@ -13,21 +15,31 @@ export class ShhMessageProvider implements IMessageProvider {
     // private publicMessFilterId;
     private callback: (err, message) => void;
     
-    public async init(directoryProvider, directoryKey) {
+    public async init(directoryProvider, keyStorePath) {
         let companyName = process.env.COMPANY_NAME
         let nodeUrl = process.env.NODE_URL;
         this.web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl));
         this.shh = this.web3.shh;
         console.log("Shh version:", this.shh.version());
         
-        this.myPrvKeyId = await directoryProvider.getCompanyKey(companyName, directoryKey);
-        
-        console.log("myPrvKeyId", this.myPrvKeyId);
-        if(!this.myPrvKeyId) {
-            this.myPrvKeyId = process.env[directoryKey];
-            if(!this.myPrvKeyId) {
-                console.log("new key creates in message provider");
-                this.myPrvKeyId = this.shh.newKeyPair();
+        // this.myPrvKeyId = await directoryProvider.getCompanyKey(companyName, directoryKey);
+        // console.log("myPrvKeyId", this.myPrvKeyId);
+        // if(!this.myPrvKeyId) {
+        //     this.myPrvKeyId = process.env[directoryKey];
+        //     if(!this.myPrvKeyId) {
+        //         console.log("new key creates in message provider");
+        //         this.myPrvKeyId = this.shh.newKeyPair();
+        //     }
+        // }
+
+        let keyStorePwd = process.env["shhkeyPass"];
+        if(fs.existsSync(keyStorePath)) {
+            let contents = fs.readFileSync(keyStorePath, 'utf8');
+            if(contents) {
+                let wallet = await ethers.Wallet.fromEncryptedWallet(contents, keyStorePwd);
+                if(wallet) {
+                    this.myPrvKeyId = this.shh.addPrivateKey(wallet.privateKey);
+                }
             }
         }
 
