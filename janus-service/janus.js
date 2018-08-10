@@ -1,6 +1,6 @@
 'use strict';
 
-var janus = require("janus");
+var janus = require("eth-janus");
 //import {ContainerBuilder, YamlFileLoader} from 'node-dependency-injection'
 var ndi = require("node-dependency-injection");
 const utils = new janus.Utils();

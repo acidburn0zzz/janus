@@ -15,6 +15,7 @@ Follow steps from ./example/quorum-docker-Nnodes/Readme.md to setup and run quor
 cd example/quorum-docker-Nnodes
 docker build -t quorum .
 cd Nnodes
+./setup.sh
 docker-compose up -d
 cd ../../..
 ```
@@ -39,7 +40,7 @@ Edit the `nodeIps` variable in *setup.sh* to list IP addresses on which node is 
 nodeIps=("10.0.0.11" "10.0.0.12" "10.0.0.13")
 
 Edit the `companyNames` variables in *setup.sh* to list the company names corresponding to hdwallet configured above.
-companyNames=("Bob_comp" "Alise_comp" "Tom_comp")
+companyNames=("Bob_comp" "Alice_comp" "Tom_comp")
 
 Edit the `mnemonics` variable in setup.sh to list the HD Wallet mnemonics for the nodes 
 

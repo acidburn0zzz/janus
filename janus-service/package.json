@@ -1,23 +1,23 @@
 {
-  "name": "janus-service",
+  "name": "eth-janus-service",
   "version": "0.0.1",
-  "private": true,
-  "description": "New Swagger API Project",
+  "description": "Janus Indirection API Service",
   "keywords": [],
-  "author": "",
-  "license": "",
+  "author": "Mano Samy, Consensys",
+  "license": "MIT",
   "main": "app.js",
   "dependencies": {
+    "eth-janus": "0.0.1",
     "express": "^4.12.3",
     "guid-typescript": "^1.0.7",
-    "janus": "file:../janus",
     "node-dependency-injection": "^2.1.0",
     "swagger-express-mw": "^0.7.0",
-    "swagger-tools": "^0.10.3"
+    "swagger-tools": "^0.10.4"
   },
   "devDependencies": {
     "should": "^7.1.0",
-    "supertest": "^1.0.0"
+    "supertest": "^1.0.0",
+    "swagger": "^0.7.5"
   },
   "scripts": {
     "start": "node app.js",
