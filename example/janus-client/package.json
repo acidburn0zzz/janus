@@ -19,7 +19,7 @@
     "ethers": "^3.0.26",
     "guid-typescript": "^1.0.7",
     "janus": "file:../../janus",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.19",
     "web3": "^0.20.1"
   }
 }
